@@ -4,12 +4,12 @@ import uk.ac.cam.acr31.features.javac.proto.GraphProtos;
 
 import java.util.*;
 
-public class ASTHelper {
+public class ProtoGraphHelper {
 
     private Map<Long, Set<Long>> nodeIDsToEdgeIDs = new HashMap<>();
     private Map<Long, GraphProtos.FeatureNode> nodeIDsToFeatureNodes = new HashMap<>();
 
-    public ASTHelper(GraphProtos.Graph graph) {
+    public ProtoGraphHelper(GraphProtos.Graph graph) {
         graph.getNodeList().forEach(featureNode -> nodeIDsToFeatureNodes.put(featureNode.getId(), featureNode));
 
         graph.getNodeList().forEach(featureNode -> nodeIDsToEdgeIDs.put(featureNode.getId(), new HashSet<>()));

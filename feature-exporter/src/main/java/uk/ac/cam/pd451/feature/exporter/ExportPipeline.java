@@ -5,8 +5,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import org.apache.commons.cli.*;
 import uk.ac.cam.acr31.features.javac.proto.GraphProtos;
+import uk.ac.cam.pd451.feature.exporter.analysis.AndersenPointsToAnalysisExtractor;
+import uk.ac.cam.pd451.feature.exporter.neo4j.Neo4jConnector;
 
-public class ProtoImporter {
+public class ExportPipeline {
 
     public static void main(String[] args) throws IOException, ParseException {
         Options option = new Options();
@@ -18,15 +20,14 @@ public class ProtoImporter {
 
         try (FileInputStream fis = new FileInputStream(cmd.getOptionValue("input-file"))) {
             GraphProtos.Graph graph = GraphProtos.Graph.parseFrom(fis);
-            Neo4jConnector neo4jConnector = new Neo4jConnector();
-            neo4jConnector.loadGraph(graph);
+            System.out.println("Loading graph into Neo4J");
+            Neo4jConnector.getInstance().loadGraph(graph);
 
-            new ASTWalker(neo4jConnector).writeToCSV(
-                    new File(cmd.getOptionValue("output-file")),
-                    graph);
+            AndersenPointsToAnalysisExtractor extractor = new AndersenPointsToAnalysisExtractor();
+            extractor.extractAnalysis();
+            extractor.writeToCSV(new File(cmd.getOptionValue("output-file")));
 
-            neo4jConnector.closeConnections();
-
+            Neo4jConnector.getInstance().closeConnections();
         }
     }
 }

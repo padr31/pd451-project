@@ -1,4 +1,4 @@
-package uk.ac.cam.pd451.feature.exporter.relation;
+package uk.ac.cam.pd451.feature.exporter.analysis;
 
 import java.io.*;
 import java.util.HashSet;
@@ -28,9 +28,5 @@ public class Relation {
         try (PrintWriter pw = new PrintWriter(writer)) {
             this.entries.forEach(entry -> pw.println(entry.getCSVString()));
         }
-    }
-
-    public int getArity() {
-        return this.arity;
     }
 }

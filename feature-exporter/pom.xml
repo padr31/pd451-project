@@ -30,7 +30,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        uk.ac.cam.pd451.feature.exporter.ProtoImporter
+                                        uk.ac.cam.pd451.feature.exporter.ExportPipeline
                                     </mainClass>
                                 </manifest>
                             </archive>

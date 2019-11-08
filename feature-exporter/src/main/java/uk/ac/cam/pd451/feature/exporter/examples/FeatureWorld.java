@@ -1,4 +1,4 @@
-package uk.ac.cam.pd451.feature.exporter;
+package uk.ac.cam.pd451.feature.exporter.examples;
 
 import java.util.ArrayList;
 import java.util.List;
