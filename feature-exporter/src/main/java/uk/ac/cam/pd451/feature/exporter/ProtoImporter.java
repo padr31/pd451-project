@@ -20,11 +20,13 @@ public class ProtoImporter {
             GraphProtos.Graph graph = GraphProtos.Graph.parseFrom(fis);
             Neo4jConnector neo4jConnector = new Neo4jConnector();
             neo4jConnector.loadGraph(graph);
-            neo4jConnector.closeConnections();
 
-            new ASTWalker().writeToCSV(
+            new ASTWalker(neo4jConnector).writeToCSV(
                     new File(cmd.getOptionValue("output-file")),
                     graph);
+
+            neo4jConnector.closeConnections();
+
         }
     }
 }

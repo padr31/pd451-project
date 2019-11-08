@@ -1,6 +1,7 @@
 package uk.ac.cam.pd451.feature.exporter;
 
 import org.neo4j.ogm.config.Configuration;
+import org.neo4j.ogm.model.Result;
 import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
 import org.neo4j.ogm.transaction.Transaction;
@@ -77,5 +78,12 @@ public class Neo4jConnector {
         for(FeatureEdgePOJO featureEdgePOJO : featureEdgePOJOs) session.save(featureEdgePOJO);
 
         txn.commit();
+    }
+
+    public Result query(String query) {
+        Session session = sessionFactory.openSession();
+        Map<String, Object> params = new HashMap<>(1);
+        Result result = session.query(query, params);
+        return result;
     }
 }
