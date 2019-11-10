@@ -1,11 +1,8 @@
 package uk.ac.cam.pd451.feature.exporter.analysis;
 
 import org.neo4j.ogm.model.Result;
-import uk.ac.cam.acr31.features.javac.proto.GraphProtos;
-import uk.ac.cam.pd451.feature.exporter.neo4j.Neo4jConnector;
+import uk.ac.cam.pd451.feature.exporter.neo4j.ResultParseUtils;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,6 +12,27 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
     @Override
     public List<Relation> extractAnalysis() {
         List<Relation> extractedRelations = new ArrayList<>();
+
+        extractedRelations.add(((RelationExtractor) () -> {
+            Relation alloc = new Relation("ALLOC", 3);
+
+            Result result = neo4jConnector.query(
+                    "match (var) --> (eq) --> (new)\n" +
+                    "match (type) <-- (new_class) --> (new)\n" +
+                    "match (met) --> (met_name) --> (name) <-- (met_sig)\n" +
+                    "match p=shortestPath((met) -[*]-> (var)) where met.contents=\"METHOD\" and met_name.contents=\"NAME\" and name.type=\"IDENTIFIER_TOKEN\" and new.contents=\"NEW\" and eq.contents=\"EQ\" and var.type=\"IDENTIFIER_TOKEN\"  and new_class.contents=\"NEW_CLASS\" and type.type=\"TYPE\" and met_sig.type=\"SYMBOL_MTH\"\n" +
+                    "return var.contents as var, new.startLineNumber as heap, collect([met_sig.contents, toString(length(p))]) as inMeth, met_sig.type");
+
+            result.queryResults().forEach(resultEntry -> {
+                String inMeth = ResultParseUtils.getMinDistanceMethodName((List<String>[]) resultEntry.get("inMeth"));
+                alloc.addEntry(new RelationEntry(
+                        (String) resultEntry.get("var"),
+                        Long.toString((Long) resultEntry.get("heap")),
+                        ResultParseUtils.fromSgiToMeth(inMeth))
+                );
+            });
+            return alloc;
+        }).extractRelation());
 
         extractedRelations.add(((RelationExtractor) () -> {
             Relation move = new Relation("MOVE", 2);
@@ -29,20 +47,6 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
                 move.addEntry(new RelationEntry((String) resultEntry.get("to.contents"), (String) resultEntry.get("fro.contents")));
             });
             return move;
-        }).extractRelation());
-
-        extractedRelations.add(((RelationExtractor) () -> {
-            Relation alloc = new Relation("ALLOC", 3);
-            Result result = neo4jConnector.query("match (var) --> (eq) --> (new)\n" +
-                    "match (type) --> (new_class) --> (new)\n" +
-                    "match shortestPath( (method {contents: \"METHOD\"})-[*]->(new))\n" +
-                    "match (method_name) --> (method)\n" +
-                    "where new.contents=\"NEW\" and eq.contents=\"EQ\" and var.type=\"IDENTIFIER_TOKEN\"  and new_class.contents=\"NEW_CLASS\" and type.type=\"SYMBOL_MTH\" and method_name.type=\"SYMBOL_MTH\"\n" +
-                    "return var.contents, type.contents, method_name.contents, new.startLineNumber");
-            result.queryResults().forEach(resultEntry -> {
-                alloc.addEntry(new RelationEntry((String) resultEntry.get("var.contents"), Long.toString((Long) resultEntry.get("new.startLineNumber")), (String) resultEntry.get("method_name.contents")));
-            });
-            return alloc;
         }).extractRelation());
 
         extractedRelations.add(((RelationExtractor) () -> {
@@ -85,14 +89,17 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
         extractedRelations.add(((RelationExtractor) () -> {
             Relation formalArg = new Relation("FORMALARG", 3);
             Result result = neo4jConnector.query("match (method) --> (method_name)\n" +
-                    "    match (method) --> (parameters) --> (variable) --> (name)\n" +
-                    "    where method.contents=\"METHOD\" and method_name.type=\"IDENTIFIER_TOKEN\" and parameters.contents=\"PARAMETERS\" and variable.contents=\"VARIABLE\" and name.type=\"IDENTIFIER_TOKEN\"\n" +
-                    "            return method_name.contents as method, collect(name.contents) as arguments");
+                    "match (method) --> (parameters) --> (variable) --> (name)\n" +
+                    "where method.contents=\"METHOD\" and method_name.type=\"IDENTIFIER_TOKEN\" and parameters.contents=\"PARAMETERS\" and variable.contents=\"VARIABLE\" and name.type=\"IDENTIFIER_TOKEN\"\n" +
+                    "return method_name.contents as method, collect([name.contents, toString(name.startLineNumber), toString(name.startPosition)]) as arguments");
             result.queryResults().forEach(resultEntry -> {
+
                 String method = (String) resultEntry.get("method");
-                List<String> args = Arrays.asList((String[]) resultEntry.get("arguments"));
+                List<String> args = ResultParseUtils.getOrderedArguments((List<String>[]) resultEntry.get("arguments"));
+                int i = 0;
                 for (String arg : args) {
-                    formalArg.addEntry(new RelationEntry(method, Integer.toString(args.size()-args.indexOf(arg)), arg));
+                    i++;
+                    formalArg.addEntry(new RelationEntry(method, Integer.toString(i), arg));
                 }
             });
             return formalArg;
@@ -172,18 +179,13 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
                     "match p=shortestPath((body) -[*]-> (base)) where in_method.type=\"SYMBOL_MTH\" and met.contents=\"METHOD\" and body.contents=\"BODY\"\n" +
                     "return base.contents, meth_sym.contents, meth_invoc.startLineNumber, collect([in_method.contents, toString(length(p))]) as methods");
             result.queryResults().forEach(resultEntry -> {
-                Object[] methods = (Object[]) resultEntry.get("methods");
-                int min = Integer.MAX_VALUE;
-                String inMethod = "";
-                for(Object o : methods) {
-                    List<String> l = (List<String>) o;
-                    int len = Integer.parseInt(l.get(1));
-                    if(len < min) {
-                        min = len;
-                        inMethod = l.get(0);
-                    }
-                }
-                vcall.addEntry(new RelationEntry((String) resultEntry.get("base.contents"), (String) resultEntry.get("meth_sym.contents"), Long.toString((Long)resultEntry.get("meth_invoc.startLineNumber")), inMethod));
+                String inMethod = ResultParseUtils.getMinDistanceMethodName((List<String>[]) resultEntry.get("methods"));
+                vcall.addEntry(
+                        new RelationEntry((String) resultEntry.get("base.contents"),
+                        (String) resultEntry.get("meth_sym.contents"),
+                        Long.toString((Long)resultEntry.get("meth_invoc.startLineNumber")),
+                        ResultParseUtils.fromSgiToMeth(inMethod))
+                );
             });
             return vcall;
         }).extractRelation());
