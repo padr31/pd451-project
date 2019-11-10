@@ -1,0 +1,28 @@
+alloc(X,Y,Z) :- csv3("/Users/padr/repos/pd451-project/feature-exporter/out/ALLOC.csv",X,Y,Z).
+move(X,Y) :- csv2("/Users/padr/repos/pd451-project/feature-exporter/out/MOVE.csv",X,Y).
+load(X,Y,Z) :- csv3("/Users/padr/repos/pd451-project/feature-exporter/out/LOAD.csv",X,Y,Z).
+store(X,Y,Z) :- csv3("/Users/padr/repos/pd451-project/feature-exporter/out/STORE.csv",X,Y,Z).
+vCall(X,Y,Z,W) :- csv4("/Users/padr/repos/pd451-project/feature-exporter/out/VCALL.csv",X,Y,Z,W).
+formalArg(X,Y,Z) :- csv3("/Users/padr/repos/pd451-project/feature-exporter/out/FORMALARG.csv",X,Y,Z).
+actualArg(X,Y,Z) :- csv3("/Users/padr/repos/pd451-project/feature-exporter/out/ACTUALARG.csv",X,Y,Z).
+formalReturn(X,Y) :- csv2("/Users/padr/repos/pd451-project/feature-exporter/out/FORMALRETURN.csv",X,Y).
+actualReturn(X,Y) :- csv2("/Users/padr/repos/pd451-project/feature-exporter/out/ACTUALRETURN.csv",X,Y).
+thisVar(X,Y) :- csv2("/Users/padr/repos/pd451-project/feature-exporter/out/THISVAR.csv",X,Y).
+heapType(X,Y) :- csv2("/Users/padr/repos/pd451-project/feature-exporter/out/HEAPTYPE.csv",X,Y).
+lookup(X,Y,Z) :- csv3("/Users/padr/repos/pd451-project/feature-exporter/out/LOOKUP.csv",X,Y,Z).
+
+reachable("main").
+reachable("main(java.lang.String[])").
+
+varPointsTo(Var, Heap) :- reachable(Meth), alloc(Var, Heap, Meth).
+varPointsTo(To, Heap) :- move(To, From), varPointsTo(From, Heap).
+fldPointsTo(BaseH, Fld, Heap) :- store(Base, Fld, From), varPointsTo(From, Heap), varPointsTo(Base, BaseH).
+varPointsTo(To, Heap) :- load(To, Base, Fld), varPointsTo(Base, BaseH), fldPointsTo(BaseH, Fld, Heap).
+reachable(ToMeth) :- vCall(Base, Sig, Invo, InMeth), reachable(InMeth), varPointsTo(Base, Heap), heapType(Heap, HeapT), lookup(HeapT, Sig, ToMeth), thisVar(ToMeth, This).
+varPointsTo(This, Heap) :- vCall(Base, Sig, Invo, InMeth), reachable(InMeth), varPointsTo(Base, Heap), heapType(Heap, HeapT), lookup(HeapT, Sig, ToMeth), thisVar(ToMeth, This).
+callGraph(Invo, ToMeth) :- vCall(Base, Sig, Invo, InMeth), reachable(InMeth), varPointsTo(Base, Heap), heapType(Heap, HeapT), lookup(HeapT, Sig, ToMeth), thisVar(ToMeth, This).
+interProcAssign(To, From) :- callGraph(Invo, Meth), formalArg(Meth, N, To), actualArg(Invo, N, From).
+interProcAssign(To, From) :- callGraph(Invo, Meth), formalReturn(Meth, From), actualReturn(Invo, To).
+varPointsTo(To, Heap) :- interProcAssign(To, From), varPointsTo(From, Heap).
+
+?- varPointsTo(X,Y).
