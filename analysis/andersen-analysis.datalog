@@ -13,6 +13,8 @@ lookup(X,Y,Z) :- csv3("/Users/padr/repos/pd451-project/feature-exporter/out/LOOK
 
 reachable("main").
 reachable("main(java.lang.String[])").
+reachable("uk.ac.cam.pd451.feature.exporter.FeatureWorld.main").
+reachable("uk.ac.cam.pd451.feature.exporter.FeatureWorld.main(java.lang.String[])").
 
 varPointsTo(Var, Heap) :- reachable(Meth), alloc(Var, Heap, Meth).
 varPointsTo(To, Heap) :- move(To, From), varPointsTo(From, Heap).
