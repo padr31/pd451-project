@@ -29,7 +29,7 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
                 alloc.addEntry(new RelationEntry(
                         (String) resultEntry.get("decl_var.contents"),
                         Long.toString((Long) resultEntry.get("heap")),
-                        ResultParseUtils.fromSgiToMeth(inMeth))
+                        inMeth)
                 );
             });
             return alloc;
@@ -89,9 +89,9 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
         extractedRelations.add(((RelationExtractor) () -> {
             Relation formalArg = new Relation("FORMALARG", 3);
             Result result = neo4jConnector.query("match (method) --> (name1) --> (method_name) <-- (decl_meth)\n" +
-                    "match (method) --> (parameters) --> (variable) --> (name2) --> (par_name)\n" +
-                    "where method.contents=\"METHOD\" and method_name.type=\"IDENTIFIER_TOKEN\" and parameters.contents=\"PARAMETERS\" and variable.contents=\"VARIABLE\" and par_name.type=\"IDENTIFIER_TOKEN\" and name1.contents=\"NAME\" and name2.contents=\"NAME\" and decl_meth.type=\"SYMBOL_MTH\"\n" +
-                    "return decl_meth.contents as method, collect([par_name.contents, toString(par_name.startLineNumber), toString(par_name.startPosition)]) as arguments");
+                    "match (method) --> (parameters) --> (variable) --> (name2) --> (par_name) <-- (decl_par)\n" +
+                    "where method.contents=\"METHOD\" and method_name.type=\"IDENTIFIER_TOKEN\" and parameters.contents=\"PARAMETERS\" and variable.contents=\"VARIABLE\" and par_name.type=\"IDENTIFIER_TOKEN\" and name1.contents=\"NAME\" and name2.contents=\"NAME\" and decl_meth.type=\"SYMBOL_MTH\" and decl_par.type=\"SYMBOL_VAR\"\n" +
+                    "return decl_meth.contents as method, collect([decl_par.contents, toString(par_name.startLineNumber), toString(par_name.startPosition)]) as arguments");
             result.queryResults().forEach(resultEntry -> {
 
                 String method = (String) resultEntry.get("method");
@@ -195,6 +195,17 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
                 );
             });
             return vcall;
+        }).extractRelation());
+
+        extractedRelations.add(((RelationExtractor) () -> {
+            Relation reachable = new Relation("REACHABLE", 1);
+            Result result = neo4jConnector.query("match (decl_meth) where decl_meth.type=\"SYMBOL_MTH\" and decl_meth.contents CONTAINS \"main\" return decl_meth.contents\n");
+            result.queryResults().forEach(resultEntry -> {
+                reachable.addEntry(
+                        new RelationEntry((String) resultEntry.get("decl_meth.contents"))
+                );
+            });
+            return reachable;
         }).extractRelation());
 
         this.relations = extractedRelations;

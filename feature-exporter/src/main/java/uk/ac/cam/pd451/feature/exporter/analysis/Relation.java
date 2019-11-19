@@ -24,7 +24,7 @@ public class Relation {
     public void writeToCSV(File dir) throws IOException {
         if(!dir.exists()) dir.mkdir();
         File csvOutputFile = new File(dir.getAbsolutePath() + File.separator + this.name + ".csv");
-        FileWriter writer = new FileWriter(csvOutputFile, false);
+        FileWriter writer = new FileWriter(csvOutputFile, true);
         try (PrintWriter pw = new PrintWriter(writer)) {
             this.entries.forEach(entry -> pw.println(entry.getCSVString()));
         }
