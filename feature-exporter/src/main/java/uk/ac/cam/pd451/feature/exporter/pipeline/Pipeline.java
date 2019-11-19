@@ -1,17 +1,18 @@
 package uk.ac.cam.pd451.feature.exporter.pipeline;
 
-public class Pipeline<I,O> {
-    private final Pipe<I, O> current;
+public class Pipeline<I,O> implements Step<I,O> {
+    private final Step<I, O> currentStep;
 
-    private Pipeline(Pipe<I, O> current) {
-        this.current = current;
+    public Pipeline(Step<I, O> initialStep) {
+        this.currentStep = initialStep;
     }
 
-    private <NewO> Pipeline<I, NewO> pipe(Pipe<O, NewO> next) {
-        return new Pipeline<>(input -> next.process(current.process(input)));
+    public <NewO> Pipeline<I, NewO> addStep(Step<O, NewO> nextStep) {
+        return new Pipeline<>(input -> nextStep.process(currentStep.process(input)));
     }
 
-    public O execute(I input) throws Pipe.PipeException {
-        return current.process(input);
+    @Override
+    public O process(I input) throws PipeException {
+        return currentStep.process(input);
     }
 }

@@ -1,12 +1,10 @@
 package uk.ac.cam.pd451.feature.exporter;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import org.apache.commons.cli.*;
-import uk.ac.cam.acr31.features.javac.proto.GraphProtos;
-import uk.ac.cam.pd451.feature.exporter.analysis.AndersenPointsToAnalysisExtractor;
-import uk.ac.cam.pd451.feature.exporter.neo4j.Neo4jConnector;
+import uk.ac.cam.pd451.feature.exporter.pipeline.CompilerStep;
+import uk.ac.cam.pd451.feature.exporter.pipeline.ExtractorStep;
+import uk.ac.cam.pd451.feature.exporter.pipeline.Pipeline;
 
 public class ExportPipeline {
 
@@ -17,7 +15,13 @@ public class ExportPipeline {
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(option, args);
 
+        Pipeline compilationAndExtractionPipeline = new Pipeline<>(
+                new CompilerStep()
+        ).addStep(new ExtractorStep());
+        compilationAndExtractionPipeline.process(new CompilerStep.CompilerPipeInput(cmd.getOptionValue("input-file"),cmd.getOptionValue("input-file") + "/target"));
 
+
+        /**
         try (FileInputStream fis = new FileInputStream(cmd.getOptionValue("input-file"))) {
             GraphProtos.Graph graph = GraphProtos.Graph.parseFrom(fis);
             System.out.println("Loading graph into Neo4J");
@@ -28,6 +32,6 @@ public class ExportPipeline {
             extractor.writeToCSV(new File(cmd.getOptionValue("output-file")));
 
             Neo4jConnector.getInstance().closeConnections();
-        }
+        }**/
     }
 }

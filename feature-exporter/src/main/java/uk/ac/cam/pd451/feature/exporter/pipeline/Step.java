@@ -1,6 +1,6 @@
 package uk.ac.cam.pd451.feature.exporter.pipeline;
 
-public interface Pipe<I, O> {
+public interface Step<I, O> {
 
     O process(I input) throws PipeException;
 
