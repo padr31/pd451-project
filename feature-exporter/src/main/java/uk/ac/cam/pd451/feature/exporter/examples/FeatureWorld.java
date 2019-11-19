@@ -11,7 +11,7 @@ public class FeatureWorld {
 
     public FeatureWorld(String name) {
         this.name = name;
-        features = new ArrayList<>(); // ALLOC(features, line-number, FeatureWorld-FeatureWorld()) //HEAPTYPE(line-number, ArrayList<>())
+        features = new ArrayList<>(); // ALLOC(features, line-number, ArrayList()) //HEAPTYPE(line-number, ArrayList<>())
     }
 
     //FORMALARG(changeFeatures, 1, f1), FORMALARG(changeFeatures, 2, f2), LOOKUP(FeatureWorld, changeFeatures(f1, f2), FeatureWorld-changeFeatures())
@@ -34,7 +34,12 @@ public class FeatureWorld {
         FeatureWorld featureWorld = new FeatureWorld("features");
         Feature f;
         f = new Feature(); //ALLOC(f, line-number, FeatureWorld-main) //HEAPTYPE(line-number, Feature())
-        featureWorld.changeFeatures(new Feature(), new Feature());
+        Feature f1 = new Feature();
+        featureWorld.changeFeatures(f, f1);
+
+        B beee = new B();
+        A a = new A();
+        a.doSomething(beee);
     }
 
     static class Feature {
@@ -48,7 +53,9 @@ public class FeatureWorld {
             //ACTUALARG(changeName-2, 1, f)
             changeName(f);
             this.name = f.name; //THISVAR(Feature-Feature(), Feature-Feature()-this)
-            this.name = getName(); //ACTUALRETURN(invoc-foo-x, x)
+            name = this.getName(); //ACTUALRETURN(line-number, x)
+            this.name = getName();
+            this.name = this.getName();
         }
 
         //FORMALARG(changeName, 1, f)
@@ -63,6 +70,15 @@ public class FeatureWorld {
 
         public String getName() {
             return name; //FORMALRETURN(getName, name)
+        }
+
+        public String getString() {
+            this.name = "name";
+            if(false) {
+                return "false";
+            } else {
+                return this.name; //FORMALRETURN(getName, name)
+            }
         }
     }
 }

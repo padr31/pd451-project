@@ -20,10 +20,6 @@ public class ResultParseUtils {
         return minMethod;
     }
 
-    public static String fromSgiToMeth(String sig) {
-        return sig.substring(0, sig.indexOf("("));
-    }
-
     public static List<String> getOrderedArguments(List<String>[] arguments) {
         Arrays.sort(arguments, (arg1, arg2) -> {
             int lineDiff = Integer.parseInt(arg1.get(1)) - Integer.parseInt(arg2.get(1));
