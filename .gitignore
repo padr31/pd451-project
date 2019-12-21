@@ -5,3 +5,5 @@ feature-exporter/target/
 features-javac/
 exalog/
 vanillalog/
+.DS_Store
+*.class
