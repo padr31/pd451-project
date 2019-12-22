@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class VariableElimination implements InferenceAlgorithm {
 
@@ -16,13 +17,21 @@ public class VariableElimination implements InferenceAlgorithm {
     }
 
     @Override
-    public Factor infer(Assignment events, Assignment evidence) {
+    public double infer(Assignment events, Assignment evidence) {
         this.setEvidence(evidence);
         return this.infer(events);
     }
 
     @Override
-    public Factor infer(Assignment events) {
+    public double infer(Assignment events) {
+        // check if evidence entails or contradicts
+        if(evidence.contains(events)) {
+            return 1.0;
+        } else if(events.contradicts(evidence)) {
+            return 0.0;
+        }
+
+        // else perform variable elimination
         List<Variable> order = model.topologicalOrdering();
         Collections.reverse(order);
 
@@ -30,7 +39,7 @@ public class VariableElimination implements InferenceAlgorithm {
         for (Variable v : order) {
             factors.add(v.getParentalFactor());
 
-            // don't sum out if variable is evidence or is of interest
+            // don't sum out if variable is being inferred or is evidence
             if (!events.contains(v) && !evidence.contains(v)) {
                 Factor temp = factors.get(0);
                 for (int i = 1; i < factors.size(); i++)
@@ -41,16 +50,24 @@ public class VariableElimination implements InferenceAlgorithm {
             }
         }
 
-        // Point wise product of all remaining factors.
+        // make product of all remaining factors
         Factor result = factors.get(0);
         for (int i = 1; i < factors.size(); i++)
             result = result.product(factors.get(i));
 
-        // Normalize the result factor
-        result.normalise();
+        // no evidence to incorporate, return P(events)
+        if(evidence.events.isEmpty()) {
+            return result.get(events);
+        }
 
-        // Return the result matching the query in string format.
-        return result;
+        // calculate P(evidence) from P(events, evidence) by elimination events
+        Factor onlyEvidence = result;
+        for(Variable v : events.events.stream().map(Event::getVariable).collect(Collectors.toList())) {
+            onlyEvidence = onlyEvidence.eliminate(v);
+        }
+
+        // incorporate evidence using P(events|evidence) = P(events,evidence)/P(evidence)
+        return result.get(events.combineWith(evidence))/onlyEvidence.get(evidence);
     }
 
     @Override

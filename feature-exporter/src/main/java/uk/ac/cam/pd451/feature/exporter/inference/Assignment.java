@@ -1,9 +1,6 @@
 package uk.ac.cam.pd451.feature.exporter.inference;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Assignment {
@@ -59,6 +56,19 @@ public class Assignment {
         return true;
     }
 
+    public boolean contradicts(Assignment evidence) {
+        Map<String, Event> m = new HashMap<>();
+        this.events.forEach(e -> m.put(e.getVariable().getName(), e));
+        for(Event e : evidence.events) {
+            String varName = e.getVariable().getName();
+            if (
+                m.containsKey(varName) &&
+                m.get(e.getVariable().getName()).getValue() != e.getValue()
+            ) return true;
+        }
+        return false;
+    }
+
     public Assignment remove(Variable v) {
         return new Assignment(events
                 .stream()
@@ -82,4 +92,14 @@ public class Assignment {
         return ret;
     }
 
+    /**
+     * If the evidence contains
+     * @param evidence
+     * @return
+     */
+    public Assignment combineWith(Assignment evidence) {
+        List<Event> eventsAndEvidence = new ArrayList<>(this.events);
+        eventsAndEvidence.addAll(evidence.events);
+        return new Assignment(eventsAndEvidence);
+    }
 }

@@ -15,6 +15,9 @@ class VariableEliminationTest {
     private static FactorGraph fg;
     private static Variable grade;
     private static Variable intelligence;
+    private static Variable sat;
+    private static Variable difficulty;
+    private static Variable letter;
 
     /**
      * DIFFICULTY   INTELLIGENCE
@@ -29,11 +32,11 @@ class VariableEliminationTest {
         Set<Integer> binaryDomain = Set.of(0,1);
         Set<Integer> gradesDomain = Set.of(1,2,3);
 
-        Variable difficulty = new Variable("difficulty", binaryDomain);
+        difficulty = new Variable("difficulty", binaryDomain);
         intelligence = new Variable("intelligence", binaryDomain);
         grade = new Variable("grade", gradesDomain);
-        Variable sat = new Variable("sat", binaryDomain);
-        Variable letter = new Variable("letter", binaryDomain);
+        sat = new Variable("sat", binaryDomain);
+        letter = new Variable("letter", binaryDomain);
 
         Map<Assignment, Double> dmap = Map.of(
             new Assignment(List.of(new Event(difficulty, 0))), 0.6,
@@ -95,17 +98,71 @@ class VariableEliminationTest {
         sat.addParent(intelligence);
         letter.addParent(grade);
 
-        fg = new FactorGraph(List.of(difficulty, intelligence, grade, sat,letter));
+        fg = new FactorGraph(List.of(difficulty, intelligence, grade, sat, letter));
     }
 
     @Test
     void testVariableElimination() {
         uut = new VariableElimination();
         uut.setModel(fg);
-        //TODO incorporate evidence when getting result
-        // uut.setEvidence(new Assignment(List.of(new Event(intelligence, 0))));
+
         Assignment question = new Assignment(List.of(new Event(grade, 1)));
-        Factor result = uut.infer(question);
-        assertEquals(0.362, result.get(question));
+        double result = uut.infer(question);
+        assertEquals(0.362, result);
+
+        Assignment question2 = new Assignment(List.of(new Event(grade, 2)));
+        double result2 = uut.infer(question2);
+        assertEquals(0.28839999999999993, result2);
+
+        Assignment question3 = new Assignment(List.of(new Event(sat, 1)));
+        double result3 = uut.infer(question3);
+        assertEquals(0.27499999999999997, result3);
+
+        Assignment question4 = new Assignment(List.of(new Event(difficulty, 1)));
+        double result4 = uut.infer(question4);
+        assertEquals(0.4, result4);
+
+        Assignment question5 = new Assignment(List.of(new Event(intelligence, 0)));
+        double result5 = uut.infer(question5);
+        assertEquals(0.7, result5);
+
+        Assignment question6 = new Assignment(List.of(new Event(letter, 1)));
+        double result6 = uut.infer(question6);
+        assertEquals(0.5023360000000001, result6);
+    }
+
+    @Test
+    void testVariableEliminationWithEvidence() {
+        uut = new VariableElimination();
+        uut.setModel(fg);
+
+        uut.setEvidence(new Assignment(List.of(new Event(intelligence, 0))));
+        Assignment question = new Assignment(List.of(new Event(grade, 1)));
+        double result = uut.infer(question);
+        assertEquals(0.19999999999999998, result);
+
+        Assignment question2 = new Assignment(List.of(new Event(intelligence, 1)));
+        double result2 = uut.infer(question2);
+        assertEquals(0.0, result2);
+
+        Assignment question3 = new Assignment(List.of(new Event(intelligence, 0)));
+        double result3 = uut.infer(question3);
+        assertEquals(1.0, result3);
+
+        uut.setEvidence(new Assignment(List.of(new Event(intelligence, 0))));
+        Assignment question4 = new Assignment(List.of(new Event(grade, 2)));
+        double result4 = uut.infer(question4);
+        assertEquals(0.33999999999999997, result4);
+
+        uut.setEvidence(new Assignment(List.of(new Event(intelligence, 0))));
+        Assignment question5 = new Assignment(List.of(new Event(letter, 1)));
+        double result5 = uut.infer(question5);
+        assertEquals(0.38860000000000006, result5);
+
+        //TODO make sure letter
+        uut.setEvidence(new Assignment(List.of(new Event(intelligence, 0), new Event(letter, 1))));
+        Assignment question6 = new Assignment(List.of(new Event(grade, 1)));
+        double result6 = uut.infer(question6);
+        assertEquals(0.33999999999999997, result6);
     }
 }
