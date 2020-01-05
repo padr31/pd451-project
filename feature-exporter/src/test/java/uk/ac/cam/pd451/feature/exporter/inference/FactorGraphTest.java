@@ -2,8 +2,11 @@ package uk.ac.cam.pd451.feature.exporter.inference;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import uk.ac.cam.pd451.feature.exporter.graph.factor.FactorGraph;
+import uk.ac.cam.pd451.feature.exporter.graph.factor.FactorNode;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -36,21 +39,27 @@ class FactorGraphTest {
         sat = new Variable("sat", binaryDomain);
         letter = new Variable("letter", binaryDomain);
 
-        grade.addParent(difficulty);
-        grade.addParent(intelligence);
-        sat.addParent(intelligence);
-        letter.addParent(grade);
         //we don't set up any factors, only connections
+        FactorNode difficultyNode = new FactorNode(difficulty);
+        FactorNode intelligenceNode = new FactorNode(intelligence);
+        FactorNode gradeNode = new FactorNode(grade);
+        FactorNode satNode = new FactorNode(sat);
+        FactorNode letterNode = new FactorNode(letter);
 
-        uut = new FactorGraph(List.of(difficulty, intelligence, grade, sat,letter));
+        gradeNode.addParent(difficultyNode);
+        gradeNode.addParent(intelligenceNode);
+        satNode.addParent(intelligenceNode);
+        letterNode.addParent(gradeNode);
+
+        uut = new FactorGraph(List.of(difficultyNode, intelligenceNode, gradeNode, satNode, letterNode));
     }
     @Test
     void topologicalOrdering() {
-        List<Variable> order = uut.topologicalOrdering();
+        List<FactorNode> order = uut.topologicalOrdering();
 
         // there are multiple correct orderings
         // the expected one is due to the fact that we start with the node difficulty
         List<Variable> expectedOrder = List.of(intelligence, sat, difficulty, grade, letter);
-        assertEquals(expectedOrder, order);
+        assertEquals(expectedOrder, order.stream().map(FactorNode::getVariable).collect(Collectors.toList()));
     }
 }

@@ -1,12 +1,14 @@
 package uk.ac.cam.pd451.feature.exporter.inference;
 
+import uk.ac.cam.pd451.feature.exporter.graph.factor.FactorGraph;
+import uk.ac.cam.pd451.feature.exporter.graph.factor.FactorNode;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-public class VariableElimination implements InferenceAlgorithm {
+public class FactorEliminationInference implements InferenceAlgorithm<FactorGraph> {
 
     private FactorGraph model;
     private Assignment evidence = new Assignment(List.of());
@@ -22,7 +24,6 @@ public class VariableElimination implements InferenceAlgorithm {
         return this.infer(events);
     }
 
-    @Override
     public double infer(Assignment events) {
         // check if evidence entails or contradicts
         if(evidence.contains(events)) {
@@ -32,12 +33,13 @@ public class VariableElimination implements InferenceAlgorithm {
         }
 
         // else perform variable elimination
-        List<Variable> order = model.topologicalOrdering();
+        List<FactorNode> order = model.topologicalOrdering();
         Collections.reverse(order);
 
         List<Factor> factors = new ArrayList<Factor>();
-        for (Variable v : order) {
-            factors.add(v.getParentalFactor());
+        for (FactorNode n : order) {
+            Variable v = n.getVariable();
+            factors.add(n.getParentalFactor());
 
             // don't sum out if variable is being inferred or is evidence
             if (!events.contains(v) && !evidence.contains(v)) {

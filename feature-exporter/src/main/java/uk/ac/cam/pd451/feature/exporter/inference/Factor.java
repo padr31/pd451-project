@@ -1,6 +1,7 @@
 package uk.ac.cam.pd451.feature.exporter.inference;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Factor {
 
@@ -8,6 +9,7 @@ public class Factor {
     public Map<Assignment, Double> function;
 
     public Factor(List<Variable> variables, Map<Assignment, Double> function) {
+        // TODO make sure that variables reflects the actual variables contained in assignments, variables is redundant
         this.variables = variables;
         this.function = function;
     }
@@ -60,5 +62,11 @@ public class Factor {
     }
 
     public void normalise() {
+        double sum = this.function.values().stream().mapToDouble(d -> d).sum();
+        if(!(sum == 1.0 || sum == 0.0)) {
+            for(Assignment a: this.function.keySet()) {
+                this.function.put(a, function.get(a)/sum);
+            }
+        }
     }
 }

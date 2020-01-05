@@ -59,10 +59,6 @@ class FactorTest {
     }
 
     @Test
-    void get() {
-    }
-
-    @Test
     void eliminate() {
         Map<Assignment, Double> probs = new HashMap<>();
         probs.put(xy00, 0.2);
@@ -83,7 +79,7 @@ class FactorTest {
     }
 
     @Test
-    void product() {
+    void productTest1() {
         Map<Assignment, Double> probsXY = new HashMap<>();
         probsXY.put(xy00, 0.2);
         probsXY.put(xy01, 0.2);
@@ -120,5 +116,24 @@ class FactorTest {
 
         Factor fXYZ = fXY.product(fYZ);
         assertEquals(probsXYZ, fXYZ.function);
+    }
+
+    @Test
+    public void productTest2() {
+        Variable a = new Variable("a", Set.of(0, 1));
+        Variable b = new Variable("b", Set.of(0, 1));
+        Variable f = new Variable("f", Set.of(0, 1));
+
+        Map<Assignment, Double> amap = Map.of(
+                new Assignment(List.of(new Event(a, 0), new Event(b, 0), new Event(f, 0))), 0.997,
+                new Assignment(List.of(new Event(a, 1), new Event(b, 0), new Event(f, 0))), 0.003,
+                new Assignment(List.of(new Event(a, 0), new Event(b, 0), new Event(f, 1))), 0.8,
+                new Assignment(List.of(new Event(a, 1), new Event(b, 0), new Event(f, 1))), 0.2,
+                new Assignment(List.of(new Event(a, 0), new Event(b, 1), new Event(f, 0))), 0.01,
+                new Assignment(List.of(new Event(a, 1), new Event(b, 1), new Event(f, 0))), 0.99,
+                new Assignment(List.of(new Event(a, 0), new Event(b, 1), new Event(f, 1))), 0.008,
+                new Assignment(List.of(new Event(a, 1), new Event(b, 1), new Event(f, 1))), 0.992
+        );
+        Factor acpt = new Factor(List.of(a), amap);
     }
 }

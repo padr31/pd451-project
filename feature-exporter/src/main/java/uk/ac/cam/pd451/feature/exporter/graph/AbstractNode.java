@@ -27,7 +27,7 @@ public abstract class AbstractNode {
     @Override
     public boolean equals(Object obj) {
         if(!(obj instanceof AbstractNode)) return false;
-        return this.id == ((AbstractNode) obj).id;
+        return this.id.equals(((AbstractNode) obj).id);
     }
 
     @Override

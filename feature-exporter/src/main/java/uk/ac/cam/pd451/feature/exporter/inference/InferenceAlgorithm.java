@@ -1,10 +1,7 @@
 package uk.ac.cam.pd451.feature.exporter.inference;
 
-import java.util.Set;
-
-public interface InferenceAlgorithm {
-    void setModel(FactorGraph g);
-    double infer(Assignment events);
+public interface InferenceAlgorithm<T> {
+    void setModel(T model);
     double infer(Assignment events, Assignment evidence);
     void setEvidence(Assignment evidence);
 }

@@ -10,6 +10,13 @@ public class Assignment {
         this.events = new ArrayList<>(events);
     }
 
+    public Assignment(Assignment assignment, Assignment newAssignment) {
+        this.events = new ArrayList<>(newAssignment.events);
+        assignment.events.forEach(e -> {
+            if(!this.contains(e.getVariable())) this.addEvent(e);
+        });
+    }
+
     public static List<Assignment> allAssignments(List<Variable> varList) {
         List<Variable> varListCopy = new ArrayList<>(varList);
         return recAllAssignments(varListCopy);
@@ -33,6 +40,15 @@ public class Assignment {
                 }
             }
             return result;
+        }
+    }
+
+    public int getValue(Variable v) {
+        Optional<Event> first = this.events.stream().filter(e -> e.getVariable().equals(v)).findFirst();
+        if (!first.isPresent()) {
+            throw new RuntimeException("Does not contain the variable.");
+        } else {
+            return first.get().getValue();
         }
     }
 
@@ -92,8 +108,12 @@ public class Assignment {
         return ret;
     }
 
+    public Set<Variable> getVariables() {
+        return new HashSet<>(this.events.stream().map(e -> e.getVariable()).collect(Collectors.toList()));
+    }
+
     /**
-     * If the evidence contains
+     * If the evidence contains overlap with others then deal with it
      * @param evidence
      * @return
      */
