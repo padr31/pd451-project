@@ -173,6 +173,18 @@ class BayesianEnumerationInferenceTest {
         Assignment question7 = new Assignment(List.of(new Event(letter, 1), new Event(intelligence, 0), new Event(difficulty, 1)));
         double result7 = uut.infer(question7);
         assertEquals(0.05656, result7, DELTA_TOLLERANCE);
+        System.out.println(uut.infer(new Assignment(List.of(new Event(letter, 1)))));
+        System.out.println(uut.infer(new Assignment(List.of(new Event(intelligence, 0)))));
+        System.out.println(uut.infer(new Assignment(List.of(new Event(difficulty, 1)))));
+        System.out.println(uut.infer(new Assignment(List.of(new Event(letter, 1), new Event(intelligence, 1), new Event(difficulty, 1)))));
+        System.out.println(uut.infer(new Assignment(List.of(new Event(letter, 1), new Event(intelligence, 1), new Event(difficulty, 0)))));
+        System.out.println(uut.infer(new Assignment(List.of(new Event(letter, 1), new Event(intelligence, 0), new Event(difficulty, 1)))));
+        System.out.println(uut.infer(new Assignment(List.of(new Event(letter, 1), new Event(intelligence, 0), new Event(difficulty, 0)))));
+        System.out.println(uut.infer(new Assignment(List.of(new Event(letter, 0), new Event(intelligence, 1), new Event(difficulty, 1)))));
+        System.out.println(uut.infer(new Assignment(List.of(new Event(letter, 0), new Event(intelligence, 1), new Event(difficulty, 0)))));
+        System.out.println(uut.infer(new Assignment(List.of(new Event(letter, 0), new Event(intelligence, 0), new Event(difficulty, 1)))));
+        System.out.println(uut.infer(new Assignment(List.of(new Event(letter, 0), new Event(intelligence, 0), new Event(difficulty, 0)))));
+
 
         //TODO make sure letter
         uut.setEvidence(new Assignment(List.of(new Event(letter, 1), new Event(intelligence, 0), new Event(difficulty, 1))));

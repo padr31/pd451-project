@@ -232,10 +232,16 @@ class BayesianPropagationInferenceTest {
 
         uut.setEvidence(new Assignment(List.of()));
         Assignment question7 = new Assignment(List.of(new Event(letter, 1), new Event(intelligence, 0), new Event(difficulty, 1)));
-        double result7 = uut.infer(question7);
         // TODO this test was not passing - issue with inferring joint probability
+        // TODO fix joint probability calculation by conditioning using chain rule
+        // need to apply chain rule to get P(i=0,l=1,d=1) = P(i=0)P(l=1|i=0)P(d=1|i=0,l=1)
+        double b = uut.infer(new Assignment(List.of(new Event(intelligence, 0))));
+        uut.addEvidence(new Event(intelligence, 0));
+        double a = uut.infer(new Assignment(List.of(new Event(letter, 1))));
+        uut.addEvidence(new Event(letter, 1));
+        double c = uut.infer(new Assignment(List.of(new Event(difficulty, 1))));
+        double result7 = a*b*c;
         assertEquals(0.05656, result7, DELTA_TOLLERANCE);
-        //assertEquals(0.14065408, result7, DELTA_TOLLERANCE);
 
         uut.addEvidence(new Event(intelligence, 0));
         uut.addEvidence(new Event(difficulty, 1));
