@@ -16,10 +16,16 @@ public class ExportPipeline {
         CommandLine cmd = parser.parse(option, args);
 
         Pipeline compilationAndExtractionPipeline = new Pipeline<>(
-                new CompilerStep()
-        ).addStep(new ExtractorStep());
-        compilationAndExtractionPipeline.process(new CompilerStep.CompilerPipeInput(cmd.getOptionValue("input-file"),cmd.getOptionValue("input-file") + "/target"));
+                new ExtractorStep()
+        );
+        compilationAndExtractionPipeline.process(cmd.getOptionValue("input-file"));
 
+        /**
+         * Pipeline compilationAndExtractionPipeline = new Pipeline<>(
+         *                 new CompilerStep()
+         *         ).addStep(new ExtractorStep());
+         *         compilationAndExtractionPipeline.process(new CompilerStep.CompilerPipeInput(cmd.getOptionValue("input-file"),cmd.getOptionValue("input-file") + "/target"));
+         */
 
         /**
         try (FileInputStream fis = new FileInputStream(cmd.getOptionValue("input-file"))) {

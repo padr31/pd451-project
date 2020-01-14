@@ -16,7 +16,7 @@ varPointsTo(Var, Heap) :- reachable(Meth), alloc(Var, Heap, Meth).
 varPointsTo(To, Heap) :- move(To, From), varPointsTo(From, Heap).
 fldPointsTo(BaseH, Fld, Heap) :- store(Base, Fld, From), varPointsTo(From, Heap), varPointsTo(Base, BaseH).
 varPointsTo(To, Heap) :- load(To, Base, Fld), varPointsTo(Base, BaseH), fldPointsTo(BaseH, Fld, Heap).
-reachable(ToMeth) :- vCall(Base, Sig, Invo, InMeth), reachable(InMeth), varPointsTo(Base, Heap), heapType(Heap, HeapT), lookup(HeapT, Sig, ToMeth), thisVar(ToMeth, This).
+reachable(ToMeth) :- vCall(Base, Sig, Invo, InMeth), reachable(InMeth), varPointsTo(Base, Heap), heapType(Heap, HeapT), lookup(HeapT, Sig, ToMeth).
 varPointsTo(This, Heap) :- vCall(Base, Sig, Invo, InMeth), reachable(InMeth), varPointsTo(Base, Heap), heapType(Heap, HeapT), lookup(HeapT, Sig, ToMeth), thisVar(ToMeth, This).
 callGraph(Invo, ToMeth) :- vCall(Base, Sig, Invo, InMeth), reachable(InMeth), varPointsTo(Base, Heap), heapType(Heap, HeapT), lookup(HeapT, Sig, ToMeth), thisVar(ToMeth, This).
 interProcAssign(To, From) :- callGraph(Invo, Meth), formalArg(Meth, N, To), actualArg(Invo, N, From).
@@ -24,3 +24,4 @@ interProcAssign(To, From) :- callGraph(Invo, Meth), formalReturn(Meth, From), ac
 varPointsTo(To, Heap) :- interProcAssign(To, From), varPointsTo(From, Heap).
 
 ?- varPointsTo(X,Y).
+?- reachable(Z).

@@ -4,5 +4,6 @@ public class A {
     void doSomething(B bro) {
         B theB = new B();
         theB = bro;
+
     }
 }

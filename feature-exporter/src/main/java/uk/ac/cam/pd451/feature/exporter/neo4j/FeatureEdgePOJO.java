@@ -3,6 +3,7 @@ package uk.ac.cam.pd451.feature.exporter.neo4j;
 import org.neo4j.ogm.annotation.*;
 import uk.ac.cam.acr31.features.javac.proto.GraphProtos;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RelationshipEntity(type="FEATURE_EDGE")
@@ -46,4 +47,12 @@ public class FeatureEdgePOJO {
 
     @EndNode
     private FeatureNodePOJO destinationNode;
+
+    public Map<String, Object> toMap() {
+        Map<String, Object> m = new HashMap<>();
+        m.put("sourceId", this.sourceId);
+        m.put("destinationId", this.destinationId);
+        m.put("edgeType", this.edgeType);
+        return m;
+    }
 }
