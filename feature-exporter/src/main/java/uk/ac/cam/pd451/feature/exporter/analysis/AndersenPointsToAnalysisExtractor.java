@@ -1,6 +1,8 @@
 package uk.ac.cam.pd451.feature.exporter.analysis;
 
 import uk.ac.cam.pd451.feature.exporter.neo4j.ResultParseUtils;
+import uk.ac.cam.pd451.feature.exporter.utils.Timer;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -11,6 +13,7 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
     @Override
     public List<Relation> extractAnalysis() {
         List<Relation> extractedRelations = new ArrayList<>();
+        Timer t = new Timer();
 
         extractedRelations.add(((RelationExtractor) () -> {
             Relation alloc = new Relation("ALLOC", 3);
@@ -33,6 +36,7 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
             });
             return alloc;
         }).extractRelation());
+        t.printLastTimeSegment("TIMER 3 - ALLOC");
 
         extractedRelations.add(((RelationExtractor) () -> {
             Relation move = new Relation("MOVE", 2);
@@ -46,6 +50,7 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
             });
             return move;
         }).extractRelation());
+        t.printLastTimeSegment("TIMER 3 - MOVE");
 
         extractedRelations.add(((RelationExtractor) () -> {
             Relation heaptype = new Relation("HEAPTYPE", 2);
@@ -58,6 +63,7 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
             });
             return heaptype;
         }).extractRelation());
+        t.printLastTimeSegment("TIMER 3 - HEAPTYPE");
 
         extractedRelations.add(((RelationExtractor) () -> {
             Relation load = new Relation("LOAD", 3);
@@ -71,6 +77,7 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
             });
             return load;
         }).extractRelation());
+        t.printLastTimeSegment("TIMER 3 - LOAD");
 
         extractedRelations.add(((RelationExtractor) () -> {
             Relation store = new Relation("STORE", 3);
@@ -84,6 +91,7 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
             });
             return store;
         }).extractRelation());
+        t.printLastTimeSegment("TIMER 3 - STORE");
 
         extractedRelations.add(((RelationExtractor) () -> {
             Relation formalArg = new Relation("FORMALARG", 3);
@@ -102,6 +110,7 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
             });
             return formalArg;
         }).extractRelation());
+        t.printLastTimeSegment("TIMER 3 - FORMALARG");
 
         extractedRelations.add(((RelationExtractor) () -> {
             Relation actualArg = new Relation("ACTUALARG", 3);
@@ -121,6 +130,7 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
             });
             return actualArg;
         }).extractRelation());
+        t.printLastTimeSegment("TIMER 3 - ACTUALARG");
 
         extractedRelations.add(((RelationExtractor) () -> {
             Relation formalReturn = new Relation("FORMALRETURN", 2);
@@ -136,6 +146,7 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
             });
             return formalReturn;
         }).extractRelation());
+        t.printLastTimeSegment("TIMER 3 - FORMALRETURN");
 
         extractedRelations.add(((RelationExtractor) () -> {
             Relation actualReturn = new Relation("ACTUALRETURN", 2);
@@ -148,6 +159,7 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
             });
             return actualReturn;
         }).extractRelation());
+        t.printLastTimeSegment("TIMER 3 - ACTUALRETURN");
 
         extractedRelations.add(((RelationExtractor) () -> {
             Relation thisVar = new Relation("THISVAR", 2);
@@ -159,6 +171,7 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
             });
             return thisVar;
         }).extractRelation());
+        t.printLastTimeSegment("TIMER 3 - THISVAR");
 
         extractedRelations.add(((RelationExtractor) () -> {
             Relation lookup = new Relation("LOOKUP", 3);
@@ -172,6 +185,7 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
             });
             return lookup;
         }).extractRelation());
+        t.printLastTimeSegment("TIMER 3 - LOOKUP");
 
         extractedRelations.add(((RelationExtractor) () -> {
             Relation vcall = new Relation("VCALL", 4);
@@ -194,6 +208,7 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
             });
             return vcall;
         }).extractRelation());
+        t.printLastTimeSegment("TIMER 3 - VCALL");
 
         extractedRelations.add(((RelationExtractor) () -> {
             Relation reachable = new Relation("REACHABLE", 1);
@@ -205,6 +220,7 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
             });
             return reachable;
         }).extractRelation());
+        t.printLastTimeSegment("TIMER 3 - REACHABLE");
 
         this.relations = extractedRelations;
         return extractedRelations;
