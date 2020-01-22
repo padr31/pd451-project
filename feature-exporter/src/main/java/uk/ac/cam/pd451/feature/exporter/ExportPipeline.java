@@ -2,9 +2,9 @@ package uk.ac.cam.pd451.feature.exporter;
 
 import java.io.IOException;
 import org.apache.commons.cli.*;
-import uk.ac.cam.pd451.feature.exporter.pipeline.CompilerStep;
-import uk.ac.cam.pd451.feature.exporter.pipeline.ExtractorStep;
-import uk.ac.cam.pd451.feature.exporter.pipeline.Pipeline;
+import uk.ac.cam.pd451.feature.exporter.pipeline.*;
+import uk.ac.cam.pd451.feature.exporter.pipeline.io.EmptyIO;
+import uk.ac.cam.pd451.feature.exporter.pipeline.io.PipelineDirectoryIO;
 
 public class ExportPipeline {
 
@@ -22,11 +22,14 @@ public class ExportPipeline {
          *         compilationAndExtractionPipeline.process(cmd.getOptionValue("input-file"));
          */
 
-        Pipeline compilationAndExtractionPipeline = new Pipeline<>(
+        /*Pipeline compilationAndExtractionPipeline = new Pipeline<>(
                           new CompilerStep()
                   ).addStep(new ExtractorStep());
                   compilationAndExtractionPipeline.process(new CompilerStep.CompilerPipeInput(cmd.getOptionValue("input-file"),cmd.getOptionValue("input-file") + "/target"));
+        */
 
+        Pipeline provenanceImportStep = new Pipeline<>(new ProvenanceImportStep());
+        System.out.println(provenanceImportStep.process(new EmptyIO()));
 
         /**
         try (FileInputStream fis = new FileInputStream(cmd.getOptionValue("input-file"))) {

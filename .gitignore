@@ -2,6 +2,7 @@
 DS_Store
 feature-exporter/out/
 feature-exporter/target/
+feature-exporter/out_provenance/
 features-javac/
 exalog/
 vanillalog/
