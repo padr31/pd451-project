@@ -3,9 +3,7 @@ package uk.ac.cam.pd451.feature.exporter.pipeline;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.ac.cam.pd451.feature.exporter.datalog.GroundClausePOJO;
-import uk.ac.cam.pd451.feature.exporter.datalog.ProvenancePOJO;
 import uk.ac.cam.pd451.feature.exporter.pipeline.io.EmptyIO;
-import uk.ac.cam.pd451.feature.exporter.pipeline.io.PipelineDirectoryIO;
 
 import java.io.BufferedReader;
 import java.io.File;

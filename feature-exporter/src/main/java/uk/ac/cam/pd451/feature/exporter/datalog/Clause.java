@@ -1,0 +1,36 @@
+package uk.ac.cam.pd451.feature.exporter.datalog;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class Clause {
+
+    private Predicate head;
+    private List<Predicate> body;
+
+    public Clause(Predicate head, Predicate...body) {
+        this.head = head;
+        this.body = Arrays.asList(body);
+    }
+
+    public Clause(Predicate head, List<Predicate> body) {
+        this.head = head;
+        this.body = new ArrayList<>(body);
+    }
+
+    public String getRule() {
+        return this.head.getName();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if(!(other instanceof Clause)) return false;
+        return this.head.equals(((Clause) other).head) && this.body.equals(((Clause) other).body);
+    }
+
+    @Override
+    public int hashCode() {
+        return this.head.hashCode() + this.body.hashCode();
+    }
+}
