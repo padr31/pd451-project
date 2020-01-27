@@ -28,12 +28,12 @@ public class ExportPipeline {
                   compilationAndExtractionPipeline.process(new CompilerStep.CompilerPipeInput(cmd.getOptionValue("input-file"),cmd.getOptionValue("input-file") + "/target"));
         */
 
-        /*Pipeline provenanceImportStep = new Pipeline<>(
+        Pipeline provenanceImportStep = new Pipeline<>(
                 new ProvenanceImportStep()
-            ).addStep(new ProvenanceCreationStep());
+            ).addStep(new CycleEliminationStep()).addStep(new ProvenanceCreationStep());
 
         System.out.println(provenanceImportStep.process(new EmptyIO()));
-*/
+
         /**
         try (FileInputStream fis = new FileInputStream(cmd.getOptionValue("input-file"))) {
             GraphProtos.Graph graph = GraphProtos.Graph.parseFrom(fis);
