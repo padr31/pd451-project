@@ -15,7 +15,7 @@ public class ProvenanceCreationStep implements Step<List<GroundClausePOJO>, Prov
         // create predicates and map them to unique provenance network variable names
         Map<Predicate, String> predicateToUUID = new HashMap<>();
         for(GroundClausePOJO groundClause : groundClauses) {
-            predicateToUUID.put(new Predicate(groundClause.getPredicate(), groundClause.getTerms()), UUID.randomUUID().toString());
+            predicateToUUID.put(new Predicate(groundClause .getPredicate(), groundClause.getTerms()), UUID.randomUUID().toString());
         }
 
         // create the inverse mapping for looking up predicates of variables

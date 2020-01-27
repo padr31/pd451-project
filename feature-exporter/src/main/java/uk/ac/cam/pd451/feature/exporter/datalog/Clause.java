@@ -2,6 +2,7 @@ package uk.ac.cam.pd451.feature.exporter.datalog;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Clause {
@@ -32,5 +33,13 @@ public class Clause {
     @Override
     public int hashCode() {
         return this.head.hashCode() + this.body.hashCode();
+    }
+
+    public Predicate getHead() {
+        return head;
+    }
+
+    public List<Predicate> getBody() {
+        return Collections.unmodifiableList(body);
     }
 }
