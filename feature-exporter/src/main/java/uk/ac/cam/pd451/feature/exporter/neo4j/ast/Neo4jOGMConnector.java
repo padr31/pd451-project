@@ -1,4 +1,4 @@
-package uk.ac.cam.pd451.feature.exporter.neo4j;
+package uk.ac.cam.pd451.feature.exporter.neo4j.ast;
 
 import org.neo4j.ogm.config.Configuration;
 import org.neo4j.ogm.model.Result;
@@ -6,11 +6,12 @@ import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
 import org.neo4j.ogm.transaction.Transaction;
 import uk.ac.cam.acr31.features.javac.proto.GraphProtos;
+import uk.ac.cam.pd451.feature.exporter.neo4j.Neo4jConnector;
 import uk.ac.cam.pd451.feature.exporter.utils.Timer;
 
 import java.util.*;
 
-public class Neo4jOGMConnector implements Neo4jConnector{
+public class Neo4jOGMConnector implements Neo4jConnector<GraphProtos.Graph> {
 
     private static Neo4jOGMConnector instance;
 
@@ -30,7 +31,7 @@ public class Neo4jOGMConnector implements Neo4jConnector{
      */
     private Neo4jOGMConnector() {
         Configuration configuration = new Configuration.Builder().uri(SERVER_URI).credentials(SERVER_USERNAME, SERVER_PASSWORD).build();
-        sessionFactory = new SessionFactory(configuration, "uk.ac.cam.pd451.feature.exporter.neo4j");
+        sessionFactory = new SessionFactory(configuration, "uk.ac.cam.pd451.feature.exporter.neo4j.ast");
     }
 
     public static Neo4jOGMConnector getInstance() {

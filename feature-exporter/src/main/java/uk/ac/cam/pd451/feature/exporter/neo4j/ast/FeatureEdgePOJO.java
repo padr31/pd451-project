@@ -1,4 +1,4 @@
-package uk.ac.cam.pd451.feature.exporter.neo4j;
+package uk.ac.cam.pd451.feature.exporter.neo4j.ast;
 
 import org.neo4j.ogm.annotation.*;
 import uk.ac.cam.acr31.features.javac.proto.GraphProtos;

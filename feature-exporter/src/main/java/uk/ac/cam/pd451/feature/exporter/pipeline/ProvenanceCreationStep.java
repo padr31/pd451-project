@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 public class ProvenanceCreationStep implements Step<List<Clause>, ProvenanceGraph> {
     @Override
     public ProvenanceGraph process(List<Clause> groundClauses) throws PipeException {
+        System.out.println("Eliminated clause count: " + groundClauses.size());
+
         // create predicates and map them to unique provenance network variable names
         // some of them are inserted twice - this is not an issue as the uuid will just be updated
         Map<Predicate, String> predicateToUUID = new HashMap<>();
@@ -95,11 +97,6 @@ public class ProvenanceCreationStep implements Step<List<Clause>, ProvenanceGrap
                     new Assignment(List.of(new Event(rootNode.getVariable(), 1))), 1.0
             )));
         }
-
-
-        BayessianGibbsSamplingInference i = new BayessianGibbsSamplingInference();
-        i.setModel(bn);
-        System.out.println(i.infer(new Assignment(List.of(new Event(variable, 0)))));
 
         return new ProvenanceGraph(bn, variableNameToBayesianNode, predicateToUUID, UUIDToPredicate);
     }

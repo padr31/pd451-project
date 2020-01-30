@@ -12,6 +12,8 @@ public class CycleEliminationStep implements Step<List<Clause>, List<Clause>> {
 
     @Override
     public List<Clause> process(List<Clause> input) throws PipeException {
+        System.out.println("Initial clause count: " + input.size());
+
         //initialise timestamps
         for(Clause cl : input) {
             putTimestamp(cl.getHead());

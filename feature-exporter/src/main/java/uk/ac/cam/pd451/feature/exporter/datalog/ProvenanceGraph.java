@@ -8,6 +8,8 @@ import java.util.Map;
 public class ProvenanceGraph {
 
     private BayesianNetwork bn;
+
+
     private Map<String, BayesianNode> UUIDToNode;
     private Map<Predicate, String> predicateToUUDI;
     private Map<String, Predicate> UUDIToPredicate;
@@ -17,5 +19,20 @@ public class ProvenanceGraph {
         this.UUIDToNode = UUIDToNode;
         this.predicateToUUDI = predicateToUUDI;
         this.UUDIToPredicate = UUDIToPredicate;
+    }
+
+    public BayesianNetwork getBayesianNetwork() {
+        return this.bn;
+    }
+    public Map<String, BayesianNode> getUUIDToNode() {
+        return UUIDToNode;
+    }
+
+    public Map<Predicate, String> getPredicateToUUDI() {
+        return predicateToUUDI;
+    }
+
+    public Map<String, Predicate> getUUDIToPredicate() {
+        return UUDIToPredicate;
     }
 }

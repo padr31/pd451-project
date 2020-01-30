@@ -1,8 +1,7 @@
 package uk.ac.cam.pd451.feature.exporter.pipeline;
 import uk.ac.cam.acr31.features.javac.proto.GraphProtos;
 import uk.ac.cam.pd451.feature.exporter.analysis.AndersenPointsToAnalysisExtractor;
-import uk.ac.cam.pd451.feature.exporter.neo4j.Neo4jJavaConnector;
-import uk.ac.cam.pd451.feature.exporter.neo4j.Neo4jOGMConnector;
+import uk.ac.cam.pd451.feature.exporter.neo4j.ast.Neo4jJavaConnector;
 import uk.ac.cam.pd451.feature.exporter.utils.Timer;
 
 import java.io.File;

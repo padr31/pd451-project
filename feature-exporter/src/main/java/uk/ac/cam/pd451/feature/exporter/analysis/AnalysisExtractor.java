@@ -1,8 +1,7 @@
 package uk.ac.cam.pd451.feature.exporter.analysis;
 
 import uk.ac.cam.pd451.feature.exporter.neo4j.Neo4jConnector;
-import uk.ac.cam.pd451.feature.exporter.neo4j.Neo4jJavaConnector;
-import uk.ac.cam.pd451.feature.exporter.neo4j.Neo4jOGMConnector;
+import uk.ac.cam.pd451.feature.exporter.neo4j.ast.Neo4jOGMConnector;
 
 import java.io.File;
 import java.io.IOException;

@@ -1,8 +1,9 @@
-package uk.ac.cam.pd451.feature.exporter.neo4j;
+package uk.ac.cam.pd451.feature.exporter.neo4j.ast;
 
 import org.neo4j.driver.internal.value.ListValue;
 import org.neo4j.driver.v1.*;
 import uk.ac.cam.acr31.features.javac.proto.GraphProtos;
+import uk.ac.cam.pd451.feature.exporter.neo4j.Neo4jConnector;
 import uk.ac.cam.pd451.feature.exporter.utils.Timer;
 
 import java.util.*;
@@ -10,7 +11,7 @@ import java.util.stream.Collectors;
 
 import static org.neo4j.driver.v1.Values.parameters;
 
-public class Neo4jJavaConnector implements Neo4jConnector {
+public class Neo4jJavaConnector implements Neo4jConnector<GraphProtos.Graph> {
     private static Neo4jJavaConnector instance;
 
     private final org.neo4j.driver.v1.Driver driver;

@@ -1,5 +1,7 @@
 package uk.ac.cam.pd451.feature.exporter.datalog;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -40,5 +42,9 @@ public class Predicate {
 
     public String getName() {
         return this.name;
+    }
+
+    public String getTerms() {
+        return StringUtils.join(this.terms, ", ");
     }
 }

@@ -5,10 +5,10 @@ import uk.ac.cam.acr31.features.javac.proto.GraphProtos;
 import java.util.Iterator;
 import java.util.Map;
 
-public interface Neo4jConnector {
+public interface Neo4jConnector<G> {
 
     void closeConnections();
     void clearDatabase();
-    void loadGraph(GraphProtos.Graph graph);
+    void loadGraph(G graph);
     Iterator<Map<String, Object>> query(String query);
 }
