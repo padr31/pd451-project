@@ -2,6 +2,7 @@ package uk.ac.cam.pd451.feature.exporter.pipeline;
 
 import uk.ac.cam.pd451.feature.exporter.datalog.Clause;
 import uk.ac.cam.pd451.feature.exporter.datalog.Predicate;
+import uk.ac.cam.pd451.feature.exporter.neo4j.provenance.Neo4jOGMProvenanceConnector;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -12,6 +13,9 @@ public class CycleEliminationStep implements Step<List<Clause>, List<Clause>> {
 
     @Override
     public List<Clause> process(List<Clause> input) throws PipeException {
+        Neo4jOGMProvenanceConnector provenanceConnector = Neo4jOGMProvenanceConnector.getInstance();
+        provenanceConnector.clearDatabase();
+        provenanceConnector.loadGraph(input);
         System.out.println("Initial clause count: " + input.size());
 
         //initialise timestamps

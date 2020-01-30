@@ -30,7 +30,7 @@ public class ExportPipeline {
 
         Pipeline provenanceImportStep = new Pipeline<>(
                 new ProvenanceImportStep()
-            )/*.addStep(new CycleEliminationStep())*/.addStep(new ProvenanceCreationStep()).addStep(new UserInteractionStep());
+            ).addStep(new CycleEliminationStep()).addStep(new ProvenanceCreationStep()).addStep(new UserInteractionStep());
 
         System.out.println(provenanceImportStep.process(new EmptyIO()));
 

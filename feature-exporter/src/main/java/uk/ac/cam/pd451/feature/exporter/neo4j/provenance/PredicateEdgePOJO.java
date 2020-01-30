@@ -8,16 +8,10 @@ public class PredicateEdgePOJO {
 
     public PredicateEdgePOJO() {}
 
-    public PredicateEdgePOJO(PredicateNodePOJO parent, PredicateNodePOJO child) {
+    public PredicateEdgePOJO(PredicateNodePOJO parent, PredicateNodePOJO child, String rule) {
         this.parent = parent;
         this.child = child;
-    }
-
-    public PredicateEdgePOJO(Predicate parent, Predicate child) {
-        this(
-                new PredicateNodePOJO(parent),
-                new PredicateNodePOJO(child)
-        );
+        this.rule = rule;
     }
 
     @Id @GeneratedValue
@@ -29,5 +23,8 @@ public class PredicateEdgePOJO {
 
     @EndNode
     private PredicateNodePOJO child;
+
+    @Property
+    private String rule;
 
 }

@@ -11,21 +11,23 @@ public class PredicateNodePOJO {
 
     public PredicateNodePOJO() {}
 
-    public PredicateNodePOJO(String name, String terms) {
+    public PredicateNodePOJO(long id, String name, String terms) {
+        this.id = id;
         this.name = name;
         this.terms = terms;
     }
 
-    public PredicateNodePOJO(Predicate predicate) {
+    public PredicateNodePOJO(long id, Predicate predicate) {
         this(
+                id,
                 predicate.getName(),
                 predicate.getTerms()
         );
     }
 
-    @Id @GeneratedValue
+    @Id
     // need to use Long for generated IDs, long for inherited
-    private Long id;
+    private long id;
 
     @Property
     private String name;

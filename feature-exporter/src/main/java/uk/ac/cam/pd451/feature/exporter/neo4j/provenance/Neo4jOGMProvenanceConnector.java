@@ -7,6 +7,7 @@ import org.neo4j.ogm.session.SessionFactory;
 import org.neo4j.ogm.transaction.Transaction;
 import uk.ac.cam.acr31.features.javac.proto.GraphProtos;
 import uk.ac.cam.pd451.feature.exporter.datalog.Clause;
+import uk.ac.cam.pd451.feature.exporter.datalog.Predicate;
 import uk.ac.cam.pd451.feature.exporter.neo4j.Neo4jConnector;
 import uk.ac.cam.pd451.feature.exporter.neo4j.ast.FeatureEdgePOJO;
 import uk.ac.cam.pd451.feature.exporter.neo4j.ast.FeatureNodePOJO;
@@ -14,6 +15,7 @@ import uk.ac.cam.pd451.feature.exporter.neo4j.ast.Neo4jOGMConnector;
 import uk.ac.cam.pd451.feature.exporter.utils.Timer;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Neo4jOGMProvenanceConnector implements Neo4jConnector<List<Clause>> {
     private static Neo4jOGMProvenanceConnector instance;
@@ -61,6 +63,41 @@ public class Neo4jOGMProvenanceConnector implements Neo4jConnector<List<Clause>>
     }
 
     public void loadGraph(List<Clause> groundClauses) {
-       
+        Session session = sessionFactory.openSession();
+        session.purgeDatabase();
+
+        Transaction txn = session.beginTransaction();
+
+        Map<Predicate, Long> predToId = new HashMap<>();
+        long c = 1;
+        for(Clause cl : groundClauses) {
+            predToId.put(cl.getHead(), c++);
+            for(Predicate p : cl.getBody()) {
+                predToId.put(p, c++);
+            }
+        }
+
+        Map<Long, PredicateNodePOJO> predicateNodePOJOs = predToId
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getValue, e -> new PredicateNodePOJO(e.getValue(), e.getKey())));
+
+        List<PredicateEdgePOJO> predicateEdgePOJOs = new ArrayList<>();
+        for(Clause cl : groundClauses) {
+            for(Predicate p : cl.getBody()) {
+                predicateEdgePOJOs.add(
+                    new PredicateEdgePOJO(
+                        predicateNodePOJOs.get(predToId.get(p)),
+                        predicateNodePOJOs.get(predToId.get(cl.getHead())),
+                        cl.getRule()
+                    )
+                );
+            }
+        }
+
+        for(PredicateNodePOJO predicateNodePOJO : predicateNodePOJOs.values()) session.save(predicateNodePOJO);
+        for(PredicateEdgePOJO predicateEdgePOJO : predicateEdgePOJOs) session.save(predicateEdgePOJO);
+
+        txn.commit();
     }
 }

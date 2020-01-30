@@ -4,6 +4,7 @@ import uk.ac.cam.pd451.feature.exporter.datalog.*;
 import uk.ac.cam.pd451.feature.exporter.graph.bn.BayesianNetwork;
 import uk.ac.cam.pd451.feature.exporter.graph.bn.BayesianNode;
 import uk.ac.cam.pd451.feature.exporter.inference.*;
+import uk.ac.cam.pd451.feature.exporter.neo4j.provenance.Neo4jOGMProvenanceConnector;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -13,6 +14,9 @@ public class ProvenanceCreationStep implements Step<List<Clause>, ProvenanceGrap
     public ProvenanceGraph process(List<Clause> groundClauses) throws PipeException {
         System.out.println("Eliminated clause count: " + groundClauses.size());
 
+        Neo4jOGMProvenanceConnector provenanceConnector = Neo4jOGMProvenanceConnector.getInstance();
+        provenanceConnector.clearDatabase();
+        provenanceConnector.loadGraph(groundClauses);
         // create predicates and map them to unique provenance network variable names
         // some of them are inserted twice - this is not an issue as the uuid will just be updated
         Map<Predicate, String> predicateToUUID = new HashMap<>();
