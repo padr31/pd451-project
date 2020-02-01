@@ -33,6 +33,27 @@ class CycleEliminationStepTest {
         );
 
         List<Clause> cycleEliminatedClauses = cPipe.process(clauses);
-        assertEquals(true, cycleEliminatedClauses.equals(clausesWithoutCycle));
+        assertTrue(cycleEliminatedClauses.equals(clausesWithoutCycle));
+
+        clauses = List.of(
+                new Clause(new Predicate("B", "X", "Y"), new Predicate("read_csv1", "X"), new Predicate("read_csv1", "Y")),
+                new Clause(new Predicate("C", "X", "Y"), new Predicate("read_csv2", "X"), new Predicate("read_csv2", "Y")),
+                new Clause(new Predicate("B", "X", "Y"), new Predicate("C", "X", "Y")),
+                new Clause(new Predicate("C", "X", "Y"), new Predicate("B", "X", "Y")),
+                new Clause(new Predicate("D", "X"), new Predicate("B", "X", "Y")),
+                new Clause(new Predicate("E", "Y"), new Predicate("C", "X", "Y")),
+                new Clause(new Predicate("C", "X", "Y"), new Predicate("D", "X"))
+        );
+
+        clausesWithoutCycle = List.of(
+                new Clause(new Predicate("B", "X", "Y"), new Predicate("read_csv1", "X"), new Predicate("read_csv1", "Y")),
+                new Clause(new Predicate("C", "X", "Y"), new Predicate("read_csv2", "X"), new Predicate("read_csv2", "Y")),
+                new Clause(new Predicate("D", "X"), new Predicate("B", "X", "Y")),
+                new Clause(new Predicate("E", "Y"), new Predicate("C", "X", "Y")),
+                new Clause(new Predicate("C", "X", "Y"), new Predicate("D", "X"))
+        );
+
+        cycleEliminatedClauses = cPipe.process(clauses);
+        assertTrue(cycleEliminatedClauses.equals(clausesWithoutCycle));
     }
 }

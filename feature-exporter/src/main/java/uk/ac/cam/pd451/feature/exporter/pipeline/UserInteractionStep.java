@@ -17,9 +17,8 @@ public class UserInteractionStep implements Step<ProvenanceGraph, RankingStatist
         Map<Predicate, Variable> pointsToSet = g.getPredicateToUUDI()
                 .entrySet()
                 .stream()
-                .filter(e -> e.getKey().getName().equals("varPointsTo"))
+                .filter(e -> e.getKey().getName().equals("pointsTo"))
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> g.getUUIDToNode().get(e.getValue()).getVariable()));
-
 
         BayessianGibbsSamplingInference i = new BayessianGibbsSamplingInference();
         i.setModel(g.getBayesianNetwork());
