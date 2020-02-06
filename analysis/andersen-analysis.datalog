@@ -12,20 +12,17 @@ heapType(X,Y) :- read_csv2("/Users/padr/repos/pd451-project/feature-exporter/out
 lookup(X,Y,Z) :- read_csv3("/Users/padr/repos/pd451-project/feature-exporter/out/LOOKUP.csv",X,Y,Z).
 reachable(X) :- read_csv1("/Users/padr/repos/pd451-project/feature-exporter/out/REACHABLE.csv",X).
 
-pointsTo(Var, Heap) :- varPointsToAlloc(Var, Heap).
-pointsTo(Var, Heap) :- varPointsToMove(Var, Heap).
-pointsTo(Var, Heap) :- varPointsToField(Var, Heap).
-pointsTo(Var, Heap) :- varPointsToThis(Var, Heap).
-pointsTo(Var, Heap) :- varPointsToInterProcess(Var, Heap).
-varPointsToAlloc(Var, Heap) :- reachable(Meth), alloc(Var, Heap, Meth).
-varPointsToMove(To, Heap) :- move(To, From), varPointsTo(From, Heap).
+pointsTo(Var, Heap) :- varPointsTo(Var, Heap).
+nullPointer(Var) :- pointsTo(Var, Heap), heapType(Heap, "null").
+varPointsTo(Var, Heap) :- reachable(Meth), alloc(Var, Heap, Meth).
+varPointsTo(To, Heap) :- move(To, From), varPointsTo(From, Heap).
 fldPointsTo(BaseH, Fld, Heap) :- store(Base, Fld, From), varPointsTo(From, Heap), varPointsTo(Base, BaseH).
-varPointsToField(To, Heap) :- load(To, Base, Fld), varPointsTo(Base, BaseH), fldPointsTo(BaseH, Fld, Heap).
-reachable(ToMeth) :- vCall(Base, Sig, Invo, ToMeth).
-varPointsToThis(This, Heap) :- vCall(Base, Sig, Invo, InMeth), reachable(InMeth), varPointsTo(Base, Heap), heapType(Heap, HeapT), lookup(HeapT, Sig, ToMeth), thisVar(ToMeth, This).
+varPointsTo(To, Heap) :- load(To, Base, Fld), varPointsTo(Base, BaseH), fldPointsTo(BaseH, Fld, Heap).
+varPointsTo(This, Heap) :- vCall(Base, Sig, Invo, InMeth), reachable(InMeth), varPointsTo(Base, Heap), heapType(Heap, HeapT), lookup(HeapT, Sig, ToMeth), thisVar(ToMeth, This).
 callGraph(Invo, ToMeth) :- vCall(Base, Sig, Invo, InMeth), reachable(InMeth), varPointsTo(Base, Heap), heapType(Heap, HeapT), lookup(HeapT, Sig, ToMeth), thisVar(ToMeth, This).
 interProcAssign(To, From) :- callGraph(Invo, Meth), formalArg(Meth, N, To), actualArg(Invo, N, From).
 interProcAssign(To, From) :- callGraph(Invo, Meth), formalReturn(Meth, From), actualReturn(Invo, To).
-varPointsToInterProcess(To, Heap) :- interProcAssign(To, From), varPointsTo(From, Heap).
+varPointsTo(To, Heap) :- interProcAssign(To, From), varPointsTo(From, Heap).
 
 ?- pointsTo(X,Y).
+?- nullPointer(V).

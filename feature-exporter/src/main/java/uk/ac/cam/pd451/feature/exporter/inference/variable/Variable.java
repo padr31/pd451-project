@@ -7,27 +7,27 @@ import java.util.Set;
 
 public class Variable implements Comparable{
 
-    private String name;
+    private String id;
     private Set<Integer> domain;
 
-    public Variable(String name, Set<Integer> domain) {
-        this.name = name;
+    public Variable(String id, Set<Integer> domain) {
+        this.id = id;
         this.domain = domain;
     }
 
     @Override
     public boolean equals(Object other) {
         if(!(other instanceof Variable)) return false;
-        return ((Variable) other).getName().equals(this.name);
+        return ((Variable) other).getId().equals(this.id);
     }
 
     @Override
     public int hashCode() {
-        return this.name.hashCode();
+        return this.id.hashCode();
     }
 
-    public String getName() {
-        return this.name;
+    public String getId() {
+        return this.id;
     }
 
     public Set<Integer> getDomain() {
@@ -39,7 +39,7 @@ public class Variable implements Comparable{
         if(!(o instanceof Variable)) {
             throw new ClassCastException();
         }
-        return this.name.compareTo(((Variable) o).name);
+        return this.id.compareTo(((Variable) o).id);
     }
 
     public Event randomSample() {
