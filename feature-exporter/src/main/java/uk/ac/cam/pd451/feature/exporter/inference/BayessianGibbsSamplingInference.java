@@ -2,8 +2,8 @@ package uk.ac.cam.pd451.feature.exporter.inference;
 
 import uk.ac.cam.pd451.feature.exporter.graph.bn.BayesianNetwork;
 import uk.ac.cam.pd451.feature.exporter.graph.bn.BayesianNode;
+import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +17,7 @@ public class BayessianGibbsSamplingInference implements InferenceAlgorithm<Bayes
     //Should be Map<Variable, Map<Event, Integer>> but I will avoid creating Event objects every time
     private Map<Variable, Map<Integer, Double>> counts = new HashMap<>();
 
-    private final static int DEFAULT_GIBBS_ITERATIONS = 1000;
+    private final static int DEFAULT_GIBBS_ITERATIONS = 100;
 
     @Override
     public void setModel(BayesianNetwork model) {
@@ -94,7 +94,11 @@ public class BayessianGibbsSamplingInference implements InferenceAlgorithm<Bayes
                 List<Event> parentsOfChildEvents = child.getParentSet().stream().map(n -> state.get(n.getVariable())).filter(ev -> !ev.getVariable().equals(v)).collect(Collectors.toList());
                 Assignment parentsOfChildAssignment = new Assignment(parentsOfChildEvents);
                 parentsOfChildAssignment = parentsOfChildAssignment.addEvent(e).addEvent(ce);
-                childrenScalingFactorFunction.put(domElem, childrenScalingFactorFunction.get(domElem)*child.getCPT().get(parentsOfChildAssignment));
+                if(child.getCPT().get(parentsOfChildAssignment) == null) {
+                    continue;
+                };
+                childrenScalingFactorFunction.put(
+                        domElem, childrenScalingFactorFunction.get(domElem)*child.getCPT().get(parentsOfChildAssignment));
             }
         }
 
@@ -117,5 +121,9 @@ public class BayessianGibbsSamplingInference implements InferenceAlgorithm<Bayes
     @Override
     public void setEvidence(Assignment evidence) {
         this.evidence = evidence;
+    }
+
+    public void addEvidence(Event e) {
+        this.evidence.addEvent(e);
     }
 }

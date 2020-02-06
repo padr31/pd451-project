@@ -15,24 +15,26 @@ public class ExportPipeline {
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(option, args);
 
-        /*
-         * Pipeline compilationAndExtractionPipeline = new Pipeline<>(
-         *                 new ExtractorStep()
-         *         );
-         *         compilationAndExtractionPipeline.process(cmd.getOptionValue("input-file"));
-         */
 
-        /*Pipeline compilationAndExtractionPipeline = new Pipeline<>(
+   /*      Pipeline compilationAndExtractionPipeline = new Pipeline<>(
+                          new ExtractorStep()
+                  );
+                  compilationAndExtractionPipeline.process(cmd.getOptionValue("input-file"));
+*/
+
+/*        Pipeline compilationAndExtractionPipeline = new Pipeline<>(
                           new CompilerStep()
                   ).addStep(new ExtractorStep());
                   compilationAndExtractionPipeline.process(new CompilerStep.CompilerPipeInput(cmd.getOptionValue("input-file"),cmd.getOptionValue("input-file") + "/target"));
-        */
+*/
 
         Pipeline provenanceImportStep = new Pipeline<>(
-                new ProvenanceImportStep()
-            ).addStep(new CycleEliminationStep()).addStep(new ProvenanceCreationStep()).addStep(new UserInteractionStep());
-
+                new DatalogStep())
+                .addStep(new CycleEliminationStep())
+                .addStep(new ProvenanceCreationStep())
+                .addStep(new UserInteractionStep());
         System.out.println(provenanceImportStep.process(new EmptyIO()));
+
 
         /**
         try (FileInputStream fis = new FileInputStream(cmd.getOptionValue("input-file"))) {

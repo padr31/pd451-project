@@ -2,6 +2,7 @@ package uk.ac.cam.pd451.feature.exporter.pipeline;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.protobuf.Empty;
 import uk.ac.cam.pd451.feature.exporter.datalog.*;
 import uk.ac.cam.pd451.feature.exporter.pipeline.io.EmptyIO;
 
@@ -16,10 +17,10 @@ import java.util.stream.Collectors;
 /**
  * Responsible for taking a directory of .java files, compiling them with the feature extractor and outputing the target directory.
  */
-public class ProvenanceImportStep implements Step<EmptyIO, List<Clause>> {
+public class ProvenanceImportStep implements Step<EmptyIO, EmptyIO> {
 
     @Override
-    public List<Clause> process(EmptyIO input) throws PipeException {
+    public EmptyIO process(EmptyIO input) throws PipeException {
         Runtime rt = Runtime.getRuntime();
         try {
             Process proc = rt.exec(new String[]{"sh","-c","stack exec -- vanillalog run -f ~/repos/pd451-project/analysis/andersen-analysis.datalog --keep-all-predicates --json --provenance > /Users/padr/repos/pd451-project/feature-exporter/out_provenance/provenance.json"},
@@ -46,41 +47,6 @@ public class ProvenanceImportStep implements Step<EmptyIO, List<Clause>> {
         } catch (IOException e) {
             throw new PipeException(e);
         }
-
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        try {
-            File file = new File("out_provenance/provenance.json");
-            //file.createNewFile();
-            List<GroundClausePOJO> provenance = objectMapper.readValue(file, new TypeReference<List<GroundClausePOJO>>(){});
-            System.out.println(objectMapper.writeValueAsString(provenance));
-
-            return clausify(provenance);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    private List<Clause> clausify(List<GroundClausePOJO> provenance) {
-        List<Clause> groundClauses = new ArrayList<>();
-        for(GroundClausePOJO groundClause : provenance) {
-            groundClauses.add(
-                    new Clause(
-                        new Predicate(groundClause.getPredicate(), groundClause.getTerms()),
-                        provenanceItemToPredicateList(groundClause.getProvenance())
-                    )
-            );
-        }
-        return groundClauses;
-    }
-
-    private List<Predicate> provenanceItemToPredicateList(GroundClauseProvenancePOJO provenanceItem) {
-        return provenanceItem.getBody().stream().map(clPOJO -> {
-            return new Predicate(
-                    clPOJO.getPredicate(),
-                    clPOJO.getTerms().stream().map(ClauseTermPOJO::getContents).collect(Collectors.toList()));
-        }).collect(Collectors.toList());
+        return new EmptyIO();
     }
 }

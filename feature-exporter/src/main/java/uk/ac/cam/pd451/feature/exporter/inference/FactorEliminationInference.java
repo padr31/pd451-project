@@ -2,6 +2,7 @@ package uk.ac.cam.pd451.feature.exporter.inference;
 
 import uk.ac.cam.pd451.feature.exporter.graph.factor.FactorGraph;
 import uk.ac.cam.pd451.feature.exporter.graph.factor.FactorNode;
+import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 
 import java.util.ArrayList;
 import java.util.Collections;

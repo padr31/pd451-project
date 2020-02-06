@@ -9,13 +9,13 @@ import java.util.stream.Collectors;
 
 public class CycleEliminationStep implements Step<List<Clause>, List<Clause>> {
 
-    private Map<Predicate, Integer> tupleTStamps = new HashMap<>();
+    private Map<Predicate, Double> tupleTStamps = new HashMap<>();
 
     @Override
     public List<Clause> process(List<Clause> input) throws PipeException {
-        Neo4jOGMProvenanceConnector provenanceConnector = Neo4jOGMProvenanceConnector.getInstance();
+        /*Neo4jOGMProvenanceConnector provenanceConnector = Neo4jOGMProvenanceConnector.getInstance();
         provenanceConnector.clearDatabase();
-        provenanceConnector.loadGraph(input);
+        provenanceConnector.loadGraph(input);*/
         System.out.println("Initial clause count: " + input.size());
 
         //initialise timestamps
@@ -25,13 +25,14 @@ public class CycleEliminationStep implements Step<List<Clause>, List<Clause>> {
                 putTimestamp(bodyPredicate);
             }
         }
+        System.out.println("number of tuples before elimination: " + tupleTStamps.size());
 
         //propagate timestamp increments
         boolean done = false;
         while(!done) {
             done = true;
             for(Clause cl : input) {
-                int maxBodyTimeStamp = getMaxTimestamp(cl.getBody());
+                double maxBodyTimeStamp = getMaxTimestamp(cl.getBody());
                 if(getTimestamp(cl.getHead()) > maxBodyTimeStamp + 1) {
                     done = false;
                     putTimestamp(cl.getHead(), maxBodyTimeStamp + 1);
@@ -40,28 +41,37 @@ public class CycleEliminationStep implements Step<List<Clause>, List<Clause>> {
         }
 
         //filter clauses involved in cycles
-        return input.stream().filter(cl ->
+        List<Clause> result = input.stream().filter(cl ->
             getTimestamp(cl.getHead()) > getMaxTimestamp(cl.getBody())
         ).collect(Collectors.toList());
+
+        Set<Predicate> outputTuples = new HashSet<>();
+        for(Clause cl : result) {
+            outputTuples.add(cl.getHead());
+            outputTuples.addAll(cl.getBody());
+        }
+        System.out.println("number of tuples after elimination: " + outputTuples.size());
+
+        return result;
     }
 
-    private Integer getMaxTimestamp(List<Predicate> body) {
-        return body.stream().map(p -> tupleTStamps.get(p)).max(Comparator.naturalOrder()).get();
+    private Double getMaxTimestamp(List<Predicate> body) {
+        return body.stream().mapToDouble(p -> tupleTStamps.get(p)).max().getAsDouble();
     }
 
     private void putTimestamp(Predicate p) {
         if(p.getName().contains("read_csv")) {
-            tupleTStamps.put(p, 0);
+            tupleTStamps.put(p, 0.0);
         } else {
-            tupleTStamps.put(p, Integer.MAX_VALUE);
+            tupleTStamps.put(p, Double.POSITIVE_INFINITY);
         }
     }
 
-    private void putTimestamp(Predicate p, Integer timeStamp) {
+    private void putTimestamp(Predicate p, Double timeStamp) {
         tupleTStamps.put(p, timeStamp);
     }
 
-    private Integer getTimestamp(Predicate p) {
+    private Double getTimestamp(Predicate p) {
         return tupleTStamps.get(p);
     }
 }

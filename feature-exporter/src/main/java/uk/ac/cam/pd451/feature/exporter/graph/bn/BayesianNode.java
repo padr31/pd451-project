@@ -2,7 +2,7 @@ package uk.ac.cam.pd451.feature.exporter.graph.bn;
 
 import uk.ac.cam.pd451.feature.exporter.graph.factor.FactorNode;
 import uk.ac.cam.pd451.feature.exporter.inference.Factor;
-import uk.ac.cam.pd451.feature.exporter.inference.Variable;
+import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import uk.ac.cam.pd451.feature.exporter.graph.factor.FactorGraph;
 import uk.ac.cam.pd451.feature.exporter.graph.factor.FactorNode;
+import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 
 import java.util.*;
 import java.util.stream.Collectors;

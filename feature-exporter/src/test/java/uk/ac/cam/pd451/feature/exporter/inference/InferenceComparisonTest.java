@@ -6,6 +6,7 @@ import uk.ac.cam.pd451.feature.exporter.graph.bn.BayesianNetwork;
 import uk.ac.cam.pd451.feature.exporter.graph.bn.BayesianNode;
 import uk.ac.cam.pd451.feature.exporter.graph.factor.FactorGraph;
 import uk.ac.cam.pd451.feature.exporter.graph.factor.FactorNode;
+import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 
 import java.util.HashMap;
 import java.util.List;

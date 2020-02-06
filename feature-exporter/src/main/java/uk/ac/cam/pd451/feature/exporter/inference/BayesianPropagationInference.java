@@ -2,6 +2,7 @@ package uk.ac.cam.pd451.feature.exporter.inference;
 
 import uk.ac.cam.pd451.feature.exporter.graph.bn.BayesianNetwork;
 import uk.ac.cam.pd451.feature.exporter.graph.bn.BayesianNode;
+import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 
 import java.util.ArrayList;
 import java.util.HashMap;

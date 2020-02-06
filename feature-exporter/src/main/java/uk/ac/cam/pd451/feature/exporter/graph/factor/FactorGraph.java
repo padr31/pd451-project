@@ -1,13 +1,15 @@
 package uk.ac.cam.pd451.feature.exporter.graph.factor;
 
+import uk.ac.cam.pd451.feature.exporter.inference.variable.VariableIdentifier;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class FactorGraph {
-    private Map<String, FactorNode> nodes;
+    private Map<VariableIdentifier, FactorNode> nodes;
 
     public FactorGraph(List<FactorNode> nodes) {
-        this.nodes = nodes.stream().collect(Collectors.toMap(n -> n.getVariable().getName(), n -> n));
+        this.nodes = nodes.stream().collect(Collectors.toMap(n -> n.getVariable().getId(), n -> n));
     }
 
     public List<FactorNode> topologicalOrdering(){

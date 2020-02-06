@@ -34,6 +34,24 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
                         inMeth)
                 );
             });
+
+            //adding null
+            result = neo4JConnector.query("match (var) --> (eq) --> (nul)\n" +
+                    "match (decl_var) --> (var)\n" +
+                    "match (met) --> (met_name) --> (name) <-- (met_sig)\n" +
+                    "match p=shortestPath((met) -[*]-> (var)) where nul.contents=\"null\" and decl_var.type=\"SYMBOL_VAR\" and met.contents=\"METHOD\" and met_name.contents=\"NAME\" and name.type=\"IDENTIFIER_TOKEN\" and eq.contents=\"EQ\" and var.type=\"IDENTIFIER_TOKEN\" and met_sig.type=\"SYMBOL_MTH\"\n" +
+                    "return decl_var.contents, nul.startLineNumber as heap, collect([met_sig.contents, \n" +
+                    "toString(length(p))]) as inMeth, met_sig.type");
+
+            result.forEachRemaining(resultEntry -> {
+                String inMeth = ResultParseUtils.getMinDistanceMethodName((List<String>[]) resultEntry.get("inMeth"));
+                alloc.addEntry(new RelationEntry(
+                        (String) resultEntry.get("decl_var.contents"),
+                        Long.toString((Long) resultEntry.get("heap")),
+                        inMeth)
+                );
+            });
+
             return alloc;
         }).extractRelation());
         t.printLastTimeSegment("TIMER 3 - ALLOC");
@@ -57,10 +75,19 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
             Iterator<Map<String, Object>> result = neo4JConnector.query("match (var) --> (eq) --> (new)\n" +
                     "match (type) <-- (new_class) --> (new)\n" +
                     "where new.contents=\"NEW\" and eq.contents=\"EQ\" and var.type=\"IDENTIFIER_TOKEN\" and type.type=\"TYPE\"\n" +
-                    "return new.startLineNumber, type.contents");
+                    "return new.startLineNumber as lineNumber, type.contents as heapType");
+
             result.forEachRemaining(resultEntry -> {
-                heaptype.addEntry(new RelationEntry(Long.toString((Long) resultEntry.get("new.startLineNumber")), (String) resultEntry.get("type.contents")));
+                heaptype.addEntry(new RelationEntry(Long.toString((Long) resultEntry.get("lineNumber")), (String) resultEntry.get("heapType")));
             });
+
+            //adding null
+            result = neo4JConnector.query("match (n) where n.contents=\"null\" return n.startLineNumber as lineNumber, n.contents as heapType");
+
+            result.forEachRemaining(resultEntry -> {
+                heaptype.addEntry(new RelationEntry(Long.toString((Long) resultEntry.get("lineNumber")), (String) resultEntry.get("heapType")));
+            });
+
             return heaptype;
         }).extractRelation());
         t.printLastTimeSegment("TIMER 3 - HEAPTYPE");

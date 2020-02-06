@@ -1,4 +1,6 @@
 package uk.ac.cam.pd451.feature.exporter.pipeline;
+import me.tongfei.progressbar.ProgressBar;
+import me.tongfei.progressbar.ProgressBarStyle;
 import uk.ac.cam.acr31.features.javac.proto.GraphProtos;
 import uk.ac.cam.pd451.feature.exporter.analysis.AndersenPointsToAnalysisExtractor;
 import uk.ac.cam.pd451.feature.exporter.neo4j.ast.Neo4jJavaConnector;
@@ -31,7 +33,10 @@ public class ExtractorStep implements Step<String, String> {
         protoFilePaths.forEach(System.out::println);
         t.printLastTimeSegment("loading file paths");
 
+        ProgressBar pb = new ProgressBar("Feature Extraction", protoFilePaths.size(), ProgressBarStyle.ASCII); // name, initial max
+        pb.start();
         for(Path filePath : protoFilePaths) {
+            pb.step();
             try (FileInputStream fis = new FileInputStream(filePath.toString())) {
                 GraphProtos.Graph graph = GraphProtos.Graph.parseFrom(fis);
                 System.out.println("Loading graph into Neo4J: " + filePath.toString());
@@ -55,6 +60,7 @@ public class ExtractorStep implements Step<String, String> {
                 throw new PipeException(e);
             }
         }
+        pb.stop();
         Neo4jJavaConnector.getInstance().closeConnections();
         return null;
     }

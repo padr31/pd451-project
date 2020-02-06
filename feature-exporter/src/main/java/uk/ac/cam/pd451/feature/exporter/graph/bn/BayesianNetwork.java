@@ -1,16 +1,17 @@
 package uk.ac.cam.pd451.feature.exporter.graph.bn;
 
-import uk.ac.cam.pd451.feature.exporter.inference.Variable;
+import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
+import uk.ac.cam.pd451.feature.exporter.inference.variable.VariableIdentifier;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class BayesianNetwork {
 
-    private Map<String, BayesianNode> nodes;
+    private Map<VariableIdentifier, BayesianNode> nodes;
 
     public BayesianNetwork(List<BayesianNode> nodes) {
-        this.nodes = nodes.stream().collect(Collectors.toMap(n -> n.getVariable().getName(), n -> n));
+        this.nodes = nodes.stream().collect(Collectors.toMap(n -> n.getVariable().getId(), n -> n));
     }
 
     public List<BayesianNode> topologicalOrdering(){
@@ -39,7 +40,7 @@ public class BayesianNetwork {
     }
 
     public BayesianNode getNode(Variable v) {
-        return this.nodes.get(v.getName());
+        return this.nodes.get(v.getId());
     }
 
     public List<BayesianNode> getRoots() {

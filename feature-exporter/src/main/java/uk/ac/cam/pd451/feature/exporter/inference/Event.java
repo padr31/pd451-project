@@ -1,6 +1,8 @@
 package uk.ac.cam.pd451.feature.exporter.inference;
 
-public class Event implements Comparable {
+import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
+
+public class Event {
     private Variable variable;
     private int value;
 
@@ -18,7 +20,7 @@ public class Event implements Comparable {
 
     @Override
     public int hashCode() {
-        return this.getVariable().getName().hashCode();
+        return this.getVariable().getId().hashCode();
     }
 
     public Variable getVariable() {
@@ -29,11 +31,4 @@ public class Event implements Comparable {
         return value;
     }
 
-    @Override
-    public int compareTo(Object o) {
-        if(!(o instanceof Event)) {
-            throw new ClassCastException();
-        }
-        return this.variable.compareTo(((Event) o).variable);
-    }
 }

@@ -33,12 +33,15 @@ public class FeatureWorld {
     public static void main(String[] args) {
         FeatureWorld featureWorld = new FeatureWorld("features");
         Feature f;
+        f = null;
         f = new Feature(); //ALLOC(f, line-number, FeatureWorld-main) //HEAPTYPE(line-number, Feature())
         Feature f1 = new Feature();
         featureWorld.changeFeatures(f, f1);
 
         B beee = new B();
-        A a = new A();
+        A a;
+        a = null;
+        a = new A();
         a.doSomething(beee);
     }
 

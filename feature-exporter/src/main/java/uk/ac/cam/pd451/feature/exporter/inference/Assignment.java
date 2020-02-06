@@ -1,5 +1,8 @@
 package uk.ac.cam.pd451.feature.exporter.inference;
 
+import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
+import uk.ac.cam.pd451.feature.exporter.inference.variable.VariableIdentifier;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -73,13 +76,13 @@ public class Assignment {
     }
 
     public boolean contradicts(Assignment evidence) {
-        Map<String, Event> m = new HashMap<>();
-        this.events.forEach(e -> m.put(e.getVariable().getName(), e));
+        Map<VariableIdentifier, Event> m = new HashMap<>();
+        this.events.forEach(e -> m.put(e.getVariable().getId(), e));
         for(Event e : evidence.events) {
-            String varName = e.getVariable().getName();
+            VariableIdentifier varName = e.getVariable().getId();
             if (
                 m.containsKey(varName) &&
-                m.get(e.getVariable().getName()).getValue() != e.getValue()
+                m.get(e.getVariable().getId()).getValue() != e.getValue()
             ) return true;
         }
         return false;

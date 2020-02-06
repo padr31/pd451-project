@@ -1,7 +1,7 @@
-package uk.ac.cam.pd451.feature.exporter.inference;
+package uk.ac.cam.pd451.feature.exporter.inference.variable;
 
-public interface VariableIdentifier {
+public abstract class VariableIdentifier {
 
-    int hashCode();
-    boolean equals(Object other);
+    public abstract int hashCode();
+    public abstract boolean equals(Object other);
 }

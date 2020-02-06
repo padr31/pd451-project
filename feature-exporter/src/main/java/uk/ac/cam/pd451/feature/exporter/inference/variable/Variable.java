@@ -1,16 +1,25 @@
-package uk.ac.cam.pd451.feature.exporter.inference;
+package uk.ac.cam.pd451.feature.exporter.inference.variable;
+
+import uk.ac.cam.pd451.feature.exporter.inference.Assignment;
+import uk.ac.cam.pd451.feature.exporter.inference.Event;
+import uk.ac.cam.pd451.feature.exporter.inference.Factor;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-public class Variable implements Comparable{
+public class Variable {
 
-    private String id;
+    private VariableIdentifier id;
     private Set<Integer> domain;
 
     public Variable(String id, Set<Integer> domain) {
+        this.id = new VariableNameIdentifier(id);
+        this.domain = domain;
+    }
+
+    public Variable(VariableIdentifier id, Set<Integer> domain) {
         this.id = id;
         this.domain = domain;
     }
@@ -26,20 +35,12 @@ public class Variable implements Comparable{
         return this.id.hashCode();
     }
 
-    public String getId() {
+    public VariableIdentifier getId() {
         return this.id;
     }
 
     public Set<Integer> getDomain() {
         return this.domain;
-    }
-
-    @Override
-    public int compareTo(Object o) {
-        if(!(o instanceof Variable)) {
-            throw new ClassCastException();
-        }
-        return this.id.compareTo(((Variable) o).id);
     }
 
     public Event randomSample() {

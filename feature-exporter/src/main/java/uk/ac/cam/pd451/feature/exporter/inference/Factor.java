@@ -1,7 +1,8 @@
 package uk.ac.cam.pd451.feature.exporter.inference;
 
+import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
+
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Factor {
 
