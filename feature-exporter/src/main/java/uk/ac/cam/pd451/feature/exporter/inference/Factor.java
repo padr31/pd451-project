@@ -70,4 +70,16 @@ public class Factor {
             }
         }
     }
+
+    @Override
+    public boolean equals(Object other) {
+        if(!(other instanceof Factor))
+            return false;
+        if(!(new HashSet<>(this.variables).equals(new HashSet<>(((Factor) other).variables))))
+            return false;
+        for(Map.Entry<Assignment, Double> e : this.function.entrySet()) {
+            if(!((Factor) other).get(e.getKey()).equals(e.getValue())) return false;
+        }
+        return true;
+    }
 }

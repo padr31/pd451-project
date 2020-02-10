@@ -23,4 +23,9 @@ public class VariablePredicateIdentifier extends VariableIdentifier {
             return this.p.equals(((VariablePredicateIdentifier) other).p);
         }
     }
+
+    @Override
+    public String toString() {
+        return this.p.getName();
+    }
 }

@@ -239,7 +239,8 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
 
         extractedRelations.add(((RelationExtractor) () -> {
             Relation reachable = new Relation("REACHABLE", 1);
-            Iterator<Map<String, Object>> result = neo4JConnector.query("match (decl_meth) where decl_meth.type=\"SYMBOL_MTH\" and decl_meth.contents CONTAINS \"main\" return decl_meth.contents\n");
+            // only containing main Iterator<Map<String, Object>> result = neo4JConnector.query("match (decl_meth) where decl_meth.type=\"SYMBOL_MTH\" and decl_meth.contents CONTAINS \"main\" return decl_meth.contents\n");
+            Iterator<Map<String, Object>> result = neo4JConnector.query("match (decl_meth) where decl_meth.type=\"SYMBOL_MTH\" return decl_meth.contents");
             result.forEachRemaining(resultEntry -> {
                 reachable.addEntry(
                         new RelationEntry((String) resultEntry.get("decl_meth.contents"))

@@ -23,7 +23,8 @@ public class UserInteractionStep implements Step<ProvenanceGraph, RankingStatist
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getVariable()));
 
         System.out.println("Initialising inference algorithm");
-        BayesianPropagationInference i = new BayesianPropagationInference();
+
+        BayessianGibbsSamplingInference i = new BayessianGibbsSamplingInference();
         i.setModel(g.getBayesianNetwork());
 
         Map<Predicate, Event> evidence = new HashMap<>();

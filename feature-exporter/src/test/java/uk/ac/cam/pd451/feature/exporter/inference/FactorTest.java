@@ -137,4 +137,48 @@ class FactorTest {
         );
         Factor acpt = new Factor(List.of(a), amap);
     }
+
+    @Test
+    public void equalsTest() {
+        Variable a = new Variable("a", Set.of(0, 1));
+        Variable b = new Variable("b", Set.of(0, 1));
+        Variable f = new Variable("f", Set.of(0, 1));
+
+        Map<Assignment, Double> amap = Map.of(
+                new Assignment(List.of(new Event(a, 0), new Event(b, 0), new Event(f, 0))), 0.997,
+                new Assignment(List.of(new Event(a, 1), new Event(b, 0), new Event(f, 0))), 0.003,
+                new Assignment(List.of(new Event(a, 0), new Event(b, 0), new Event(f, 1))), 0.8,
+                new Assignment(List.of(new Event(a, 1), new Event(b, 0), new Event(f, 1))), 0.2,
+                new Assignment(List.of(new Event(a, 0), new Event(b, 1), new Event(f, 0))), 0.01,
+                new Assignment(List.of(new Event(a, 1), new Event(b, 1), new Event(f, 0))), 0.99,
+                new Assignment(List.of(new Event(a, 0), new Event(b, 1), new Event(f, 1))), 0.008,
+                new Assignment(List.of(new Event(a, 1), new Event(b, 1), new Event(f, 1))), 0.992
+        );
+        Factor acpt = new Factor(List.of(a, b, f), amap);
+
+        Map<Assignment, Double> bmap = Map.of(
+                new Assignment(List.of(new Event(a, 0), new Event(b, 0), new Event(f, 0))), 0.997,
+                new Assignment(List.of(new Event(a, 0), new Event(b, 0), new Event(f, 1))), 0.8,
+                new Assignment(List.of(new Event(a, 1), new Event(b, 0), new Event(f, 0))), 0.003,
+                new Assignment(List.of(new Event(a, 1), new Event(b, 0), new Event(f, 1))), 0.2,
+                new Assignment(List.of(new Event(a, 1), new Event(b, 1), new Event(f, 0))), 0.99,
+                new Assignment(List.of(new Event(a, 0), new Event(b, 1), new Event(f, 0))), 0.01,
+                new Assignment(List.of(new Event(a, 0), new Event(b, 1), new Event(f, 1))), 0.008,
+                new Assignment(List.of(new Event(a, 1), new Event(b, 1), new Event(f, 1))), 0.992
+        );
+        Factor bcpt = new Factor(List.of(b, a, f), amap);
+        assertEquals(acpt, bcpt);
+
+        Map<Assignment, Double> cmap = Map.of(
+                new Assignment(List.of(new Event(a, 0), new Event(b, 0), new Event(f, 0))), 0.97,
+                new Assignment(List.of(new Event(a, 0), new Event(b, 0), new Event(f, 1))), 0.8,
+                new Assignment(List.of(new Event(a, 1), new Event(b, 0), new Event(f, 0))), 0.203,
+                new Assignment(List.of(new Event(a, 1), new Event(b, 0), new Event(f, 1))), 0.2,
+                new Assignment(List.of(new Event(a, 1), new Event(b, 1), new Event(f, 0))), 0.99,
+                new Assignment(List.of(new Event(a, 0), new Event(b, 1), new Event(f, 0))), 0.01
+        );
+        Factor ccpt = new Factor(List.of(b, a, f), cmap);
+
+        assertNotEquals(acpt, ccpt);
+    }
 }

@@ -17,7 +17,6 @@ public class ProvenanceCreationStep implements Step<List<Clause>, ProvenanceGrap
     @Override
     public ProvenanceGraph process(List<Clause> groundClauses) throws PipeException {
         System.out.println("Eliminated clause count: " + groundClauses.size());
-
         /*Neo4jOGMProvenanceConnector provenanceConnector = Neo4jOGMProvenanceConnector.getInstance();
         provenanceConnector.clearDatabase();
         provenanceConnector.loadGraph(groundClauses);*/
@@ -83,12 +82,6 @@ public class ProvenanceCreationStep implements Step<List<Clause>, ProvenanceGrap
          *
          */
         clauseToNode.forEach((cl, node) -> {
-                    List<Variable> bodyVariables = node.getParentSet().stream().map(BayesianNode::getVariable).collect(Collectors.toList());
-                    if(bodyVariables.size() > 4) {
-                        System.out.println();
-                    }
-        });
-        clauseToNode.forEach((cl, node) -> {
             List<Variable> bodyVariables = node.getParentSet().stream().map(BayesianNode::getVariable).collect(Collectors.toList());
             Variable clauseVariable = node.getVariable();
 
@@ -104,8 +97,8 @@ public class ProvenanceCreationStep implements Step<List<Clause>, ProvenanceGrap
                     }
                 if(allBodyVariablesTrue && a.getValue(clauseVariable) == 1) return 0.95;
                 else if(allBodyVariablesTrue && a.getValue(clauseVariable) == 0) return 0.05;
-                else if(!allBodyVariablesTrue && a.getValue(clauseVariable) == 1) return 0.0;
-                else return 1.0;
+                else if(!allBodyVariablesTrue && a.getValue(clauseVariable) == 1) return 0.1;
+                else return 0.9;
             }));
 
             Factor CPT = new Factor(assignmentVariables, function);
@@ -162,10 +155,10 @@ public class ProvenanceCreationStep implements Step<List<Clause>, ProvenanceGrap
                             orOfAncestors = true;
                             break;
                         }
-                    if(orOfAncestors && a.getValue(predVariable) == 1) return 1.0;
-                    else if(orOfAncestors && a.getValue(predVariable) == 0) return 0.0;
-                    else if(!orOfAncestors && a.getValue(predVariable) == 1) return 0.0;
-                    else return 1.0;
+                    if(orOfAncestors && a.getValue(predVariable) == 1) return 0.9;
+                    else if(orOfAncestors && a.getValue(predVariable) == 0) return 0.1;
+                    else if(!orOfAncestors && a.getValue(predVariable) == 1) return 0.1;
+                    else return 0.9;
                 }));
 
                 Factor CPT = new Factor(assignmentVariables, function);

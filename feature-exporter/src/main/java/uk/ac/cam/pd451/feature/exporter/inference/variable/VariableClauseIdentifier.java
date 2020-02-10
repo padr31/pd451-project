@@ -20,4 +20,9 @@ public class VariableClauseIdentifier extends VariableIdentifier {
         if(!(other instanceof VariableClauseIdentifier)) return false;
         else return this.c.equals(((VariableClauseIdentifier) other).c);
     }
+
+    @Override
+    public String toString() {
+        return "cl: " + this.c.getHead().getName();
+    }
 }

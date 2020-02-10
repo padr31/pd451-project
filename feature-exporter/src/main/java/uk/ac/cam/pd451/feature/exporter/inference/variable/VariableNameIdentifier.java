@@ -20,4 +20,9 @@ public class VariableNameIdentifier extends VariableIdentifier {
             return this.name.equals(((VariableNameIdentifier) other).name);
         }
     }
+
+    @Override
+    public String toString() {
+        return this.name;
+    }
 }

@@ -17,7 +17,7 @@ public class BayessianGibbsSamplingInference implements InferenceAlgorithm<Bayes
     //Should be Map<Variable, Map<Event, Integer>> but I will avoid creating Event objects every time
     private Map<Variable, Map<Integer, Double>> counts = new HashMap<>();
 
-    private final static int DEFAULT_GIBBS_ITERATIONS = 100;
+    private final static int DEFAULT_GIBBS_ITERATIONS = 10;
 
     @Override
     public void setModel(BayesianNetwork model) {
@@ -42,15 +42,22 @@ public class BayessianGibbsSamplingInference implements InferenceAlgorithm<Bayes
             for(int i : v.getDomain()) {
                 counts.get(v).put(i, 1.0);
             }
+            //System.out.print(v.getId().toString() + " | ");
         }
+        //System.out.println();
 
         //initialise state - set unobserved variables to random samples from their domains
         for(BayesianNode node : topsort) {
             Variable v = node.getVariable();
             if(this.evidence.contains(v)) {
                 state.put(v, new Event(v, this.evidence.getValue(v)));
-            } else state.put(v, new Event(v, v.randomSample().getValue()));
+            } else {
+                Event e = new Event(v, v.randomSample().getValue());
+                state.put(v, e);
+                //System.out.print(e.getValue() + " | ");
+            }
         }
+        //System.out.println();
 
         for(int j = 0; j < DEFAULT_GIBBS_ITERATIONS; j++) {
             for(BayesianNode n : topsort) {
@@ -59,8 +66,10 @@ public class BayessianGibbsSamplingInference implements InferenceAlgorithm<Bayes
                     Event e = sampleBasedOnMarkovBlanket(v, state);
                     state.put(v, e);
                     counts.get(v).put(e.getValue(), counts.get(v).get(e.getValue()) + 1.0);
+                    //System.out.print(e.getValue() + " | ");
                 }
             }
+            //System.out.println();
             boolean equalsInferredAssignment = true;
             for(Event e : events.events) {
                 if(!state.get(e.getVariable()).equals(e)) equalsInferredAssignment = false;
@@ -124,6 +133,6 @@ public class BayessianGibbsSamplingInference implements InferenceAlgorithm<Bayes
     }
 
     public void addEvidence(Event e) {
-        this.evidence.addEvent(e);
+        this.evidence = this.evidence.addEvent(e);
     }
 }
