@@ -2,6 +2,7 @@ package uk.ac.cam.pd451.feature.exporter.inference;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import uk.ac.cam.pd451.feature.exporter.inference.factor.AssignmentTableFactor;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 
 import java.util.*;
@@ -67,13 +68,13 @@ class FactorTest {
         probs.put(xy10, 0.2);
         probs.put(xy11, 0.4);
 
-        Factor f = new Factor(List.of(x, y), probs);
+        AssignmentTableFactor f = new AssignmentTableFactor(List.of(x, y), probs);
 
         Map<Assignment, Double> probsx = new HashMap<>();
         probsx.put(xy00.remove(y), 0.4);
         probsx.put(xy10.remove(y), 0.6000000000000001);
 
-        Factor fx = f.eliminate(y);
+        AssignmentTableFactor fx = f.eliminate(y);
 
         assertEquals(probsx, fx.function);
         assertEquals(List.of(x), fx.variables);
@@ -87,7 +88,7 @@ class FactorTest {
         probsXY.put(xy10, 0.2);
         probsXY.put(xy11, 0.4);
 
-        Factor fXY = new Factor(List.of(x, y), probsXY);
+        AssignmentTableFactor fXY = new AssignmentTableFactor(List.of(x, y), probsXY);
 
         Map<Assignment, Double> probsYZ = new HashMap<>();
         probsYZ.put(yz00, 0.1);
@@ -95,7 +96,7 @@ class FactorTest {
         probsYZ.put(yz10, 0.4);
         probsYZ.put(yz11, 0.2);
 
-        Factor fYZ = new Factor(List.of(y, z), probsYZ);
+        AssignmentTableFactor fYZ = new AssignmentTableFactor(List.of(y, z), probsYZ);
 
         Assignment xyz000 = new Assignment(List.of(ex0, ey0, ez0));
         Assignment xyz001 = new Assignment(List.of(ex0, ey0, ez1));
@@ -115,7 +116,7 @@ class FactorTest {
         probsXYZ.put(xyz110, 0.16000000000000003);
         probsXYZ.put(xyz111, 0.08000000000000002);
 
-        Factor fXYZ = fXY.product(fYZ);
+        AssignmentTableFactor fXYZ = fXY.product(fYZ);
         assertEquals(probsXYZ, fXYZ.function);
     }
 
@@ -135,7 +136,7 @@ class FactorTest {
                 new Assignment(List.of(new Event(a, 0), new Event(b, 1), new Event(f, 1))), 0.008,
                 new Assignment(List.of(new Event(a, 1), new Event(b, 1), new Event(f, 1))), 0.992
         );
-        Factor acpt = new Factor(List.of(a), amap);
+        AssignmentTableFactor acpt = new AssignmentTableFactor(List.of(a), amap);
     }
 
     @Test
@@ -154,7 +155,7 @@ class FactorTest {
                 new Assignment(List.of(new Event(a, 0), new Event(b, 1), new Event(f, 1))), 0.008,
                 new Assignment(List.of(new Event(a, 1), new Event(b, 1), new Event(f, 1))), 0.992
         );
-        Factor acpt = new Factor(List.of(a, b, f), amap);
+        AssignmentTableFactor acpt = new AssignmentTableFactor(List.of(a, b, f), amap);
 
         Map<Assignment, Double> bmap = Map.of(
                 new Assignment(List.of(new Event(a, 0), new Event(b, 0), new Event(f, 0))), 0.997,
@@ -166,7 +167,7 @@ class FactorTest {
                 new Assignment(List.of(new Event(a, 0), new Event(b, 1), new Event(f, 1))), 0.008,
                 new Assignment(List.of(new Event(a, 1), new Event(b, 1), new Event(f, 1))), 0.992
         );
-        Factor bcpt = new Factor(List.of(b, a, f), amap);
+        AssignmentTableFactor bcpt = new AssignmentTableFactor(List.of(b, a, f), amap);
         assertEquals(acpt, bcpt);
 
         Map<Assignment, Double> cmap = Map.of(
@@ -177,7 +178,7 @@ class FactorTest {
                 new Assignment(List.of(new Event(a, 1), new Event(b, 1), new Event(f, 0))), 0.99,
                 new Assignment(List.of(new Event(a, 0), new Event(b, 1), new Event(f, 0))), 0.01
         );
-        Factor ccpt = new Factor(List.of(b, a, f), cmap);
+        AssignmentTableFactor ccpt = new AssignmentTableFactor(List.of(b, a, f), cmap);
 
         assertNotEquals(acpt, ccpt);
     }

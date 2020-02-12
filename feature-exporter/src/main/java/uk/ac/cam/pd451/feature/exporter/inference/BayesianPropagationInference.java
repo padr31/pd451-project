@@ -2,6 +2,7 @@ package uk.ac.cam.pd451.feature.exporter.inference;
 
 import uk.ac.cam.pd451.feature.exporter.graph.bn.BayesianNetwork;
 import uk.ac.cam.pd451.feature.exporter.graph.bn.BayesianNode;
+import uk.ac.cam.pd451.feature.exporter.inference.factor.AssignmentTableFactor;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 
 import java.util.ArrayList;
@@ -15,11 +16,11 @@ public class BayesianPropagationInference implements InferenceAlgorithm<Bayesian
     private BayesianNetwork bn;
     private Assignment evidence = new Assignment(List.of());
 
-    Map<Variable, Factor> lambdaValues = new HashMap<>();
-    Map<Variable, Map<Variable, Factor>> lambdaMessages = new HashMap<>();
-    Map<Variable, Factor> piValues = new HashMap<>();
-    Map<Variable, Map<Variable, Factor>> piMessages = new HashMap<>();
-    Map<Variable, Factor> conditionalProbs = new HashMap<>();
+    Map<Variable, AssignmentTableFactor> lambdaValues = new HashMap<>();
+    Map<Variable, Map<Variable, AssignmentTableFactor>> lambdaMessages = new HashMap<>();
+    Map<Variable, AssignmentTableFactor> piValues = new HashMap<>();
+    Map<Variable, Map<Variable, AssignmentTableFactor>> piMessages = new HashMap<>();
+    Map<Variable, AssignmentTableFactor> conditionalProbs = new HashMap<>();
 
 
     @Override
@@ -62,7 +63,7 @@ public class BayesianPropagationInference implements InferenceAlgorithm<Bayesian
 
     private void sendPiMessage(BayesianNode nodeZ, BayesianNode nodeX) {
         //update pi message Z -> pi_x(z) -> X
-        Factor piXZ = piValues.get(nodeZ.getVariable());
+        AssignmentTableFactor piXZ = piValues.get(nodeZ.getVariable());
         for(BayesianNode nodeY : nodeZ.getChildSet()) {
             if(!nodeY.getVariable().equals(nodeX.getVariable())) {
                 piXZ = piXZ.product(
@@ -76,8 +77,8 @@ public class BayesianPropagationInference implements InferenceAlgorithm<Bayesian
 
         //calculate pi value of X
         if(!evidence.contains(nodeX.getVariable())) {
-            Factor piX = nodeX.getCPT();
-            Map<Variable, Factor> piXMessages = piMessages.get(nodeX.getVariable());
+            AssignmentTableFactor piX = nodeX.getCPT();
+            Map<Variable, AssignmentTableFactor> piXMessages = piMessages.get(nodeX.getVariable());
             for(BayesianNode nodeZi : nodeX.getParentSet()) {
                 piX = piX.product(piXMessages.get(nodeZi.getVariable()));
             }
@@ -88,7 +89,7 @@ public class BayesianPropagationInference implements InferenceAlgorithm<Bayesian
             piValues.put(nodeX.getVariable(), piX);
 
             //calculate conditional prob of X
-            Factor probX = lambdaValues.get(nodeX.getVariable()).product(piX);
+            AssignmentTableFactor probX = lambdaValues.get(nodeX.getVariable()).product(piX);
             probX.normalise();
             conditionalProbs.put(nodeX.getVariable(), probX);
 
@@ -108,7 +109,7 @@ public class BayesianPropagationInference implements InferenceAlgorithm<Bayesian
 
     private void sendLambdaMessage(BayesianNode nodeY, BayesianNode nodeX) {
         //Y sends X a message
-        Factor lambdaYX = nodeY.getCPT();
+        AssignmentTableFactor lambdaYX = nodeY.getCPT();
         for(BayesianNode nodeWi : nodeY.getParentSet()) {
             if(!nodeWi.getVariable().equals(nodeX.getVariable()))
                 lambdaYX = lambdaYX.product(piMessages.get(nodeY.getVariable()).get(nodeWi.getVariable()));
@@ -124,7 +125,7 @@ public class BayesianPropagationInference implements InferenceAlgorithm<Bayesian
         //update lambda of X from the lambda messages of its children
         if(!nodeX.getChildSet().isEmpty()) {
             List<BayesianNode> childList = new ArrayList<>(nodeX.getChildSet());
-            Factor lambdaX = lambdaMessages.get(childList.get(0).getVariable()).get(nodeX.getVariable());
+            AssignmentTableFactor lambdaX = lambdaMessages.get(childList.get(0).getVariable()).get(nodeX.getVariable());
             for(int i = 1; i < childList.size(); i++) {
                 lambdaX = lambdaX.product(lambdaMessages.get(childList.get(i).getVariable()).get(nodeX.getVariable()));
             }
@@ -132,7 +133,7 @@ public class BayesianPropagationInference implements InferenceAlgorithm<Bayesian
         }
 
         //update conditional probs of X
-        Factor probsX = lambdaValues.get(nodeX.getVariable()).product(piValues.get(nodeX.getVariable()));
+        AssignmentTableFactor probsX = lambdaValues.get(nodeX.getVariable()).product(piValues.get(nodeX.getVariable()));
         probsX.normalise();
         conditionalProbs.put(nodeX.getVariable(), probsX);
 
@@ -147,12 +148,12 @@ public class BayesianPropagationInference implements InferenceAlgorithm<Bayesian
         }
     }
 
-    private Factor getUnitFactorFor(Variable x) {
-        return new Factor(List.of(x), Assignment.allAssignments(List.of(x)).stream().collect(Collectors.toMap(a -> a, a -> 1.0)));
+    private AssignmentTableFactor getUnitFactorFor(Variable x) {
+        return new AssignmentTableFactor(List.of(x), Assignment.allAssignments(List.of(x)).stream().collect(Collectors.toMap(a -> a, a -> 1.0)));
     }
 
-    private Factor getOneHotFactorFor(Event e) {
-        return new Factor(List.of(e.getVariable()), Assignment.allAssignments(List.of(e.getVariable())).stream().collect(Collectors.toMap(a -> a, a -> a.contains(e) ? 1.0 : 0.0)));
+    private AssignmentTableFactor getOneHotFactorFor(Event e) {
+        return new AssignmentTableFactor(List.of(e.getVariable()), Assignment.allAssignments(List.of(e.getVariable())).stream().collect(Collectors.toMap(a -> a, a -> a.contains(e) ? 1.0 : 0.0)));
     }
 
     @Override

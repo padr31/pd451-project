@@ -6,6 +6,7 @@ import uk.ac.cam.pd451.feature.exporter.graph.bn.BayesianNetwork;
 import uk.ac.cam.pd451.feature.exporter.graph.bn.BayesianNode;
 import uk.ac.cam.pd451.feature.exporter.graph.factor.FactorGraph;
 import uk.ac.cam.pd451.feature.exporter.graph.factor.FactorNode;
+import uk.ac.cam.pd451.feature.exporter.inference.factor.AssignmentTableFactor;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 
 import java.util.HashMap;
@@ -52,7 +53,7 @@ public class InferenceComparisonTest {
                 new Assignment(List.of(new Event(burglary, 0))), 0.999,
                 new Assignment(List.of(new Event(burglary, 1))), 0.001
         );
-        Factor b = new Factor(List.of(burglary), dmap);
+        AssignmentTableFactor b = new AssignmentTableFactor(List.of(burglary), dmap);
         BayesianNode bnBurglaryNode = new BayesianNode(burglary);
         bnBurglaryNode.setCPT(b);
         FactorNode fgBurglaryNode = new FactorNode(burglary);
@@ -62,7 +63,7 @@ public class InferenceComparisonTest {
                 new Assignment(List.of(new Event(earthquake, 0))), 0.998,
                 new Assignment(List.of(new Event(earthquake, 1))), 0.002
         );
-        Factor e = new Factor(List.of(earthquake), emap);
+        AssignmentTableFactor e = new AssignmentTableFactor(List.of(earthquake), emap);
         BayesianNode bnEarthquakeNode = new BayesianNode(earthquake);
         bnEarthquakeNode.setCPT(e);
         FactorNode fgEarthquakeNode = new FactorNode(earthquake);
@@ -82,7 +83,7 @@ public class InferenceComparisonTest {
         );
         Map<Assignment, Double> amap = new HashMap<>(amap1);
         amap.putAll(amap2);
-        Factor g = new Factor(List.of(alarm, burglary, earthquake), amap);
+        AssignmentTableFactor g = new AssignmentTableFactor(List.of(alarm, burglary, earthquake), amap);
         BayesianNode bnAlarmNode = new BayesianNode(alarm);
         bnAlarmNode.setCPT(g);
         FactorNode fgAlarmNode = new FactorNode(alarm);
@@ -94,7 +95,7 @@ public class InferenceComparisonTest {
                 new Assignment(List.of(new Event(alarm, 0), new Event(john, 1))), 0.05,
                 new Assignment(List.of(new Event(alarm, 0), new Event(john, 0))), 0.95
         );
-        Factor s = new Factor(List.of(alarm, john), jmap);
+        AssignmentTableFactor s = new AssignmentTableFactor(List.of(alarm, john), jmap);
         BayesianNode bnJohnNode = new BayesianNode(john);
         bnJohnNode.setCPT(s);
         FactorNode fgJohnNode = new FactorNode(john);
@@ -106,7 +107,7 @@ public class InferenceComparisonTest {
                 new Assignment(List.of(new Event(alarm, 0), new Event(mary, 1))), 0.01,
                 new Assignment(List.of(new Event(alarm, 0), new Event(mary, 0))), 0.99
         );
-        Factor m = new Factor(List.of(alarm, mary), mmap);
+        AssignmentTableFactor m = new AssignmentTableFactor(List.of(alarm, mary), mmap);
         BayesianNode bnMaryNode = new BayesianNode(mary);
         bnMaryNode.setCPT(m);
         FactorNode fgMaryNode = new FactorNode(mary);

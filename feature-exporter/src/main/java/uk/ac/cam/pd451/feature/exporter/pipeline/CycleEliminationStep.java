@@ -16,7 +16,6 @@ public class CycleEliminationStep implements Step<List<Clause>, List<Clause>> {
         /*Neo4jOGMProvenanceConnector provenanceConnector = Neo4jOGMProvenanceConnector.getInstance();
         provenanceConnector.clearDatabase();
         provenanceConnector.loadGraph(input);*/
-        System.out.println("Initial clause count: " + input.size());
 
         //initialise timestamps
         for(Clause cl : input) {
@@ -25,7 +24,7 @@ public class CycleEliminationStep implements Step<List<Clause>, List<Clause>> {
                 putTimestamp(bodyPredicate);
             }
         }
-        System.out.println("number of tuples before elimination: " + tupleTStamps.size());
+        System.out.println("number of clauses before cycle elimination: " + input.size());
 
         //propagate timestamp increments
         boolean done = false;
@@ -45,12 +44,7 @@ public class CycleEliminationStep implements Step<List<Clause>, List<Clause>> {
             getTimestamp(cl.getHead()) > getMaxTimestamp(cl.getBody())
         ).collect(Collectors.toList());
 
-        Set<Predicate> outputTuples = new HashSet<>();
-        for(Clause cl : result) {
-            outputTuples.add(cl.getHead());
-            outputTuples.addAll(cl.getBody());
-        }
-        System.out.println("number of tuples after elimination: " + outputTuples.size());
+        System.out.println("number of clauses after cycle elimination: " + result.size());
 
         return result;
     }

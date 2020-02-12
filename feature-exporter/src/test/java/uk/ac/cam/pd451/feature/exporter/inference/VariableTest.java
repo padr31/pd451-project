@@ -2,6 +2,7 @@ package uk.ac.cam.pd451.feature.exporter.inference;
 
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeAll;
+import uk.ac.cam.pd451.feature.exporter.inference.factor.AssignmentTableFactor;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 
 import java.util.*;
@@ -21,7 +22,7 @@ public class VariableTest {
     @Test
     public void testSampleFromDistribution() {
         Variable x = new Variable("x", Set.of(0, 1, 2, 3));
-        Factor distribution = new Factor(
+        AssignmentTableFactor distribution = new AssignmentTableFactor(
             List.of(x),
             Map.of(
                 new Assignment(List.of(new Event(x, 0))), 0.3,

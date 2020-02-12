@@ -2,6 +2,7 @@ package uk.ac.cam.pd451.feature.exporter.inference;
 
 import uk.ac.cam.pd451.feature.exporter.graph.bn.BayesianNetwork;
 import uk.ac.cam.pd451.feature.exporter.graph.bn.BayesianNode;
+import uk.ac.cam.pd451.feature.exporter.inference.factor.AssignmentTableFactor;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 
 import java.util.HashMap;
@@ -121,7 +122,7 @@ public class BayessianGibbsSamplingInference implements InferenceAlgorithm<Bayes
             xProbs.put(new Assignment(List.of(e)), childrenScalingFactorFunction.get(domElem)*nodeX.getCPT().get(parentsAssignment.addEvent(e)));
         }
 
-        Factor xFactor = new Factor(List.of(nodeX.getVariable()), xProbs);
+        AssignmentTableFactor xFactor = new AssignmentTableFactor(List.of(nodeX.getVariable()), xProbs);
         xFactor.normalise();
 
         return nodeX.getVariable().sampleFromDistribution(xFactor);

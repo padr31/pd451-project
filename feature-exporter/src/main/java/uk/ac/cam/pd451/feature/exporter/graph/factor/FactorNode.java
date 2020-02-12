@@ -1,6 +1,6 @@
 package uk.ac.cam.pd451.feature.exporter.graph.factor;
 
-import uk.ac.cam.pd451.feature.exporter.inference.Factor;
+import uk.ac.cam.pd451.feature.exporter.inference.factor.AssignmentTableFactor;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 
 import java.util.HashSet;
@@ -13,7 +13,7 @@ public class FactorNode{
     private Set<FactorNode> childSet;
 
     private Variable variable;
-    private Factor parentalFactor;
+    private AssignmentTableFactor parentalFactor;
     private String id = UUID.randomUUID().toString();
 
     public FactorNode(Variable variable) {
@@ -36,7 +36,7 @@ public class FactorNode{
         return childSet;
     }
 
-    public Factor getParentalFactor() {
+    public AssignmentTableFactor getParentalFactor() {
         return parentalFactor;
     }
 
@@ -50,7 +50,7 @@ public class FactorNode{
         node.parentSet.add(this);
     }
 
-    public void setParentalFactor(Factor f) {
+    public void setParentalFactor(AssignmentTableFactor f) {
         this.parentalFactor = f;
     }
 

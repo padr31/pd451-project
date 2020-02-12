@@ -24,7 +24,7 @@ public class UserInteractionStep implements Step<ProvenanceGraph, RankingStatist
 
         System.out.println("Initialising inference algorithm");
 
-        BayessianGibbsSamplingInference i = new BayessianGibbsSamplingInference();
+        BayesianPropagationInference i = new BayesianPropagationInference();
         i.setModel(g.getBayesianNetwork());
 
         Map<Predicate, Event> evidence = new HashMap<>();
@@ -40,12 +40,14 @@ public class UserInteractionStep implements Step<ProvenanceGraph, RankingStatist
         }
         pb.stop();
 
+        alarmProbabilities.forEach((key, value) -> System.out.println(key.getTerms() + " prob: " + value));
+
         // re-rank based on user feedback (y/n)
         Scanner scanner = new Scanner(System.in);
         while(alarmProbabilities.size() != 0) {
 
             // pick alarm with largest probability and present for inspection
-            Predicate topAlarm = alarmProbabilities.entrySet().stream().min((a, b) -> a.getValue() - b.getValue() < 0 ? -1 : 1).get().getKey();
+            Predicate topAlarm = alarmProbabilities.entrySet().stream().min((a, b) -> b.getValue() - a.getValue() < 0 ? -1 : 1).get().getKey();
             System.out.println("Is this alarm a true positive? (1/0)");
             System.out.println(topAlarm.getTerms());
 

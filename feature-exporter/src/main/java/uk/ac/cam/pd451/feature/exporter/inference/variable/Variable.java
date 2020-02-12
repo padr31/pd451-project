@@ -2,7 +2,7 @@ package uk.ac.cam.pd451.feature.exporter.inference.variable;
 
 import uk.ac.cam.pd451.feature.exporter.inference.Assignment;
 import uk.ac.cam.pd451.feature.exporter.inference.Event;
-import uk.ac.cam.pd451.feature.exporter.inference.Factor;
+import uk.ac.cam.pd451.feature.exporter.inference.factor.AssignmentTableFactor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +50,7 @@ public class Variable {
         return new Event(this, dom.get(r));
     }
 
-    public Event sampleFromDistribution(Factor xFactor) {
+    public Event sampleFromDistribution(AssignmentTableFactor xFactor) {
         if(this.getDomain() == null || this.getDomain().isEmpty()) throw new ArrayIndexOutOfBoundsException("Cannot sample from empty domain.");
         double r = Math.random();
         // 0 will not be used as we have a guarantee that domain is not empty

@@ -4,10 +4,10 @@ import uk.ac.cam.pd451.feature.exporter.datalog.*;
 import uk.ac.cam.pd451.feature.exporter.graph.bn.BayesianNetwork;
 import uk.ac.cam.pd451.feature.exporter.graph.bn.BayesianNode;
 import uk.ac.cam.pd451.feature.exporter.inference.*;
+import uk.ac.cam.pd451.feature.exporter.inference.factor.AssignmentTableFactor;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.VariableClauseIdentifier;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.VariablePredicateIdentifier;
-import uk.ac.cam.pd451.feature.exporter.neo4j.provenance.Neo4jOGMProvenanceConnector;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,7 +16,6 @@ public class ProvenanceCreationStep implements Step<List<Clause>, ProvenanceGrap
 
     @Override
     public ProvenanceGraph process(List<Clause> groundClauses) throws PipeException {
-        System.out.println("Eliminated clause count: " + groundClauses.size());
         /*Neo4jOGMProvenanceConnector provenanceConnector = Neo4jOGMProvenanceConnector.getInstance();
         provenanceConnector.clearDatabase();
         provenanceConnector.loadGraph(groundClauses);*/
@@ -101,7 +100,7 @@ public class ProvenanceCreationStep implements Step<List<Clause>, ProvenanceGrap
                 else return 0.9;
             }));
 
-            Factor CPT = new Factor(assignmentVariables, function);
+            AssignmentTableFactor CPT = new AssignmentTableFactor(assignmentVariables, function);
             node.setCPT(CPT);
         });
 
@@ -129,7 +128,7 @@ public class ProvenanceCreationStep implements Step<List<Clause>, ProvenanceGrap
             // if node is root - predicate is an input clause
             if(node.getParentSet().size() == 0) {
                 node.setCPT(
-                        new Factor(List.of(node.getVariable()), Map.of(
+                        new AssignmentTableFactor(List.of(node.getVariable()), Map.of(
                             new Assignment(List.of(new Event(node.getVariable(), 0))), 0.0,
                             new Assignment(List.of(new Event(node.getVariable(), 1))), 1.0
                         )
@@ -144,10 +143,6 @@ public class ProvenanceCreationStep implements Step<List<Clause>, ProvenanceGrap
                 List<Variable> assignmentVariables = new ArrayList<>(ancestorVariables);
                 assignmentVariables.add(predVariable);
 
-                System.out.println(assignmentVariables.size());
-                if(assignmentVariables.size() > 20) {
-                    System.out.println();
-                }
                 Map<Assignment, Double> function = Assignment.allAssignments(assignmentVariables).stream().collect(Collectors.toMap(a -> a, a -> {
                     boolean orOfAncestors = false;
                     for(Variable bv: ancestorVariables)
@@ -161,7 +156,7 @@ public class ProvenanceCreationStep implements Step<List<Clause>, ProvenanceGrap
                     else return 0.9;
                 }));
 
-                Factor CPT = new Factor(assignmentVariables, function);
+                AssignmentTableFactor CPT = new AssignmentTableFactor(assignmentVariables, function);
                 node.setCPT(CPT);
             }
         });

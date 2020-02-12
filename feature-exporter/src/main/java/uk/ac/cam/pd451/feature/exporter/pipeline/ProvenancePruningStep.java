@@ -2,8 +2,6 @@ package uk.ac.cam.pd451.feature.exporter.pipeline;
 
 import uk.ac.cam.pd451.feature.exporter.datalog.Clause;
 import uk.ac.cam.pd451.feature.exporter.datalog.Predicate;
-
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -13,6 +11,10 @@ public class ProvenancePruningStep implements Step<List<Clause>, List<Clause>> {
     @Override
     public List<Clause> process(List<Clause> input) throws PipeException {
         System.out.println("Number of clauses before pruning: " + input.size());
+
+        /*Neo4jOGMProvenanceConnector provenanceConnector = Neo4jOGMProvenanceConnector.getInstance();
+        provenanceConnector.clearDatabase();
+        provenanceConnector.loadGraph(input);*/
 
         // initialize set of useful predicates - e.g. nullPointers
         Set<Predicate> essentialPredicates = input.stream().filter(cl -> cl.getHead().getName().equals("nullPointer")).map(Clause::getHead).collect(Collectors.toSet());

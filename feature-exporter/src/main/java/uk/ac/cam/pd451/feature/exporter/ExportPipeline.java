@@ -14,7 +14,7 @@ public class ExportPipeline {
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(option, args);
 
-        String pipe = "import";
+        String pipe = "extract/evaluate";
 
         Pipeline pipeline;
 
@@ -37,11 +37,18 @@ public class ExportPipeline {
                 );
                 pipeline.process("");
                 break;
+            case "extract/evaluate":
+                pipeline = new Pipeline<>(
+                        new ExtractorStep())
+                        .addStep(new DatalogStep());
+                pipeline.process(cmd.getOptionValue("input-file"));
+                break;
             case "import":
                 pipeline = new Pipeline<>(
                         new ProvenanceImportStep())
                         .addStep(new CycleEliminationStep())
-                        .addStep(new ProvenancePruningStep())
+                        //.addStep(new ProvenancePruningStep())
+                        //.addStep(new ProvenanceChainCompressionStep())
                         .addStep(new ProvenanceCreationStep())
                         .addStep(new UserInteractionStep());
                 pipeline.process(new EmptyIO());

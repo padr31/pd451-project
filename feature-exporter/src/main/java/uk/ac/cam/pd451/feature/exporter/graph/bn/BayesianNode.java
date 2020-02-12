@@ -1,7 +1,7 @@
 package uk.ac.cam.pd451.feature.exporter.graph.bn;
 
 import uk.ac.cam.pd451.feature.exporter.graph.factor.FactorNode;
-import uk.ac.cam.pd451.feature.exporter.inference.Factor;
+import uk.ac.cam.pd451.feature.exporter.inference.factor.AssignmentTableFactor;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 
 import java.util.HashSet;
@@ -19,7 +19,7 @@ public class BayesianNode {
     private Set<BayesianNode> childSet;
 
     private Variable variable;
-    private Factor cpt;
+    private AssignmentTableFactor cpt;
     private String id = UUID.randomUUID().toString();
 
     public BayesianNode(Variable variable) {
@@ -42,7 +42,7 @@ public class BayesianNode {
         return this.childSet;
     }
 
-    public Factor getCPT() {
+    public AssignmentTableFactor getCPT() {
         return this.cpt;
     }
 
@@ -56,7 +56,7 @@ public class BayesianNode {
         node.parentSet.add(this);
     }
 
-    public void setCPT(Factor cpt) {
+    public void setCPT(AssignmentTableFactor cpt) {
         this.cpt = cpt;
     }
 
