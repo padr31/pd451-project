@@ -24,7 +24,7 @@ public class UserInteractionStep implements Step<ProvenanceGraph, RankingStatist
 
         System.out.println("Initialising inference algorithm");
 
-        BayesianPropagationInference i = new BayesianPropagationInference();
+        BayessianGibbsSamplingInference i = new BayessianGibbsSamplingInference();
         i.setModel(g.getBayesianNetwork());
 
         Map<Predicate, Event> evidence = new HashMap<>();
@@ -41,6 +41,7 @@ public class UserInteractionStep implements Step<ProvenanceGraph, RankingStatist
         pb.stop();
 
         alarmProbabilities.forEach((key, value) -> System.out.println(key.getTerms() + " prob: " + value));
+        i.infer(pointsToSet.values().stream().map(v -> new Event(v, 1)).collect(Collectors.toList())).forEach(d -> System.out.println(d));
 
         // re-rank based on user feedback (y/n)
         Scanner scanner = new Scanner(System.in);

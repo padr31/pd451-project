@@ -51,7 +51,7 @@ public class ProvenanceCreationStep implements Step<List<Clause>, ProvenanceGrap
                 ));
 
         System.out.println("Connecting predicate nodes");
-
+        final int[] maxAntecedents = {0};
         //Connect nodes for all groundClauses do
         /*
          * a1     a2     a3  - antecedents (body)
@@ -64,6 +64,7 @@ public class ProvenanceCreationStep implements Step<List<Clause>, ProvenanceGrap
         clauseToNode.forEach((cl, node) -> {
             node.addChild(predicateToNode.get(cl.getHead()));
             cl.getBody().forEach(bodyPred -> node.addParent(predicateToNode.get(bodyPred)));
+            if(cl.getBody().size() > maxAntecedents[0]) maxAntecedents[0] = cl.getBody().size();
         });
 
         System.out.println("Setting CPTs for ground clauses");
@@ -138,6 +139,9 @@ public class ProvenanceCreationStep implements Step<List<Clause>, ProvenanceGrap
             // if node is non root
             else {
                 List<Variable> ancestorVariables = node.getParentSet().stream().map(BayesianNode::getVariable).collect(Collectors.toList());
+
+                if(ancestorVariables.size() > maxAntecedents[0]) maxAntecedents[0] = ancestorVariables.size();
+
                 Variable predVariable = node.getVariable();
 
                 List<Variable> assignmentVariables = new ArrayList<>(ancestorVariables);
@@ -161,6 +165,7 @@ public class ProvenanceCreationStep implements Step<List<Clause>, ProvenanceGrap
             }
         });
 
+        System.out.println("max antecedents: " + maxAntecedents[0]);
         System.out.println("Creating bayesian network");
         List<BayesianNode> allNodes = new ArrayList<>(clauseToNode.values());
         allNodes.addAll(predicateToNode.values());
