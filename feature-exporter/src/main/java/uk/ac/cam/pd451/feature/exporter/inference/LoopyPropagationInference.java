@@ -149,6 +149,16 @@ public class LoopyPropagationInference implements InferenceAlgorithm<BayesianNet
         return infer(events);
     }
 
+    public Map<Event, Double> infer(List<Event> events) {
+        return events
+                .stream()
+                .collect(Collectors.toMap(
+                        e -> e,
+                        e -> conditionalProbs.get(e.getVariable()).get(new Assignment(List.of(e)))
+                    )
+                );
+    }
+
     public double infer(Assignment events) {
         double result = 1.0;
         for(Event e : events.events) {

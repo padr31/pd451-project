@@ -191,6 +191,12 @@ class LoopyPropagationInferenceTest {
         double result3 = uut.infer(question3);
         assertEquals(0.275, result3, DELTA_TOLLERANCE);
 
+        // inference of multiple events at once
+        Map<Event, Double> res = uut.infer(List.of(new Event(grade, 1), new Event(grade, 2), new Event(sat, 1)));
+        assertEquals(0.362, res.get(new Event(grade, 1)), DELTA_TOLLERANCE);
+        assertEquals(0.2884, res.get(new Event(grade, 2)), DELTA_TOLLERANCE);
+        assertEquals(0.275, res.get(new Event(sat, 1)), DELTA_TOLLERANCE);
+
         Assignment question4 = new Assignment(List.of(new Event(difficulty, 1)));
         double result4 = uut.infer(question4);
         assertEquals(0.4, result4, DELTA_TOLLERANCE);
