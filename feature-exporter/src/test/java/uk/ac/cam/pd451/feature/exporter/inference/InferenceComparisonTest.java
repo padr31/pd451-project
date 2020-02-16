@@ -21,6 +21,7 @@ public class InferenceComparisonTest {
     private static BayesianEnumerationInference bayesianEnumerationInference;
     private static FactorEliminationInference eliminationInference;
     private static BayesianPropagationInference bayesianPropagationInference;
+    private static LoopyPropagationInference loopyPropagationInference;
 
     private static BayesianNetwork bn;
     private static FactorGraph fg;
@@ -140,18 +141,25 @@ public class InferenceComparisonTest {
         bayesianPropagationInference = new BayesianPropagationInference();
         bayesianPropagationInference.setModel(bn);
 
+        loopyPropagationInference = new LoopyPropagationInference();
+        loopyPropagationInference.setModel(bn);
+
         Assignment evidence = new Assignment(List.of(new Event(john, 1), new Event(mary, 1)));
         Assignment question = new Assignment(List.of(new Event(burglary, 1)));
         bayesianEnumerationInference.setEvidence(evidence);
         eliminationInference.setEvidence(evidence);
         bayesianPropagationInference.setEvidence(evidence);
+        loopyPropagationInference.setEvidence(evidence);
 
         double groundTruthBurglary = 0.284;
         double resultEnumeration = bayesianEnumerationInference.infer(question);
         double resultElimination = eliminationInference.infer(question);
         double resultPropagation = bayesianPropagationInference.infer(question);
+        double resultLoopy = loopyPropagationInference.infer(question);
+
         assertEquals(groundTruthBurglary, resultElimination, DELTA_TOLLERANCE);
         assertEquals(groundTruthBurglary, resultEnumeration, DELTA_TOLLERANCE);
         assertEquals(groundTruthBurglary, resultPropagation, DELTA_TOLLERANCE);
+        assertEquals(groundTruthBurglary, resultLoopy, DELTA_TOLLERANCE);
     }
 }

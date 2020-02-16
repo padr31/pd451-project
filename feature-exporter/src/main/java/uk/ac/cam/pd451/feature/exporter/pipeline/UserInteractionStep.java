@@ -32,16 +32,14 @@ public class UserInteractionStep implements Step<ProvenanceGraph, RankingStatist
 
         // insert all alarms with their prior probabilities
         System.out.println("Inferring prior probabilities");
-        ProgressBar pb = new ProgressBar("Inference of priors", pointsToSet.size(), ProgressBarStyle.ASCII);
-        pb.start();
+
+        Map<Event, Double> probs = i.infer(pointsToSet.values().stream().map(v -> new Event(v, 1)).collect(Collectors.toList()));
+
         for(Map.Entry<Predicate, Variable> pointsToVar : pointsToSet.entrySet()) {
-            pb.step();
-            alarmProbabilities.put(pointsToVar.getKey(), i.infer(new Assignment(List.of(new Event(pointsToVar.getValue(), 1)))));
+            alarmProbabilities.put(pointsToVar.getKey(), probs.get(new Event(pointsToVar.getValue(), 1)));
         }
-        pb.stop();
 
         alarmProbabilities.forEach((key, value) -> System.out.println(key.getTerms() + " prob: " + value));
-        i.infer(pointsToSet.values().stream().map(v -> new Event(v, 1)).collect(Collectors.toList())).forEach(d -> System.out.println(d));
 
         // re-rank based on user feedback (y/n)
         Scanner scanner = new Scanner(System.in);
@@ -68,7 +66,10 @@ public class UserInteractionStep implements Step<ProvenanceGraph, RankingStatist
 
             //re-calculate probabilities of remaining alarms by inference
             System.out.println("Recalculating...");
-            alarmProbabilities.replaceAll((alarm, prob) -> i.infer(new Assignment(List.of(new Event(pointsToSet.get(alarm), 1)))));
+
+            Map<Event, Double> newProbs = i.infer(alarmProbabilities.keySet().stream().map(p -> new Event(pointsToSet.get(p), 1)).collect(Collectors.toList()));
+            alarmProbabilities.replaceAll((alarm, prob) -> newProbs.get(new Event(pointsToSet.get(alarm), 1)));
+
             //print new ranking (optional)
             alarmProbabilities.forEach((key, value) -> System.out.println(key.getTerms() + " prob: " + value));
         }

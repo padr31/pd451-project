@@ -12,7 +12,13 @@ public class Main {
             c = new Object();
             c = b;
 
-            System.out.println(c.toString());
+            Main.doSomething(c);
         }
+    }
+
+    public static void doSomething(Object x) {
+        Object y;
+        y = x;
+        System.out.println(y.toString());
     }
 }

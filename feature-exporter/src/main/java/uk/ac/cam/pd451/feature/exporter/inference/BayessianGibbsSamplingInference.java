@@ -18,7 +18,7 @@ public class BayessianGibbsSamplingInference implements InferenceAlgorithm<Bayes
     //Should be Map<Variable, Map<Event, Integer>> but I will avoid creating Event objects every time
     // private Map<Variable, Map<Integer, Double>> counts = new HashMap<>();
 
-    private final static int DEFAULT_GIBBS_ITERATIONS = 100000;
+    private final static int DEFAULT_GIBBS_ITERATIONS = 1000;
     private final static int BURN_IN_PERIOD = (int) (DEFAULT_GIBBS_ITERATIONS*0.2);
 
     @Override
@@ -90,7 +90,7 @@ public class BayessianGibbsSamplingInference implements InferenceAlgorithm<Bayes
         return eventCount/(DEFAULT_GIBBS_ITERATIONS-BURN_IN_PERIOD);
     }
 
-    public List<Double> infer(List<Event> events) {
+    public Map<Event, Double> infer(List<Event> events) {
         Map<Event, Double> resultMap = events.stream().collect(Collectors.toMap(e -> e, e -> 0.0));
 
         Map<Variable, Event> state = new HashMap<>();
@@ -122,7 +122,7 @@ public class BayessianGibbsSamplingInference implements InferenceAlgorithm<Bayes
             }
         }
 
-        return events.stream().map(e -> resultMap.get(e)/(DEFAULT_GIBBS_ITERATIONS-BURN_IN_PERIOD)).collect(Collectors.toList());
+        return resultMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue()/(DEFAULT_GIBBS_ITERATIONS-BURN_IN_PERIOD)));
     }
 
 
