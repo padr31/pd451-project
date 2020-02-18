@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 public class LoopyPropagationInference implements InferenceAlgorithm<BayesianNetwork> {
 
-    private final static long DEFAULT_LOOPY_ITERATIONS = 10;
+    private final static long DEFAULT_LOOPY_ITERATIONS = 2;
     private BayesianNetwork bn;
     private Assignment evidence = new Assignment(List.of());
 
@@ -62,7 +62,7 @@ public class LoopyPropagationInference implements InferenceAlgorithm<BayesianNet
                 sendPiMessage(nodeR, childX);
             }
         }
-
+        System.out.println("done");
         loopyPropagation();
     }
 
@@ -179,6 +179,8 @@ public class LoopyPropagationInference implements InferenceAlgorithm<BayesianNet
 
     private void loopyPropagation() {
         for(int i = 0; i < DEFAULT_LOOPY_ITERATIONS; i++) {
+            System.out.println(i);
+            System.out.println(bn.topologicalOrdering().size());
             for(BayesianNode n : bn.topologicalOrdering()) {
                 n.getChildSet().forEach(c -> sendPiMessage(n, c));
             }
