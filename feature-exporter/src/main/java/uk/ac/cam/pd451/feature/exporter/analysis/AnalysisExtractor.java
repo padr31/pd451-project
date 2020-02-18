@@ -24,4 +24,14 @@ public abstract class AnalysisExtractor {
             }
         });
     }
+
+    public void appendRelations(List<Relation> result) {
+        for(Relation r : this.relations) {
+            if(result.contains(r)) {
+                r.appendTo(result.get(result.indexOf(r)));
+            } else {
+                result.add(r);
+            }
+        }
+    }
 }

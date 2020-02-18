@@ -32,4 +32,9 @@ public class RelationEntry {
         }
         return true;
     }
+
+    @Override
+    public int hashCode() {
+        return String.join("", elements).hashCode();
+    }
 }

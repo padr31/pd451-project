@@ -31,17 +31,17 @@ public class FeatureWorld {
 
     //REACHABLE(main)
     public static void main(String[] args) {
-        FeatureWorld featureWorld = new FeatureWorld("features");
+        FeatureWorld featureWorld = new FeatureWorld("features"); //ALLOC
         Feature f;
-        f = null;
+        f = null; //ALLOC
         f = new Feature(); //ALLOC(f, line-number, FeatureWorld-main) //HEAPTYPE(line-number, Feature())
-        Feature f1 = new Feature();
+        Feature f1 = new Feature(); // ALLOC
         featureWorld.changeFeatures(f, f1);
 
-        B beee = new B();
+        B beee = new B(); //ALLOC
         A a;
-        a = null;
-        a = new A();
+        a = null; //ALLOC
+        a = new A(); //ALLOC
         a.doSomething(beee);
     }
 
@@ -80,7 +80,7 @@ public class FeatureWorld {
             if(false) {
                 return "false";
             } else {
-                return this.name; //FORMALRETURN(getName, name)
+                return this.name; //FORMALRETURN(getString, name)
             }
         }
     }

@@ -94,14 +94,17 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
 
         extractedRelations.add(((RelationExtractor) () -> {
             Relation load = new Relation("LOAD", 3);
+
+            //to = base.field
             Iterator<Map<String, Object>> result = neo4JConnector.query("match (to) --> (eq) --> (base) --> (dot) --> (field)\n" +
                     "match (decl_base) --> (base)\n" +
-                    "match (variable) --> (identifier) --> (name) --> (to) <-- (decl_to)\n" +
-                    "where eq.contents=\"EQ\" AND dot.contents=\"DOT\"  AND to.type=\"IDENTIFIER_TOKEN\" AND base.type=\"IDENTIFIER_TOKEN\" AND field.type=\"IDENTIFIER_TOKEN\" AND variable.contents=\"VARIABLE\" AND identifier.contents=\"IDENTIFIER\" AND name.contents=\"NAME\" AND decl_to.type=\"SYMBOL_VAR\" AND decl_base.type=\"SYMBOL_VAR\"\n" +
-                    "return to.contents, decl_to.contents, base.contents, decl_base.contents, field.contents");
+                    "match (to) <-- (decl_to)\n" +
+                    "where eq.contents=\"EQ\" AND dot.contents=\"DOT\" AND to.type=\"IDENTIFIER_TOKEN\" AND base.type=\"IDENTIFIER_TOKEN\" AND field.type=\"IDENTIFIER_TOKEN\" AND decl_to.type=\"SYMBOL_VAR\" AND decl_base.type=\"SYMBOL_VAR\"\n" +
+                    "return decl_to.contents, decl_base.contents, field.contents");
             result.forEachRemaining(resultEntry -> {
                 load.addEntry(new RelationEntry((String) resultEntry.get("decl_to.contents"), (String) resultEntry.get("decl_base.contents"), (String) resultEntry.get("field.contents")));
             });
+
             return load;
         }).extractRelation());
         t.printLastTimeSegment("TIMER 3 - LOAD");
@@ -161,15 +164,26 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
 
         extractedRelations.add(((RelationExtractor) () -> {
             Relation formalReturn = new Relation("FORMALRETURN", 2);
-            Iterator<Map<String, Object>> result = neo4JConnector.query("match (ret) --> (expression) --> (identifier) --> (name) --> (ret_name) <-- (decl_ret)\n" +
+            /*Iterator<Map<String, Object>> result = neo4JConnector.query("match (ret) --> (expression) --> (identifier) --> (name) --> (ret_name) <-- (decl_ret)\n" +
                     "where ret.contents=\"RETURN\" and expression.contents=\"EXPRESSION\" and identifier.contents=\"IDENTIFIER\" and name.contents=\"NAME\" and decl_ret.type=\"SYMBOL_VAR\"\n" +
                     "with ret, decl_ret\n" +
                     "match (met) --> (body)\n" +
                     "match (met) --> (name2) --> (meth_name) <-- (decl_meth)\n" +
                     "match p=shortestPath((body) -[*]-> (ret)) where met.contents=\"METHOD\" and body.contents=\"BODY\" and name2.contents=\"NAME\" and decl_meth.type=\"SYMBOL_MTH\"\n" +
-                    "return decl_meth.contents, decl_ret.contents, min(length(p))");
+                    "return decl_meth.contents, decl_ret.contents, min(length(p))");*/
+            //watch out this can be costly
+            Iterator<Map<String, Object>> result = neo4JConnector.query("match (ret)\n" +
+                    "match (ret_name) <-- (decl_ret)\n" +
+                    "where ret.contents=\"RETURN\"  and decl_ret.type=\"SYMBOL_VAR\" and ret_name.type=\"IDENTIFIER_TOKEN\" and ret_name.startLineNumber=ret.startLineNumber\n" +
+                    "with ret, decl_ret\n" +
+                    "match (met) --> (body)\n" +
+                    "match (met) --> (name2) --> (meth_name) <-- (decl_meth)\n" +
+                    "match p=shortestPath((body) -[*]-> (ret)) where met.contents=\"METHOD\" and body.contents=\"BODY\" and name2.contents=\"NAME\"\n" +
+                    "and decl_meth.type=\"SYMBOL_MTH\"\n" +
+                    "return ret.startLineNumber, collect([decl_meth.contents, toString(length(p))]) as methods, decl_ret.contents");
             result.forEachRemaining(resultEntry -> {
-                formalReturn.addEntry(new RelationEntry((String) resultEntry.get("decl_meth.contents"), (String) resultEntry.get("decl_ret.contents")));
+                String inMethod = ResultParseUtils.getMinDistanceMethodName((List<String>[]) resultEntry.get("methods"));
+                formalReturn.addEntry(new RelationEntry(inMethod, (String) resultEntry.get("decl_ret.contents")));
             });
             return formalReturn;
         }).extractRelation());
@@ -177,10 +191,15 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
 
         extractedRelations.add(((RelationExtractor) () -> {
             Relation actualReturn = new Relation("ACTUALRETURN", 2);
-            Iterator<Map<String, Object>> result = neo4JConnector.query("match (assign) --> (var) --> (identifier) --> (name1) --> (var_name) <-- (decl_var)\n" +
+            /*Iterator<Map<String, Object>> result = neo4JConnector.query("match (assign) --> (var) --> (identifier) --> (name1) --> (var_name) <-- (decl_var)\n" +
                     "match (assign) --> (exp) --> (invoc)\n" +
                     "where assign.contents=\"ASSIGNMENT\" and var.contents=\"VARIABLE\" and identifier.contents=\"IDENTIFIER\" and name1.contents=\"NAME\" and decl_var.type=\"SYMBOL_VAR\"  and exp.contents=\"EXPRESSION\" and invoc.contents=\"METHOD_INVOCATION\"\n" +
+                    "return assign.startLineNumber, decl_var.contents");*/
+            Iterator<Map<String, Object>> result = neo4JConnector.query("match (var) <-- (assign) --> (exp) --> (invoc)\n" +
+                    "match (var_name) <-- (decl_var)\n" +
+                    "where assign.contents=\"ASSIGNMENT\" and var.contents=\"VARIABLE\" and decl_var.type=\"SYMBOL_VAR\" and exp.contents=\"EXPRESSION\" and invoc.contents=\"METHOD_INVOCATION\" and var.startLineNumber = var_name.startLineNumber\n" +
                     "return assign.startLineNumber, decl_var.contents");
+
             result.forEachRemaining(resultEntry -> {
                 actualReturn.addEntry(new RelationEntry(Long.toString((Long)resultEntry.get("assign.startLineNumber")), (String) resultEntry.get("decl_var.contents")));
             });
