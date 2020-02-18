@@ -1,18 +1,20 @@
 package uk.ac.cam.pd451.feature.exporter.pipeline;
 
+import uk.ac.cam.pd451.feature.exporter.analysis.Relation;
 import uk.ac.cam.pd451.feature.exporter.pipeline.io.EmptyIO;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
 
 /**
  * Responsible for taking a directory of .java files, compiling them with the feature extractor and outputing the target directory.
  */
-public class DatalogStep implements Step<String, EmptyIO> {
+public class DatalogStep implements Step<List<Relation>, EmptyIO> {
 
     @Override
-    public EmptyIO process(String input) throws PipeException {
+    public EmptyIO process(List<Relation> input) throws PipeException {
         Runtime rt = Runtime.getRuntime();
         try {
             Process proc = rt.exec(new String[]{"sh","-c","stack exec -- vanillalog run -f ~/repos/pd451-project/analysis/andersen-analysis.datalog --keep-all-predicates --json --provenance > /Users/padr/repos/pd451-project/feature-exporter/out_provenance/provenance.json"},

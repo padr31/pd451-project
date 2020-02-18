@@ -14,7 +14,7 @@ public class ExportPipeline {
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(option, args);
 
-        String pipe = "import";
+        String pipe = "extract";
 
         Pipeline pipeline;
 

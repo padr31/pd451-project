@@ -3,6 +3,7 @@ import me.tongfei.progressbar.ProgressBar;
 import me.tongfei.progressbar.ProgressBarStyle;
 import uk.ac.cam.acr31.features.javac.proto.GraphProtos;
 import uk.ac.cam.pd451.feature.exporter.analysis.AndersenPointsToAnalysisExtractor;
+import uk.ac.cam.pd451.feature.exporter.analysis.Relation;
 import uk.ac.cam.pd451.feature.exporter.neo4j.ast.Neo4jJavaConnector;
 import uk.ac.cam.pd451.feature.exporter.utils.Timer;
 
@@ -10,6 +11,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -18,10 +20,12 @@ import java.util.stream.Stream;
 /**
  * This class takes a directory, walks it to find all the .proto files and generates output relations in .csv files and returns the path to the containing directory.
   */
-public class ExtractorStep implements Step<String, String> {
+public class ExtractorStep implements Step<String, List<Relation>> {
 
     @Override
-    public String process(String input) throws PipeException {
+    public List<Relation> process(String input) throws PipeException {
+        List<Relation> result = new ArrayList<>();
+
         Timer t = new Timer();
 
         List<Path> protoFilePaths;
@@ -53,6 +57,7 @@ public class ExtractorStep implements Step<String, String> {
                 extractor.extractAnalysis();
                 t.printLastTimeSegment("analysis extraction");
 
+                extractor.appendRelations(result);
                 extractor.writeToCSV(new File("./out"));
                 t.printLastTimeSegment("writing to csv");
 
@@ -62,6 +67,6 @@ public class ExtractorStep implements Step<String, String> {
         }
         pb.stop();
         Neo4jJavaConnector.getInstance().closeConnections();
-        return null;
+        return result;
     }
 }

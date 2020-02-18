@@ -24,7 +24,7 @@ public class UserInteractionStep implements Step<ProvenanceGraph, RankingStatist
 
         System.out.println("Initialising inference algorithm");
 
-        BayessianGibbsSamplingInference i = new BayessianGibbsSamplingInference();
+        LoopyPropagationInference i = new LoopyPropagationInference();
         i.setModel(g.getBayesianNetwork());
 
         Map<Predicate, Event> evidence = new HashMap<>();
