@@ -56,6 +56,10 @@ class AndersenPointsToAnalysisExtractorTest {
         assertContains("ALLOC", "uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.features", "14", "uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.FeatureWorld(java.lang.String)");
         assertContains("ALLOC", "uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.main(java.lang.String[]).a@1444","44","uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.main(java.lang.String[])");
         assertContains("ALLOC", "uk.ac.cam.pd451.feature.exporter.examples.A.doSomething(uk.ac.cam.pd451.feature.exporter.examples.B).theB@109","5","uk.ac.cam.pd451.feature.exporter.examples.A.doSomething(uk.ac.cam.pd451.feature.exporter.examples.B)");
+        assertContains("ALLOC", "uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.changeFeatures(uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.Feature,uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.Feature).temp@613","19","uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.changeFeatures(uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.Feature,uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.Feature)");
+        assertContains("ALLOC", "uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.main(java.lang.String[]).f@1176","35","uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.main(java.lang.String[])");
+        assertContains("ALLOC", "uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.main(java.lang.String[]).a@1444","42","uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.main(java.lang.String[])");
+        assertContains("ALLOC", "uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld$Feature.name","49","uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.main(java.lang.String[])");
     }
 
     @Test
@@ -72,6 +76,7 @@ class AndersenPointsToAnalysisExtractorTest {
     @Test
     void testFormalReturnRelation() {
         assertContains("FORMALRETURN", "uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld$Feature.getName()","uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld$Feature.name");
+        assertContains("FORMALRETURN", "uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld$Feature.getString()","uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld$Feature.name");
     }
 
     @Test
@@ -85,6 +90,10 @@ class AndersenPointsToAnalysisExtractorTest {
         assertContains("HEAPTYPE", "41","uk.ac.cam.pd451.feature.exporter.examples.B");
         assertContains("HEAPTYPE", "36","null");
         assertContains("HEAPTYPE", "5","uk.ac.cam.pd451.feature.exporter.examples.B");
+        assertContains("HEAPTYPE", "19","null");
+        assertContains("HEAPTYPE", "35","null");
+        assertContains("HEAPTYPE", "42","null");
+        assertContains("HEAPTYPE", "49","null");
     }
 
     @Test
@@ -139,11 +148,22 @@ class AndersenPointsToAnalysisExtractorTest {
 
     @Test
     void testStoreRelation() {
-
+        assertContains("STORE", "uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.this","name","uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.FeatureWorld(java.lang.String).name@227");
+        assertContains("STORE", "uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.changeFeatures(uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.Feature,uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.Feature).f1@579","name","uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.changeFeatures(uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.Feature,uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.Feature).newName@705");
     }
 
     @Test
     void testThisVarRelation() {
+        assertContains("THISVAR", "uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.changeFeatures(uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.Feature,uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.Feature)","uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.changeFeatures(uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.Feature,uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.Feature)-this");
+        assertContains("THISVAR", "uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.FeatureWorld(java.lang.String)","uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.FeatureWorld(java.lang.String)-this");
+        assertContains("THISVAR", "uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld$Feature.resetName()","uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld$Feature.resetName()-this");
+        assertContains("THISVAR", "uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld$Feature.getName()","uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld$Feature.getName()-this");
+        assertContains("THISVAR", "uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld$Feature.getString()","uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld$Feature.getString()-this");
+        assertContains("THISVAR", "uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.main(java.lang.String[])","uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.main(java.lang.String[])-this");
+        assertContains("THISVAR", "uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld$Feature.Feature()","uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld$Feature.Feature()-this");
+        assertContains("THISVAR", "uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld$Feature.Feature(uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.Feature)","uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld$Feature.Feature(uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.Feature)-this");
+        assertContains("THISVAR", "uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld$Feature.changeName(uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.Feature)","uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld$Feature.changeName(uk.ac.cam.pd451.feature.exporter.examples.FeatureWorld.Feature)-this");
+        assertContains("THISVAR", "uk.ac.cam.pd451.feature.exporter.examples.A.doSomething(uk.ac.cam.pd451.feature.exporter.examples.B)","uk.ac.cam.pd451.feature.exporter.examples.A.doSomething(uk.ac.cam.pd451.feature.exporter.examples.B)-this");
 
     }
 

@@ -52,9 +52,49 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
                 );
             });
 
+            //adding uninitialised nullpointers
+            result = neo4JConnector.query("match (variable) --> (type)\n" +
+                    "match (variable) --> (name2) --> (var) <-- (decl_var)\n" +
+                    "match (variable) --> (semi)\n" +
+                    "match (typename) --> (var) --> (semi)\n" +
+                    "match (met) --> (met_name) --> (name) <-- (met_sig)\n" +
+                    "match p=shortestPath((met) -[*]-> (var)) where decl_var.type=\"SYMBOL_VAR\" and met.contents=\"METHOD\" and met_name.contents=\"NAME\" and name.type=\"IDENTIFIER_TOKEN\" and var.type=\"IDENTIFIER_TOKEN\" and met_sig.type=\"SYMBOL_MTH\" and variable.contents=\"VARIABLE\" and type.contents=\"TYPE\" and name2.contents=\"NAME\" and var.type=\"IDENTIFIER_TOKEN\" and decl_var.type=\"SYMBOL_VAR\" and semi.contents=\"SEMI\"\n" +
+                    "return variable.startLineNumber as heap, min(decl_var.contents), collect([met_sig.contents, toString(length(p))]) as inMeth");
+
+            result.forEachRemaining(resultEntry -> {
+                String inMeth = ResultParseUtils.getMinDistanceMethodName((List<String>[]) resultEntry.get("inMeth"));
+                alloc.addEntry(new RelationEntry(
+                        (String) resultEntry.get("min(decl_var.contents)"),
+                        Long.toString((Long) resultEntry.get("heap")),
+                        inMeth)
+                );
+            });
+
             return alloc;
         }).extractRelation());
         t.printLastTimeSegment("TIMER 3 - ALLOC");
+
+        /*
+        extractedRelations.add(((RelationExtractor) () -> {
+            Relation init = new Relation("INIT", 1);
+
+            Iterator<Map<String, Object>> result = neo4JConnector.query(
+                    "match (variable) --> (type)\n" +
+                            "match (variable) --> (name2) --> (var) <-- (decl_var)\n" +
+                            "match (variable) --> (semi)\n" +
+                            "match (typename) --> (var) --> (semi)\n" +
+                            "where variable.contents=\"VARIABLE\" and type.contents=\"TYPE\" and name2.contents=\"NAME\" and var.type=\"IDENTIFIER_TOKEN\" and decl_var.type=\"SYMBOL_VAR\" and semi.contents=\"SEMI\"\n" +
+                            "return variable.startLineNumber, min(decl_var.contents) as var");
+
+            result.forEachRemaining(resultEntry -> {
+                init.addEntry(new RelationEntry((String) resultEntry.get("var"))
+                );
+            });
+
+            return init;
+        }).extractRelation());
+        t.printLastTimeSegment("TIMER 3 - INIT");
+         */
 
         extractedRelations.add(((RelationExtractor) () -> {
             Relation move = new Relation("MOVE", 2);
@@ -86,6 +126,19 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
 
             result.forEachRemaining(resultEntry -> {
                 heaptype.addEntry(new RelationEntry(Long.toString((Long) resultEntry.get("lineNumber")), (String) resultEntry.get("heapType")));
+            });
+
+            //adding uninitialised nullpointers
+            result = neo4JConnector.query(
+                    "match (variable) --> (type)\n" +
+                            "match (variable) --> (name2) --> (var) <-- (decl_var)\n" +
+                            "match (variable) --> (semi)\n" +
+                            "match (typename) --> (var) --> (semi)\n" +
+                            "where variable.contents=\"VARIABLE\" and type.contents=\"TYPE\" and name2.contents=\"NAME\" and var.type=\"IDENTIFIER_TOKEN\" and decl_var.type=\"SYMBOL_VAR\" and semi.contents=\"SEMI\"\n" +
+                            "return variable.startLineNumber, min(decl_var.contents) as var");
+
+            result.forEachRemaining(resultEntry -> {
+                heaptype.addEntry(new RelationEntry(Long.toString((Long) resultEntry.get("variable.startLineNumber")), "null"));
             });
 
             return heaptype;
