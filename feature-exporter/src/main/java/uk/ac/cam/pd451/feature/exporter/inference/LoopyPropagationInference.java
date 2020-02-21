@@ -62,7 +62,7 @@ public class LoopyPropagationInference implements InferenceAlgorithm<BayesianNet
                 sendPiMessage(nodeR, childX);
             }
         }
-        System.out.println("done");
+
         loopyPropagation();
     }
 

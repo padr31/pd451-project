@@ -16,10 +16,6 @@ public class ProvenanceCreationStep implements Step<List<Clause>, ProvenanceGrap
 
     @Override
     public ProvenanceGraph process(List<Clause> groundClauses) throws PipeException {
-        /*Neo4jOGMProvenanceConnector provenanceConnector = Neo4jOGMProvenanceConnector.getInstance();
-        provenanceConnector.clearDatabase();
-        provenanceConnector.loadGraph(groundClauses);*/
-
         // create predicates and map them to unique provenance network variable names
         // some of them are inserted twice - this is not an issue as the uuid will just be updated
         System.out.println("Collecting predicates");
@@ -141,15 +137,18 @@ public class ProvenanceCreationStep implements Step<List<Clause>, ProvenanceGrap
                 List<Variable> ancestorVariables = node.getParentSet().stream().map(BayesianNode::getVariable).collect(Collectors.toList());
 
                 if(ancestorVariables.size() > maxAntecedents[0]) maxAntecedents[0] = ancestorVariables.size();
-
+                System.out.println(maxAntecedents[0]);
                 Variable predVariable = node.getVariable();
-
+                if(maxAntecedents[0] == 13) {
+                    System.out.println();
+                }
                 List<Variable> assignmentVariables = new ArrayList<>(ancestorVariables);
                 assignmentVariables.add(predVariable);
 
+                List<Variable> finalAncestorVariables = ancestorVariables;
                 Map<Assignment, Double> function = Assignment.allAssignments(assignmentVariables).stream().collect(Collectors.toMap(a -> a, a -> {
                     boolean orOfAncestors = false;
-                    for(Variable bv: ancestorVariables)
+                    for(Variable bv: finalAncestorVariables)
                         if(a.getValue(bv) == 1) {
                             orOfAncestors = true;
                             break;

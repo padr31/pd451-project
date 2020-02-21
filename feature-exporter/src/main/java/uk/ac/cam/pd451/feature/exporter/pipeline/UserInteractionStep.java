@@ -24,10 +24,11 @@ public class UserInteractionStep implements Step<ProvenanceGraph, RankingStatist
 
         System.out.println("Initialising inference algorithm");
 
-        LoopyPropagationInference i = new LoopyPropagationInference();
+        BayessianGibbsSamplingInference i = new BayessianGibbsSamplingInference();
         i.setModel(g.getBayesianNetwork());
 
         Map<Predicate, Event> evidence = new HashMap<>();
+        List<Boolean> trueFalse = new ArrayList<>();
         Map<Predicate, Double> alarmProbabilities = new HashMap<>();
 
         // insert all alarms with their prior probabilities
@@ -54,13 +55,16 @@ public class UserInteractionStep implements Step<ProvenanceGraph, RankingStatist
                 // true positive
                 Event e = new Event(pointsToSet.get(topAlarm), 1);
                 evidence.put(topAlarm, e);
+                trueFalse.add(true);
                 i.addEvidence(e);
             } else {
                 // false positive
                 Event e = new Event(pointsToSet.get(topAlarm), 0);
                 evidence.put(topAlarm, e);
+                trueFalse.add(false);
                 i.addEvidence(e);
             }
+
             // remove the inspected alarm
             alarmProbabilities.remove(topAlarm);
 
@@ -73,8 +77,11 @@ public class UserInteractionStep implements Step<ProvenanceGraph, RankingStatist
             //print new ranking (optional)
             alarmProbabilities.forEach((key, value) -> System.out.println(key.getTerms() + " prob: " + value));
         }
-
         System.out.println("Ranking done");
+        System.out.println("Alarms: " + trueFalse.size());
+        System.out.println("Last true positive: " + trueFalse.lastIndexOf(true));
+        System.out.println("True positives in first half: " + trueFalse.subList(0, trueFalse.size()/2).stream().filter(b -> b).count());
+        System.out.println("True positives in second half: " + trueFalse.subList(trueFalse.size()/2, trueFalse.size()).stream().filter(b -> b).count());
         return null;
 
     }

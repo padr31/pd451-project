@@ -14,7 +14,7 @@ public class ExportPipeline {
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(option, args);
 
-        String pipe = "compile";
+        String pipe = "import";
 
         Pipeline pipeline;
 
@@ -35,7 +35,7 @@ public class ExportPipeline {
                 pipeline = new Pipeline<>(
                         new DatalogStep()
                 );
-                pipeline.process("");
+                pipeline.process(null);
                 break;
             case "extract/evaluate":
                 pipeline = new Pipeline<>(
