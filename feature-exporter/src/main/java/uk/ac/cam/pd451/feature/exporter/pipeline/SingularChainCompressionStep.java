@@ -7,7 +7,7 @@ import uk.ac.cam.pd451.feature.exporter.neo4j.provenance.Neo4jOGMProvenanceConne
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ProvenanceChainCompressionStep implements Step<List<Clause>, List<Clause>> {
+public class SingularChainCompressionStep implements Step<List<Clause>, List<Clause>> {
     @Override
     public List<Clause> process(List<Clause> input) throws PipeException {
 
@@ -44,11 +44,11 @@ public class ProvenanceChainCompressionStep implements Step<List<Clause>, List<C
             Clause source = sources.get(p).get(0);
             Clause sink = sinks.get(p).get(0);
 
-            /*if(!removable.contains(sink.getHead()) && source.getBody().size() != 1) {
-                // the predicate is the last one in chain that is removable, so we don't remove it to keep parent number low
+            if(sink.getBody().size() != 1 && source.getBody().size() != 1) {
+                // none of source or sink have only one head variable - dont compress as it would create larger parents
                 removable.remove(0);
                 continue;
-            }*/
+            }
 
             List<Predicate> connectiveBodies = new ArrayList<>(source.getBody());
             connectiveBodies.addAll(sink.getBody());

@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 public class LoopyPropagationInference implements InferenceAlgorithm<BayesianNetwork> {
 
-    private final static long DEFAULT_LOOPY_ITERATIONS = 2;
+    private final static long DEFAULT_LOOPY_ITERATIONS = 10;
     private BayesianNetwork bn;
     private Assignment evidence = new Assignment(List.of());
 

@@ -18,7 +18,7 @@ public class BayessianGibbsSamplingInference implements InferenceAlgorithm<Bayes
     //Should be Map<Variable, Map<Event, Integer>> but I will avoid creating Event objects every time
     // private Map<Variable, Map<Integer, Double>> counts = new HashMap<>();
 
-    private final static int DEFAULT_GIBBS_ITERATIONS = 1000;
+    private final static int DEFAULT_GIBBS_ITERATIONS = 20000;
     private final static int BURN_IN_PERIOD = (int) (DEFAULT_GIBBS_ITERATIONS*0.2);
 
     @Override

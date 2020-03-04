@@ -48,7 +48,8 @@ public class ExportPipeline {
                         new ProvenanceImportStep())
                         .addStep(new CycleEliminationStep())
                         .addStep(new ProvenancePruningStep())
-                        //.addStep(new ProvenanceChainCompressionStep())
+                        .addStep(new SingularChainCompressionStep())
+                        .addStep(new ProvenanceGadgetTransformStep())
                         .addStep(new ProvenanceCreationStep())
                         .addStep(new UserInteractionStep());
                 pipeline.process(new EmptyIO());

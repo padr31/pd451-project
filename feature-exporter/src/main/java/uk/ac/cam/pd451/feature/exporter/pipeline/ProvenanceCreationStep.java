@@ -8,6 +8,7 @@ import uk.ac.cam.pd451.feature.exporter.inference.factor.AssignmentTableFactor;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.VariableClauseIdentifier;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.VariablePredicateIdentifier;
+import uk.ac.cam.pd451.feature.exporter.neo4j.provenance.Neo4jOGMProvenanceConnector;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,6 +17,10 @@ public class ProvenanceCreationStep implements Step<List<Clause>, ProvenanceGrap
 
     @Override
     public ProvenanceGraph process(List<Clause> groundClauses) throws PipeException {
+        /*Neo4jOGMProvenanceConnector provenanceConnector = Neo4jOGMProvenanceConnector.getInstance();
+        provenanceConnector.clearDatabase();
+        provenanceConnector.loadGraph(groundClauses);*/
+
         // create predicates and map them to unique provenance network variable names
         // some of them are inserted twice - this is not an issue as the uuid will just be updated
         System.out.println("Collecting predicates");
@@ -60,7 +65,9 @@ public class ProvenanceCreationStep implements Step<List<Clause>, ProvenanceGrap
         clauseToNode.forEach((cl, node) -> {
             node.addChild(predicateToNode.get(cl.getHead()));
             cl.getBody().forEach(bodyPred -> node.addParent(predicateToNode.get(bodyPred)));
-            if(cl.getBody().size() > maxAntecedents[0]) maxAntecedents[0] = cl.getBody().size();
+            if(cl.getBody().size() > maxAntecedents[0]){
+                maxAntecedents[0] = cl.getBody().size();
+            }
         });
 
         System.out.println("Setting CPTs for ground clauses");
@@ -73,8 +80,8 @@ public class ProvenanceCreationStep implements Step<List<Clause>, ProvenanceGrap
          *            | gc |
          *  P( gc | a1 & a2 & a3)    = 0.95
          *  P(!gc | a1 & a2 & a3)    = 0.05
-         *  P( gc | !(a1 & a2 & a3)) = 0.0
-         *  P(!gc | !(a1 & a2 & a3)) = 1.0
+         *  P( gc | !(a1 & a2 & a3)) = 0.1
+         *  P(!gc | !(a1 & a2 & a3)) = 0.9
          *
          */
         clauseToNode.forEach((cl, node) -> {
