@@ -3,7 +3,10 @@ package uk.ac.cam.pd451.feature.exporter;
 import java.io.IOException;
 import org.apache.commons.cli.*;
 import uk.ac.cam.pd451.feature.exporter.pipeline.*;
+import uk.ac.cam.pd451.feature.exporter.pipeline.eval.InferenceEvalStep;
 import uk.ac.cam.pd451.feature.exporter.pipeline.io.EmptyIO;
+import uk.ac.cam.pd451.feature.exporter.pipeline.run.*;
+import uk.ac.cam.pd451.feature.exporter.utils.Timer;
 
 public class ExportPipeline {
 
@@ -18,6 +21,7 @@ public class ExportPipeline {
 
         Pipeline pipeline;
 
+        Timer t = new Timer();
         switch (pipe) {
             case "extract":
                 pipeline = new Pipeline<>(
@@ -28,7 +32,7 @@ public class ExportPipeline {
             case "compile":
                 pipeline = new Pipeline<>(
                     new CompilerStep()
-            ).addStep(new ExtractorStep());
+            );
                 pipeline.process(new CompilerStep.CompilerPipeInput(cmd.getOptionValue("input-file"),cmd.getOptionValue("input-file") + "/target"));
                 break;
             case "datalog":
@@ -51,9 +55,10 @@ public class ExportPipeline {
                         .addStep(new SingularChainCompressionStep())
                         .addStep(new ProvenanceGadgetTransformStep())
                         .addStep(new ProvenanceCreationStep())
-                        .addStep(new UserInteractionStep());
+                        .addStep(new InferenceEvalStep());
                 pipeline.process(new EmptyIO());
                 break;
         }
+        t.printTimeFromStart();
     }
 }

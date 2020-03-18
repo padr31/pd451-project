@@ -9,10 +9,10 @@ import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class LoopyPropagationInference implements InferenceAlgorithm<BayesianNetwork> {
+public class EvaluableLoopyPropagationInference implements InferenceAlgorithm<BayesianNetwork> {
+
 
     private final static long DEFAULT_LOOPY_ITERATIONS = 20000;
-    private long iterations = DEFAULT_LOOPY_ITERATIONS;
 
     private BayesianNetwork bn;
     private Assignment evidence = new Assignment(List.of());
@@ -23,16 +23,22 @@ public class LoopyPropagationInference implements InferenceAlgorithm<BayesianNet
     Map<Variable, Map<Variable, AssignmentTableFactor>> piMessages = new HashMap<>();
     Map<Variable, AssignmentTableFactor> conditionalProbs = new HashMap<>();
     private String strategy = "random";
+    private int fact;
+    private int factDiff;
+    private Map<Integer, Map<Event, Double>> result = new HashMap<>();
+    private int maxFactorProducts, sampleRate;
+    private List<Event> eventsToInfer;
 
+    public EvaluableLoopyPropagationInference(int maxFactorProducts, int sampleRate, List<Event> eventsToInfer){
+        this.maxFactorProducts = maxFactorProducts;
+        this.sampleRate = sampleRate;
+        this.eventsToInfer = eventsToInfer;
+    }
 
     @Override
     public void setModel(BayesianNetwork bn) {
         this.bn = bn;
         this.initialise();
-    }
-
-    public void setIterations(int iterations) {
-        this.iterations = iterations;
     }
 
     private void initialise() {
@@ -43,12 +49,19 @@ public class LoopyPropagationInference implements InferenceAlgorithm<BayesianNet
             //init lambda values
             lambdaValues.put(X, getUnitFactorFor(X));
 
+
             //init lambda messages
             for(BayesianNode nodeZ : nodeX.getParentSet()) {
                 Variable Z = nodeZ.getVariable();
                 if(!lambdaMessages.containsKey(X)) lambdaMessages.put(X, new HashMap<>());
                 lambdaMessages.get(X).put(Z, getUnitFactorFor(Z));
             }
+
+            //pi values
+            piValues.put(X, getHalfHalfFactorFor(X));
+
+            //conditional probs
+            conditionalProbs.put(X, getHalfHalfFactorFor(X));
 
             //init pi messages
             for(BayesianNode nodeY : nodeX.getChildSet()) {
@@ -62,16 +75,17 @@ public class LoopyPropagationInference implements InferenceAlgorithm<BayesianNet
         for(BayesianNode nodeR : bn.getRoots()) {
             conditionalProbs.put(nodeR.getVariable(), nodeR.getCPT());
             piValues.put(nodeR.getVariable(), nodeR.getCPT());
-            for (BayesianNode childX : nodeR.getChildSet()) {
-                sendPiMessage(nodeR, childX);
-            }
         }
 
-        loopyPropagation(1);
-        randomPropagation(DEFAULT_LOOPY_ITERATIONS);
+        this.result.put(fact, new HashMap<>(this.infer(eventsToInfer)));
+        randomPropagation(maxFactorProducts);
     }
 
     private void sendPiMessage(BayesianNode nodeZ, BayesianNode nodeX) {
+        int factorMultiplications =  nodeZ.getChildSet().size()-1 + nodeX.getParentSet().size();
+        fact += factorMultiplications;
+        factDiff += factorMultiplications;
+
         //update pi message Z -> pi_x(z) -> X
         AssignmentTableFactor piXZ = piValues.get(nodeZ.getVariable());
         for(BayesianNode nodeY : nodeZ.getChildSet()) {
@@ -108,7 +122,13 @@ public class LoopyPropagationInference implements InferenceAlgorithm<BayesianNet
     }
 
     private void sendLambdaMessage(BayesianNode nodeY, BayesianNode nodeX) {
+        int factorMultiplications =  nodeY.getParentSet().size() + nodeX.getChildSet().size();
+        fact += factorMultiplications;
+        factDiff += factorMultiplications;
         //Y sends X a message
+        if(fact == 161753) {
+            System.out.println();
+        }
         AssignmentTableFactor lambdaYX = nodeY.getCPT();
         for(BayesianNode nodeWi : nodeY.getParentSet()) {
             if(!nodeWi.getVariable().equals(nodeX.getVariable()))
@@ -152,6 +172,10 @@ public class LoopyPropagationInference implements InferenceAlgorithm<BayesianNet
         return new AssignmentTableFactor(List.of(e.getVariable()), Assignment.allAssignments(List.of(e.getVariable())).stream().collect(Collectors.toMap(a -> a, a -> a.contains(e) ? 1.0 : 0.0)));
     }
 
+    private AssignmentTableFactor getHalfHalfFactorFor(Variable x) {
+        return new AssignmentTableFactor(List.of(x), Assignment.allAssignments(List.of(x)).stream().collect(Collectors.toMap(a -> a, a -> 0.5)));
+    }
+
     @Override
     public double infer(Assignment events, Assignment evidence) {
         this.setEvidence(evidence);
@@ -164,7 +188,7 @@ public class LoopyPropagationInference implements InferenceAlgorithm<BayesianNet
                 .collect(Collectors.toMap(
                         e -> e,
                         e -> conditionalProbs.get(e.getVariable()).get(new Assignment(List.of(e)))
-                    )
+                        )
                 );
     }
 
@@ -202,13 +226,17 @@ public class LoopyPropagationInference implements InferenceAlgorithm<BayesianNet
         }
     }
 
-    private void randomPropagation(long iterations) {
+    private void randomPropagation(long maxFact) {
         List<BayesianNode> nodes = new ArrayList<>(bn.topologicalOrdering());
         Random r = new Random();
-        for(int i = 0; i < iterations; i++) {
+        while(fact <= maxFact) {
             BayesianNode n = nodes.get(r.nextInt(nodes.size()));
             n.getChildSet().forEach(c -> sendPiMessage(n, c));
             n.getParentSet().forEach(p -> sendLambdaMessage(n, p));
+            if(factDiff >= sampleRate) {
+                factDiff = 0;
+                result.put(fact, new HashMap<>(this.infer(eventsToInfer)));
+            }
         }
     }
 
@@ -218,5 +246,9 @@ public class LoopyPropagationInference implements InferenceAlgorithm<BayesianNet
         for(Event e : evidence.events) {
             this.addEvidence(e);
         }
+    }
+
+    public Map<Integer, Map<Event, Double>> getResult() {
+        return this.result;
     }
 }

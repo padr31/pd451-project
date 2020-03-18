@@ -1,11 +1,11 @@
-package uk.ac.cam.pd451.feature.exporter.pipeline;
+package uk.ac.cam.pd451.feature.exporter.pipeline.run;
 
-import me.tongfei.progressbar.ProgressBar;
-import me.tongfei.progressbar.ProgressBarStyle;
 import uk.ac.cam.pd451.feature.exporter.datalog.Predicate;
 import uk.ac.cam.pd451.feature.exporter.datalog.ProvenanceGraph;
 import uk.ac.cam.pd451.feature.exporter.inference.*;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
+import uk.ac.cam.pd451.feature.exporter.pipeline.io.RankingStatistics;
+import uk.ac.cam.pd451.feature.exporter.pipeline.Step;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -24,7 +24,7 @@ public class UserInteractionStep implements Step<ProvenanceGraph, RankingStatist
 
         System.out.println("Initialising inference algorithm");
 
-        BayessianGibbsSamplingInference i = new BayessianGibbsSamplingInference();
+        LoopyPropagationInference i = new LoopyPropagationInference();
         i.setModel(g.getBayesianNetwork());
 
         Map<Predicate, Event> evidence = new HashMap<>();

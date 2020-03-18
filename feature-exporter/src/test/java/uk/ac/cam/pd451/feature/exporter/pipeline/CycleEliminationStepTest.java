@@ -3,6 +3,7 @@ package uk.ac.cam.pd451.feature.exporter.pipeline;
 import org.junit.jupiter.api.Test;
 import uk.ac.cam.pd451.feature.exporter.datalog.Clause;
 import uk.ac.cam.pd451.feature.exporter.datalog.Predicate;
+import uk.ac.cam.pd451.feature.exporter.pipeline.run.CycleEliminationStep;
 
 import java.util.List;
 

@@ -15,11 +15,9 @@ public class BayessianGibbsSamplingInference implements InferenceAlgorithm<Bayes
     private BayesianNetwork bn;
     private Assignment evidence = new Assignment(List.of());
 
-    //Should be Map<Variable, Map<Event, Integer>> but I will avoid creating Event objects every time
-    // private Map<Variable, Map<Integer, Double>> counts = new HashMap<>();
-
-    private final static int DEFAULT_GIBBS_ITERATIONS = 20000;
-    private final static int BURN_IN_PERIOD = (int) (DEFAULT_GIBBS_ITERATIONS*0.2);
+    private final static int DEFAULT_GIBBS_ITERATIONS = 200000;
+    private final static double BURN_IN_PERIOD = 0.2;
+    private int iterations = DEFAULT_GIBBS_ITERATIONS;
 
     @Override
     public void setModel(BayesianNetwork model) {
@@ -37,15 +35,6 @@ public class BayessianGibbsSamplingInference implements InferenceAlgorithm<Bayes
         double eventCount = 0.0;
         List<BayesianNode> topsort = bn.topologicalOrdering();
 
-        //initialise counts to zero
-        /*for(BayesianNode node : topsort) {
-            Variable v = node.getVariable();
-            counts.put(v, new HashMap<>());
-            for(int i : v.getDomain()) {
-                counts.get(v).put(i, 1.0);
-            }
-        }*/
-
         //initialise state - set unobserved variables to random samples from their domains
         for(BayesianNode node : topsort) {
             Variable v = node.getVariable();
@@ -57,7 +46,7 @@ public class BayessianGibbsSamplingInference implements InferenceAlgorithm<Bayes
             }
         }
 
-        for(int j = 0; j < DEFAULT_GIBBS_ITERATIONS; j++) {
+        for(int j = 0; j < this.iterations; j++) {
             for(BayesianNode n : topsort) {
                 Variable v = n.getVariable();
                 if(!this.evidence.contains(v)) {
@@ -66,7 +55,7 @@ public class BayessianGibbsSamplingInference implements InferenceAlgorithm<Bayes
                     //counts.get(v).put(e.getValue(), counts.get(v).get(e.getValue()) + 1.0);
                 }
             }
-            if(j > BURN_IN_PERIOD) {
+            if(j > iterations*BURN_IN_PERIOD) {
                 boolean equalsInferredAssignment = true;
                 for(Event e : events.events) {
                     if(!state.get(e.getVariable()).equals(e)) equalsInferredAssignment = false;
@@ -75,19 +64,7 @@ public class BayessianGibbsSamplingInference implements InferenceAlgorithm<Bayes
             }
         }
 
-        // normalise counts
-        // probably not needed
-        /*for(Map<Integer, Double> count : counts.values()) {
-            double sum = count.values().stream().mapToDouble(Double::doubleValue).sum();
-            count.replaceAll((k, v) -> count.get(k) / sum);
-        }
-
-        double result = 1.0;
-        for(Event e : events.events) {
-            result *= this.counts.get(e.getVariable()).get(e.getValue());
-        }*/
-
-        return eventCount/(DEFAULT_GIBBS_ITERATIONS-BURN_IN_PERIOD);
+        return eventCount/(iterations-iterations*BURN_IN_PERIOD);
     }
 
     public Map<Event, Double> infer(List<Event> events) {
@@ -107,7 +84,7 @@ public class BayessianGibbsSamplingInference implements InferenceAlgorithm<Bayes
             }
         }
 
-        for(int j = 0; j < DEFAULT_GIBBS_ITERATIONS; j++) {
+        for(int j = 0; j < this.iterations; j++) {
             for(BayesianNode n : topsort) {
                 Variable v = n.getVariable();
                 if(!this.evidence.contains(v)) {
@@ -115,14 +92,60 @@ public class BayessianGibbsSamplingInference implements InferenceAlgorithm<Bayes
                     state.put(v, e);
                 }
             }
-            if(j > BURN_IN_PERIOD) {
+            if(j > this.iterations*BURN_IN_PERIOD) {
                 for(Event e : events) {
                     if(state.get(e.getVariable()).equals(e)) resultMap.put(e, resultMap.get(e) + 1);
                 }
             }
         }
 
-        return resultMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue()/(DEFAULT_GIBBS_ITERATIONS-BURN_IN_PERIOD)));
+        return resultMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue()/(this.iterations-this.iterations*BURN_IN_PERIOD)));
+    }
+
+    // run inference up to a certain amount of factor multiplications, return map of samples after each sampleRate-amount of factor multiplications
+    // one blanket sampling corresponds roughly to one factor multiplication due to optimization done in blanket sampling
+    public Map<Integer, Map<Event, Double>> inferUpToFactorMultiplications(List<Event> events, int requiredFactorMultiplications, int sampleRate) {
+        Map<Event, Double> resultMap = events.stream().collect(Collectors.toMap(e -> e, e -> 0.0));
+        Map<Integer, Map<Event, Double>> result = new HashMap<>();
+        Map<Variable, Event> state = new HashMap<>();
+        List<BayesianNode> topsort = bn.topologicalOrdering();
+
+        //initialise state - set unobserved variables to random samples from their domains
+        for(BayesianNode node : topsort) {
+            Variable v = node.getVariable();
+            if(this.evidence.contains(v)) {
+                state.put(v, new Event(v, this.evidence.getValue(v)));
+            } else {
+                Event e = new Event(v, v.randomSample().getValue());
+                state.put(v, e);
+            }
+        }
+
+        int iter = 0;
+        int fact = 0;
+        int factDiff = 0;
+        while(fact <= requiredFactorMultiplications) {
+            for(BayesianNode n : topsort) {
+                Variable v = n.getVariable();
+                if(!this.evidence.contains(v)) {
+                    Event e = sampleBasedOnMarkovBlanket(v, state);
+                    fact++;
+                    factDiff++;
+                    state.put(v, e);
+                }
+            }
+            for(Event e : events) {
+                if(state.get(e.getVariable()).equals(e)) resultMap.put(e, resultMap.get(e) + 1);
+            }
+            iter++;
+            if(factDiff > sampleRate) {
+                factDiff = 0;
+                int finalIter = iter;
+                result.put(fact, new HashMap<>(resultMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue()/(finalIter)))));
+            }
+        }
+
+        return result;
     }
 
 
@@ -170,5 +193,9 @@ public class BayessianGibbsSamplingInference implements InferenceAlgorithm<Bayes
 
     public void addEvidence(Event e) {
         this.evidence = this.evidence.addEvent(e);
+    }
+
+    public void setIterations(int iterations) {
+        this.iterations = iterations;
     }
 }

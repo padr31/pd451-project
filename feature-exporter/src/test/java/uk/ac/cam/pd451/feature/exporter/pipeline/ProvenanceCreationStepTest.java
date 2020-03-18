@@ -11,6 +11,7 @@ import uk.ac.cam.pd451.feature.exporter.inference.factor.AssignmentTableFactor;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.VariableClauseIdentifier;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.VariablePredicateIdentifier;
+import uk.ac.cam.pd451.feature.exporter.pipeline.run.ProvenanceCreationStep;
 
 import java.util.HashMap;
 import java.util.List;

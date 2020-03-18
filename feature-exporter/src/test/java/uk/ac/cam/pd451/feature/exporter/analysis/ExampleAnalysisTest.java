@@ -1,8 +1,8 @@
 package uk.ac.cam.pd451.feature.exporter.analysis;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import uk.ac.cam.pd451.feature.exporter.pipeline.CompilerStep;
-import uk.ac.cam.pd451.feature.exporter.pipeline.ExtractorStep;
+import uk.ac.cam.pd451.feature.exporter.pipeline.run.CompilerStep;
+import uk.ac.cam.pd451.feature.exporter.pipeline.run.ExtractorStep;
 import uk.ac.cam.pd451.feature.exporter.pipeline.Pipeline;
 
 import java.util.ArrayList;

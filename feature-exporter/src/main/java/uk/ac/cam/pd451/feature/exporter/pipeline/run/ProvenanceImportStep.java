@@ -1,8 +1,9 @@
-package uk.ac.cam.pd451.feature.exporter.pipeline;
+package uk.ac.cam.pd451.feature.exporter.pipeline.run;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.ac.cam.pd451.feature.exporter.datalog.*;
+import uk.ac.cam.pd451.feature.exporter.pipeline.Step;
 import uk.ac.cam.pd451.feature.exporter.pipeline.io.EmptyIO;
 import java.io.File;
 import java.io.IOException;
@@ -10,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ProvenanceImportStep implements Step<EmptyIO, List<Clause>>{
+public class ProvenanceImportStep implements Step<EmptyIO, List<Clause>> {
 
         @Override
         public List<Clause> process(EmptyIO input) throws PipeException {

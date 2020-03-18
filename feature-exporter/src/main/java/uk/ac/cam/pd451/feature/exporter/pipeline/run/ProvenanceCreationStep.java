@@ -1,4 +1,4 @@
-package uk.ac.cam.pd451.feature.exporter.pipeline;
+package uk.ac.cam.pd451.feature.exporter.pipeline.run;
 
 import uk.ac.cam.pd451.feature.exporter.datalog.*;
 import uk.ac.cam.pd451.feature.exporter.graph.bn.BayesianNetwork;
@@ -9,6 +9,7 @@ import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.VariableClauseIdentifier;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.VariablePredicateIdentifier;
 import uk.ac.cam.pd451.feature.exporter.neo4j.provenance.Neo4jOGMProvenanceConnector;
+import uk.ac.cam.pd451.feature.exporter.pipeline.Step;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -146,9 +147,6 @@ public class ProvenanceCreationStep implements Step<List<Clause>, ProvenanceGrap
                 if(ancestorVariables.size() > maxAntecedents[0]) maxAntecedents[0] = ancestorVariables.size();
                 System.out.println(maxAntecedents[0]);
                 Variable predVariable = node.getVariable();
-                if(maxAntecedents[0] == 13) {
-                    System.out.println();
-                }
                 List<Variable> assignmentVariables = new ArrayList<>(ancestorVariables);
                 assignmentVariables.add(predVariable);
 
