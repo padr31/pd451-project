@@ -3,7 +3,6 @@ package uk.ac.cam.pd451.feature.exporter;
 import java.io.IOException;
 import org.apache.commons.cli.*;
 import uk.ac.cam.pd451.feature.exporter.pipeline.*;
-import uk.ac.cam.pd451.feature.exporter.pipeline.eval.InferenceEvalStep;
 import uk.ac.cam.pd451.feature.exporter.pipeline.io.EmptyIO;
 import uk.ac.cam.pd451.feature.exporter.pipeline.run.*;
 import uk.ac.cam.pd451.feature.exporter.utils.Timer;
@@ -53,9 +52,10 @@ public class ExportPipeline {
                         .addStep(new CycleEliminationStep())
                         .addStep(new ProvenancePruningStep())
                         .addStep(new SingularChainCompressionStep())
-                        .addStep(new ProvenanceGadgetTransformStep())
+                        .addStep(new ProvenanceNarrowingStep())
                         .addStep(new ProvenanceCreationStep())
-                        .addStep(new InferenceEvalStep());
+                        .addStep(new UserInteractionStep());
+                        //.addStep(new InferenceEvalStep());
                 pipeline.process(new EmptyIO());
                 break;
         }

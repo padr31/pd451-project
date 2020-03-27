@@ -9,6 +9,7 @@ import uk.ac.cam.pd451.feature.exporter.inference.LoopyPropagationInference;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 import uk.ac.cam.pd451.feature.exporter.pipeline.Step;
 import uk.ac.cam.pd451.feature.exporter.pipeline.io.RankingStatistics;
+import uk.ac.cam.pd451.feature.exporter.utils.Timer;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -27,26 +28,6 @@ public class InferenceEvalStep implements Step<ProvenanceGraph, RankingStatistic
 
         System.out.println("Initialising the Gibbs Sampling inference algorithm");
 
-        /*
-        BayessianGibbsSamplingInference gibbsReference = new BayessianGibbsSamplingInference();
-        gibbsReference.setModel(g.getBayesianNetwork());
-        gibbsReference.setIterations(100000);
-
-        // insert all alarms with their prior probabilities
-        System.out.println("Inferring prior probabilities with Gibbs Sampling");
-        List<Event> inferredEvents = pointsToSet.values().stream().map(v -> new Event(v, 1)).collect(Collectors.toList());
-        Map<Event, Double> gibbsReferenceProbs = gibbsReference.infer(inferredEvents);
-
-        BayessianGibbsSamplingInference gibbs = new BayessianGibbsSamplingInference();
-        gibbs.setModel(g.getBayesianNetwork());
-        int steps = 1;
-        while(steps <= 50000){
-            steps = steps*2;
-            gibbs.setIterations(steps);
-            Map<Event, Double> gibbsProbs = gibbs.infer(inferredEvents);
-            System.out.println("Steps: " + steps + " KL: " + klDistance(gibbsReferenceProbs, gibbsProbs) + " MSE: " + meanSquaredDistance(gibbsReferenceProbs, gibbsProbs));
-        }
-        */
         List<Event> eventsToInfer = pointsToSet.values().stream().map(v -> new Event(v, 1)).collect(Collectors.toList());
 
         BayessianGibbsSamplingInference gibbs = new BayessianGibbsSamplingInference();
@@ -54,23 +35,27 @@ public class InferenceEvalStep implements Step<ProvenanceGraph, RankingStatistic
 
         System.out.println("Initialising loopy belief propagation");
 
-        EvaluableLoopyPropagationInference loopy = new EvaluableLoopyPropagationInference(100000, 100, eventsToInfer);
+        Timer t = new Timer();
+        EvaluableLoopyPropagationInference loopy = new EvaluableLoopyPropagationInference(360000, 100, eventsToInfer, true);
         loopy.setModel(g.getBayesianNetwork());
+        t.printLastTimeSegment("Time of loopy belief: ");
 
-        Map<Integer, Map<Event, Double>> loopyInferred = loopy.getResult();
-        Map<Event, Double> loopyReference = loopyInferred.entrySet().stream().max(Comparator.comparingInt(Map.Entry::getKey)).get().getValue();
+        Map<Long, Map<Event, Double>> loopyInferred = loopy.getResult();
+        Map<Event, Double> loopyReference = loopyInferred.entrySet().stream().max(Comparator.comparingLong(Map.Entry::getKey)).get().getValue();
+        t.printLastTimeSegment("interval");
 
-        Map<Integer, Map<Event, Double>> gibbsInferred = gibbs.inferUpToFactorMultiplications(eventsToInfer, 100000, 100);
-        Map<Event, Double> gibbsReference = gibbsInferred.entrySet().stream().max(Comparator.comparingInt(Map.Entry::getKey)).get().getValue();
+        Map<Long, Map<Event, Double>> gibbsInferred = gibbs.inferUpToTime(eventsToInfer, 360000, 100);
+        t.printLastTimeSegment("Gibbs time: ");
+
+        Map<Event, Double> gibbsReference = gibbsInferred.entrySet().stream().max(Comparator.comparingLong(Map.Entry::getKey)).get().getValue();
 
         System.out.println("Gibbs diff");
-
-        for(int fact : gibbsInferred.keySet().stream().sorted().collect(Collectors.toList())) {
+        for(long fact : gibbsInferred.keySet().stream().sorted().collect(Collectors.toList())) {
             System.out.println(fact + "," + meanSquaredDistance(gibbsReference, gibbsInferred.get(fact)));
         }
 
         System.out.println("Loopy diff");
-        for(int fact : loopyInferred.keySet().stream().sorted().collect(Collectors.toList())) {
+        for(long fact : loopyInferred.keySet().stream().sorted().collect(Collectors.toList())) {
             System.out.println(fact + "," + meanSquaredDistance(loopyReference, loopyInferred.get(fact)));
         }
 

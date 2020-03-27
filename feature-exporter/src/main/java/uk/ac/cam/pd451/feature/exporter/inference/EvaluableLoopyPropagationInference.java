@@ -23,16 +23,22 @@ public class EvaluableLoopyPropagationInference implements InferenceAlgorithm<Ba
     Map<Variable, Map<Variable, AssignmentTableFactor>> piMessages = new HashMap<>();
     Map<Variable, AssignmentTableFactor> conditionalProbs = new HashMap<>();
     private String strategy = "random";
-    private int fact;
-    private int factDiff;
-    private Map<Integer, Map<Event, Double>> result = new HashMap<>();
-    private int maxFactorProducts, sampleRate;
+    private long fact;
+    private long factDiff;
+
+    private long time;
+    private long timeDiff;
+
+    private Map<Long, Map<Event, Double>> result = new HashMap<>();
+    private long maxFactorProducts, sampleRate;
+    private boolean useTime;
     private List<Event> eventsToInfer;
 
-    public EvaluableLoopyPropagationInference(int maxFactorProducts, int sampleRate, List<Event> eventsToInfer){
+    public EvaluableLoopyPropagationInference(long maxFactorProducts, long sampleRate, List<Event> eventsToInfer, boolean useTime){
         this.maxFactorProducts = maxFactorProducts;
         this.sampleRate = sampleRate;
         this.eventsToInfer = eventsToInfer;
+        this.useTime = useTime;
     }
 
     @Override
@@ -58,10 +64,11 @@ public class EvaluableLoopyPropagationInference implements InferenceAlgorithm<Ba
             }
 
             //pi values
-            piValues.put(X, getHalfHalfFactorFor(X));
+            AssignmentTableFactor f = getHalfHalfFactorFor(X);
+            piValues.put(X, f);
 
             //conditional probs
-            conditionalProbs.put(X, getHalfHalfFactorFor(X));
+            conditionalProbs.put(X, f);
 
             //init pi messages
             for(BayesianNode nodeY : nodeX.getChildSet()) {
@@ -77,7 +84,14 @@ public class EvaluableLoopyPropagationInference implements InferenceAlgorithm<Ba
             piValues.put(nodeR.getVariable(), nodeR.getCPT());
         }
 
-        this.result.put(fact, new HashMap<>(this.infer(eventsToInfer)));
+        time = System.currentTimeMillis();
+        timeDiff = System.currentTimeMillis();
+        if(useTime) {
+            this.result.put(System.currentTimeMillis()-time, new HashMap<>(this.infer(eventsToInfer)));
+        } else {
+            this.result.put(fact, new HashMap<>(this.infer(eventsToInfer)));
+        }
+        //loopyPropagation(1);
         randomPropagation(maxFactorProducts);
     }
 
@@ -126,9 +140,6 @@ public class EvaluableLoopyPropagationInference implements InferenceAlgorithm<Ba
         fact += factorMultiplications;
         factDiff += factorMultiplications;
         //Y sends X a message
-        if(fact == 161753) {
-            System.out.println();
-        }
         AssignmentTableFactor lambdaYX = nodeY.getCPT();
         for(BayesianNode nodeWi : nodeY.getParentSet()) {
             if(!nodeWi.getVariable().equals(nodeX.getVariable()))
@@ -173,7 +184,7 @@ public class EvaluableLoopyPropagationInference implements InferenceAlgorithm<Ba
     }
 
     private AssignmentTableFactor getHalfHalfFactorFor(Variable x) {
-        return new AssignmentTableFactor(List.of(x), Assignment.allAssignments(List.of(x)).stream().collect(Collectors.toMap(a -> a, a -> 0.5)));
+        return new AssignmentTableFactor(List.of(x), Assignment.allAssignments(List.of(x)).stream().collect(Collectors.toMap(a -> a, a -> Math.random() > 0.5 ? 0.1 : 0.9)));
     }
 
     @Override
@@ -229,13 +240,26 @@ public class EvaluableLoopyPropagationInference implements InferenceAlgorithm<Ba
     private void randomPropagation(long maxFact) {
         List<BayesianNode> nodes = new ArrayList<>(bn.topologicalOrdering());
         Random r = new Random();
-        while(fact <= maxFact) {
-            BayesianNode n = nodes.get(r.nextInt(nodes.size()));
-            n.getChildSet().forEach(c -> sendPiMessage(n, c));
-            n.getParentSet().forEach(p -> sendLambdaMessage(n, p));
-            if(factDiff >= sampleRate) {
-                factDiff = 0;
-                result.put(fact, new HashMap<>(this.infer(eventsToInfer)));
+
+        if(useTime) {
+            while(System.currentTimeMillis() - time <= maxFact) {
+                BayesianNode n = nodes.get(r.nextInt(nodes.size()));
+                n.getChildSet().forEach(c -> sendPiMessage(n, c));
+                n.getParentSet().forEach(p -> sendLambdaMessage(n, p));
+                if (System.currentTimeMillis() - timeDiff >= sampleRate) {
+                    timeDiff = System.currentTimeMillis();
+                    result.put(System.currentTimeMillis() - time, new HashMap<>(this.infer(eventsToInfer)));
+                }
+            }
+        } else {
+            while (fact <= maxFact) {
+                BayesianNode n = nodes.get(r.nextInt(nodes.size()));
+                n.getChildSet().forEach(c -> sendPiMessage(n, c));
+                n.getParentSet().forEach(p -> sendLambdaMessage(n, p));
+                if (factDiff >= sampleRate) {
+                    factDiff = 0;
+                    result.put(fact, new HashMap<>(this.infer(eventsToInfer)));
+                }
             }
         }
     }
@@ -248,7 +272,7 @@ public class EvaluableLoopyPropagationInference implements InferenceAlgorithm<Ba
         }
     }
 
-    public Map<Integer, Map<Event, Double>> getResult() {
+    public Map<Long, Map<Event, Double>> getResult() {
         return this.result;
     }
 }

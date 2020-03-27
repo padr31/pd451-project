@@ -15,7 +15,7 @@ public class BayessianGibbsSamplingInference implements InferenceAlgorithm<Bayes
     private BayesianNetwork bn;
     private Assignment evidence = new Assignment(List.of());
 
-    private final static int DEFAULT_GIBBS_ITERATIONS = 200000;
+    private final static int DEFAULT_GIBBS_ITERATIONS = 1000;
     private final static double BURN_IN_PERIOD = 0.2;
     private int iterations = DEFAULT_GIBBS_ITERATIONS;
 
@@ -104,9 +104,9 @@ public class BayessianGibbsSamplingInference implements InferenceAlgorithm<Bayes
 
     // run inference up to a certain amount of factor multiplications, return map of samples after each sampleRate-amount of factor multiplications
     // one blanket sampling corresponds roughly to one factor multiplication due to optimization done in blanket sampling
-    public Map<Integer, Map<Event, Double>> inferUpToFactorMultiplications(List<Event> events, int requiredFactorMultiplications, int sampleRate) {
+    public Map<Long, Map<Event, Double>> inferUpToFactorMultiplications(List<Event> events, long requiredFactorMultiplications, long sampleRate) {
         Map<Event, Double> resultMap = events.stream().collect(Collectors.toMap(e -> e, e -> 0.0));
-        Map<Integer, Map<Event, Double>> result = new HashMap<>();
+        Map<Long, Map<Event, Double>> result = new HashMap<>();
         Map<Variable, Event> state = new HashMap<>();
         List<BayesianNode> topsort = bn.topologicalOrdering();
 
@@ -121,9 +121,9 @@ public class BayessianGibbsSamplingInference implements InferenceAlgorithm<Bayes
             }
         }
 
-        int iter = 0;
-        int fact = 0;
-        int factDiff = 0;
+        long iter = 0;
+        long fact = 0;
+        long factDiff = 0;
         while(fact <= requiredFactorMultiplications) {
             for(BayesianNode n : topsort) {
                 Variable v = n.getVariable();
@@ -140,7 +140,7 @@ public class BayessianGibbsSamplingInference implements InferenceAlgorithm<Bayes
             iter++;
             if(factDiff > sampleRate) {
                 factDiff = 0;
-                int finalIter = iter;
+                long finalIter = iter;
                 result.put(fact, new HashMap<>(resultMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue()/(finalIter)))));
             }
         }
@@ -148,6 +148,47 @@ public class BayessianGibbsSamplingInference implements InferenceAlgorithm<Bayes
         return result;
     }
 
+    public Map<Long, Map<Event, Double>> inferUpToTime(List<Event> events, long requiredTimeMillis, long sampleRateMillis) {
+        Map<Event, Double> resultMap = events.stream().collect(Collectors.toMap(e -> e, e -> 0.0));
+        Map<Long, Map<Event, Double>> result = new HashMap<>();
+        Map<Variable, Event> state = new HashMap<>();
+        List<BayesianNode> topsort = bn.topologicalOrdering();
+
+        //initialise state - set unobserved variables to random samples from their domains
+        for(BayesianNode node : topsort) {
+            Variable v = node.getVariable();
+            if(this.evidence.contains(v)) {
+                state.put(v, new Event(v, this.evidence.getValue(v)));
+            } else {
+                Event e = new Event(v, v.randomSample().getValue());
+                state.put(v, e);
+            }
+        }
+
+        int iter = 0;
+        long time = System.currentTimeMillis();
+        long timeDiff = System.currentTimeMillis();
+        while(System.currentTimeMillis()-time <= requiredTimeMillis) {
+            for(BayesianNode n : topsort) {
+                Variable v = n.getVariable();
+                if(!this.evidence.contains(v)) {
+                    Event e = sampleBasedOnMarkovBlanket(v, state);
+                    state.put(v, e);
+                }
+            }
+            for(Event e : events) {
+                if(state.get(e.getVariable()).equals(e)) resultMap.put(e, resultMap.get(e) + 1);
+            }
+            iter++;
+            if(System.currentTimeMillis() - timeDiff > sampleRateMillis) {
+                timeDiff = System.currentTimeMillis();
+                int finalIter = iter;
+                result.put(System.currentTimeMillis() - time, new HashMap<>(resultMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue()/(finalIter)))));
+            }
+        }
+
+        return result;
+    }
 
     private Event sampleBasedOnMarkovBlanket(Variable v, Map<Variable, Event> state) {
         BayesianNode nodeX = bn.getNode(v);

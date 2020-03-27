@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-public class ProvenanceGadgetTransformStep implements Step<List<Clause>, List<Clause>> {
+public class ProvenanceNarrowingStep implements Step<List<Clause>, List<Clause>> {
 
     //Must be higher than 2 to prevent looping indefinitely as every OR gate has at least 2 parents
     private static final int MAX_PARENTS_THRESHOLD = 4;

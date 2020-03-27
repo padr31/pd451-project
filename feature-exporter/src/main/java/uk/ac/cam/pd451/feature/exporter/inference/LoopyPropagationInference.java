@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class LoopyPropagationInference implements InferenceAlgorithm<BayesianNetwork> {
 
-    private final static long DEFAULT_LOOPY_ITERATIONS = 20000;
+    private final static long DEFAULT_LOOPY_ITERATIONS = 200000;
     private long iterations = DEFAULT_LOOPY_ITERATIONS;
 
     private BayesianNetwork bn;
@@ -23,7 +23,6 @@ public class LoopyPropagationInference implements InferenceAlgorithm<BayesianNet
     Map<Variable, Map<Variable, AssignmentTableFactor>> piMessages = new HashMap<>();
     Map<Variable, AssignmentTableFactor> conditionalProbs = new HashMap<>();
     private String strategy = "random";
-
 
     @Override
     public void setModel(BayesianNetwork bn) {
@@ -43,12 +42,20 @@ public class LoopyPropagationInference implements InferenceAlgorithm<BayesianNet
             //init lambda values
             lambdaValues.put(X, getUnitFactorFor(X));
 
+
             //init lambda messages
             for(BayesianNode nodeZ : nodeX.getParentSet()) {
                 Variable Z = nodeZ.getVariable();
                 if(!lambdaMessages.containsKey(X)) lambdaMessages.put(X, new HashMap<>());
                 lambdaMessages.get(X).put(Z, getUnitFactorFor(Z));
             }
+
+            //pi values
+            AssignmentTableFactor f = getHalfHalfFactorFor(X);
+            piValues.put(X, f);
+
+            //conditional probs
+            conditionalProbs.put(X, f);
 
             //init pi messages
             for(BayesianNode nodeY : nodeX.getChildSet()) {
@@ -62,12 +69,9 @@ public class LoopyPropagationInference implements InferenceAlgorithm<BayesianNet
         for(BayesianNode nodeR : bn.getRoots()) {
             conditionalProbs.put(nodeR.getVariable(), nodeR.getCPT());
             piValues.put(nodeR.getVariable(), nodeR.getCPT());
-            for (BayesianNode childX : nodeR.getChildSet()) {
-                sendPiMessage(nodeR, childX);
-            }
         }
 
-        loopyPropagation(1);
+        //loopyPropagation(1);
         randomPropagation(DEFAULT_LOOPY_ITERATIONS);
     }
 
@@ -150,6 +154,10 @@ public class LoopyPropagationInference implements InferenceAlgorithm<BayesianNet
 
     private AssignmentTableFactor getOneHotFactorFor(Event e) {
         return new AssignmentTableFactor(List.of(e.getVariable()), Assignment.allAssignments(List.of(e.getVariable())).stream().collect(Collectors.toMap(a -> a, a -> a.contains(e) ? 1.0 : 0.0)));
+    }
+
+    private AssignmentTableFactor getHalfHalfFactorFor(Variable x) {
+        return new AssignmentTableFactor(List.of(x), Assignment.allAssignments(List.of(x)).stream().collect(Collectors.toMap(a -> a, a -> Math.random() > 0.5 ? 0.1 : 0.9)));
     }
 
     @Override

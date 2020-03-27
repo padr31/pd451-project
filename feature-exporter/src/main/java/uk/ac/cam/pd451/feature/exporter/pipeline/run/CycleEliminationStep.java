@@ -16,8 +16,8 @@ public class CycleEliminationStep implements Step<List<Clause>, List<Clause>> {
     public List<Clause> process(List<Clause> input) throws PipeException {
         /*Neo4jOGMProvenanceConnector provenanceConnector = Neo4jOGMProvenanceConnector.getInstance();
         provenanceConnector.clearDatabase();
-        provenanceConnector.loadGraph(input);*/
-
+        provenanceConnector.loadGraph(input);
+        */
         //initialise timestamps
         for(Clause cl : input) {
             putTimestamp(cl.getHead());

@@ -6,6 +6,7 @@ import uk.ac.cam.pd451.feature.exporter.inference.*;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 import uk.ac.cam.pd451.feature.exporter.pipeline.io.RankingStatistics;
 import uk.ac.cam.pd451.feature.exporter.pipeline.Step;
+import uk.ac.cam.pd451.feature.exporter.utils.Timer;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -24,7 +25,7 @@ public class UserInteractionStep implements Step<ProvenanceGraph, RankingStatist
 
         System.out.println("Initialising inference algorithm");
 
-        LoopyPropagationInference i = new LoopyPropagationInference();
+        BayessianGibbsSamplingInference i = new BayessianGibbsSamplingInference();
         i.setModel(g.getBayesianNetwork());
 
         Map<Predicate, Event> evidence = new HashMap<>();
@@ -34,7 +35,9 @@ public class UserInteractionStep implements Step<ProvenanceGraph, RankingStatist
         // insert all alarms with their prior probabilities
         System.out.println("Inferring prior probabilities");
 
+        Timer t = new Timer();
         Map<Event, Double> probs = i.infer(pointsToSet.values().stream().map(v -> new Event(v, 1)).collect(Collectors.toList()));
+        t.printLastTimeSegment("Inferred in: ");
 
         for(Map.Entry<Predicate, Variable> pointsToVar : pointsToSet.entrySet()) {
             alarmProbabilities.put(pointsToVar.getKey(), probs.get(new Event(pointsToVar.getValue(), 1)));

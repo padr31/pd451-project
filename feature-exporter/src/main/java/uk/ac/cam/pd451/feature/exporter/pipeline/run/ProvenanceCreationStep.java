@@ -144,8 +144,10 @@ public class ProvenanceCreationStep implements Step<List<Clause>, ProvenanceGrap
             else {
                 List<Variable> ancestorVariables = node.getParentSet().stream().map(BayesianNode::getVariable).collect(Collectors.toList());
 
-                if(ancestorVariables.size() > maxAntecedents[0]) maxAntecedents[0] = ancestorVariables.size();
-                System.out.println(maxAntecedents[0]);
+                if(ancestorVariables.size() > maxAntecedents[0]) {
+                    maxAntecedents[0] = ancestorVariables.size();
+                    System.out.println(maxAntecedents[0]);
+                }
                 Variable predVariable = node.getVariable();
                 List<Variable> assignmentVariables = new ArrayList<>(ancestorVariables);
                 assignmentVariables.add(predVariable);
