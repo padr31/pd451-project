@@ -3,7 +3,7 @@ package uk.ac.cam.pd451.feature.exporter.inference;
 import com.google.common.collect.Lists;
 import uk.ac.cam.pd451.feature.exporter.graph.bn.BayesianNetwork;
 import uk.ac.cam.pd451.feature.exporter.graph.bn.BayesianNode;
-import uk.ac.cam.pd451.feature.exporter.inference.factor.AssignmentTableFactor;
+import uk.ac.cam.pd451.feature.exporter.inference.factor.ConditionalProbabilityTable;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 
 import java.util.*;
@@ -17,11 +17,11 @@ public class EvaluableLoopyPropagationInference implements InferenceAlgorithm<Ba
     private BayesianNetwork bn;
     private Assignment evidence = new Assignment(List.of());
 
-    Map<Variable, AssignmentTableFactor> lambdaValues = new HashMap<>();
-    Map<Variable, Map<Variable, AssignmentTableFactor>> lambdaMessages = new HashMap<>();
-    Map<Variable, AssignmentTableFactor> piValues = new HashMap<>();
-    Map<Variable, Map<Variable, AssignmentTableFactor>> piMessages = new HashMap<>();
-    Map<Variable, AssignmentTableFactor> conditionalProbs = new HashMap<>();
+    Map<Variable, ConditionalProbabilityTable> lambdaValues = new HashMap<>();
+    Map<Variable, Map<Variable, ConditionalProbabilityTable>> lambdaMessages = new HashMap<>();
+    Map<Variable, ConditionalProbabilityTable> piValues = new HashMap<>();
+    Map<Variable, Map<Variable, ConditionalProbabilityTable>> piMessages = new HashMap<>();
+    Map<Variable, ConditionalProbabilityTable> conditionalProbs = new HashMap<>();
     private String strategy = "random";
     private long fact;
     private long factDiff;
@@ -64,7 +64,7 @@ public class EvaluableLoopyPropagationInference implements InferenceAlgorithm<Ba
             }
 
             //pi values
-            AssignmentTableFactor f = getHalfHalfFactorFor(X);
+            ConditionalProbabilityTable f = getHalfHalfFactorFor(X);
             piValues.put(X, f);
 
             //conditional probs
@@ -101,7 +101,7 @@ public class EvaluableLoopyPropagationInference implements InferenceAlgorithm<Ba
         factDiff += factorMultiplications;
 
         //update pi message Z -> pi_x(z) -> X
-        AssignmentTableFactor piXZ = piValues.get(nodeZ.getVariable());
+        ConditionalProbabilityTable piXZ = piValues.get(nodeZ.getVariable());
         for(BayesianNode nodeY : nodeZ.getChildSet()) {
             if(!nodeY.getVariable().equals(nodeX.getVariable())) {
                 piXZ = piXZ.product(
@@ -116,8 +116,8 @@ public class EvaluableLoopyPropagationInference implements InferenceAlgorithm<Ba
 
         //calculate pi value of X
         if(!evidence.contains(nodeX.getVariable())) {
-            AssignmentTableFactor piX = nodeX.getCPT();
-            Map<Variable, AssignmentTableFactor> piXMessages = piMessages.get(nodeX.getVariable());
+            ConditionalProbabilityTable piX = nodeX.getCPT();
+            Map<Variable, ConditionalProbabilityTable> piXMessages = piMessages.get(nodeX.getVariable());
             for(BayesianNode nodeZi : nodeX.getParentSet()) {
                 piX = piX.product(piXMessages.get(nodeZi.getVariable()));
             }
@@ -129,7 +129,7 @@ public class EvaluableLoopyPropagationInference implements InferenceAlgorithm<Ba
             piValues.put(nodeX.getVariable(), piX);
 
             //calculate conditional prob of X
-            AssignmentTableFactor probX = lambdaValues.get(nodeX.getVariable()).product(piX);
+            ConditionalProbabilityTable probX = lambdaValues.get(nodeX.getVariable()).product(piX);
             probX.normalise();
             conditionalProbs.put(nodeX.getVariable(), probX);
         }
@@ -140,7 +140,7 @@ public class EvaluableLoopyPropagationInference implements InferenceAlgorithm<Ba
         fact += factorMultiplications;
         factDiff += factorMultiplications;
         //Y sends X a message
-        AssignmentTableFactor lambdaYX = nodeY.getCPT();
+        ConditionalProbabilityTable lambdaYX = nodeY.getCPT();
         for(BayesianNode nodeWi : nodeY.getParentSet()) {
             if(!nodeWi.getVariable().equals(nodeX.getVariable()))
                 lambdaYX = lambdaYX.product(piMessages.get(nodeY.getVariable()).get(nodeWi.getVariable()));
@@ -157,7 +157,7 @@ public class EvaluableLoopyPropagationInference implements InferenceAlgorithm<Ba
         //update lambda of X from the lambda messages of its children
         if(!nodeX.getChildSet().isEmpty()) {
             List<BayesianNode> childList = new ArrayList<>(nodeX.getChildSet());
-            AssignmentTableFactor lambdaX = lambdaMessages.get(childList.get(0).getVariable()).get(nodeX.getVariable());
+            ConditionalProbabilityTable lambdaX = lambdaMessages.get(childList.get(0).getVariable()).get(nodeX.getVariable());
             for(int i = 1; i < childList.size(); i++) {
                 lambdaX = lambdaX.product(lambdaMessages.get(childList.get(i).getVariable()).get(nodeX.getVariable()));
             }
@@ -169,22 +169,22 @@ public class EvaluableLoopyPropagationInference implements InferenceAlgorithm<Ba
 
         //update conditional probs of X
         if(!evidence.contains(nodeX.getVariable())) {
-            AssignmentTableFactor probsX = lambdaValues.get(nodeX.getVariable()).product(piValues.get(nodeX.getVariable()));
+            ConditionalProbabilityTable probsX = lambdaValues.get(nodeX.getVariable()).product(piValues.get(nodeX.getVariable()));
             probsX.normalise();
             conditionalProbs.put(nodeX.getVariable(), probsX);
         }
     }
 
-    private AssignmentTableFactor getUnitFactorFor(Variable x) {
-        return new AssignmentTableFactor(List.of(x), Assignment.allAssignments(List.of(x)).stream().collect(Collectors.toMap(a -> a, a -> 1.0)));
+    private ConditionalProbabilityTable getUnitFactorFor(Variable x) {
+        return new ConditionalProbabilityTable(List.of(x), Assignment.allAssignments(List.of(x)).stream().collect(Collectors.toMap(a -> a, a -> 1.0)));
     }
 
-    private AssignmentTableFactor getOneHotFactorFor(Event e) {
-        return new AssignmentTableFactor(List.of(e.getVariable()), Assignment.allAssignments(List.of(e.getVariable())).stream().collect(Collectors.toMap(a -> a, a -> a.contains(e) ? 1.0 : 0.0)));
+    private ConditionalProbabilityTable getOneHotFactorFor(Event e) {
+        return new ConditionalProbabilityTable(List.of(e.getVariable()), Assignment.allAssignments(List.of(e.getVariable())).stream().collect(Collectors.toMap(a -> a, a -> a.contains(e) ? 1.0 : 0.0)));
     }
 
-    private AssignmentTableFactor getHalfHalfFactorFor(Variable x) {
-        return new AssignmentTableFactor(List.of(x), Assignment.allAssignments(List.of(x)).stream().collect(Collectors.toMap(a -> a, a -> Math.random() > 0.5 ? 0.1 : 0.9)));
+    private ConditionalProbabilityTable getHalfHalfFactorFor(Variable x) {
+        return new ConditionalProbabilityTable(List.of(x), Assignment.allAssignments(List.of(x)).stream().collect(Collectors.toMap(a -> a, a -> Math.random() > 0.5 ? 0.1 : 0.9)));
     }
 
     @Override

@@ -2,7 +2,7 @@ package uk.ac.cam.pd451.feature.exporter.inference;
 
 import uk.ac.cam.pd451.feature.exporter.graph.factor.FactorGraph;
 import uk.ac.cam.pd451.feature.exporter.graph.factor.FactorNode;
-import uk.ac.cam.pd451.feature.exporter.inference.factor.AssignmentTableFactor;
+import uk.ac.cam.pd451.feature.exporter.inference.factor.ConditionalProbabilityTable;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 
 import java.util.ArrayList;
@@ -38,14 +38,14 @@ public class FactorEliminationInference implements InferenceAlgorithm<FactorGrap
         List<FactorNode> order = model.topologicalOrdering();
         Collections.reverse(order);
 
-        List<AssignmentTableFactor> factors = new ArrayList<AssignmentTableFactor>();
+        List<ConditionalProbabilityTable> factors = new ArrayList<ConditionalProbabilityTable>();
         for (FactorNode n : order) {
             Variable v = n.getVariable();
             factors.add(n.getParentalFactor());
 
             // don't sum out if variable is being inferred or is evidence
             if (!events.contains(v) && !evidence.contains(v)) {
-                AssignmentTableFactor temp = factors.get(0);
+                ConditionalProbabilityTable temp = factors.get(0);
                 for (int i = 1; i < factors.size(); i++)
                     temp = temp.product(factors.get(i));
                 temp = temp.eliminate(v);
@@ -55,7 +55,7 @@ public class FactorEliminationInference implements InferenceAlgorithm<FactorGrap
         }
 
         // make product of all remaining factors
-        AssignmentTableFactor result = factors.get(0);
+        ConditionalProbabilityTable result = factors.get(0);
         for (int i = 1; i < factors.size(); i++)
             result = result.product(factors.get(i));
 
@@ -65,7 +65,7 @@ public class FactorEliminationInference implements InferenceAlgorithm<FactorGrap
         }
 
         // calculate P(evidence) from P(events, evidence) by elimination events
-        AssignmentTableFactor onlyEvidence = result;
+        ConditionalProbabilityTable onlyEvidence = result;
         for(Variable v : events.events.stream().map(Event::getVariable).collect(Collectors.toList())) {
             onlyEvidence = onlyEvidence.eliminate(v);
         }

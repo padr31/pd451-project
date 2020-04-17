@@ -47,4 +47,8 @@ public class Predicate {
     public String getTerms() {
         return StringUtils.join(this.terms, ", ");
     }
+
+    public String getTerms(String separator) {
+        return StringUtils.join(this.terms, separator);
+    }
 }

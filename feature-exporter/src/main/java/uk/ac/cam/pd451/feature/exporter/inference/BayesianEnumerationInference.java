@@ -2,7 +2,7 @@ package uk.ac.cam.pd451.feature.exporter.inference;
 
 import uk.ac.cam.pd451.feature.exporter.graph.bn.BayesianNetwork;
 import uk.ac.cam.pd451.feature.exporter.graph.bn.BayesianNode;
-import uk.ac.cam.pd451.feature.exporter.inference.factor.AssignmentTableFactor;
+import uk.ac.cam.pd451.feature.exporter.inference.factor.ConditionalProbabilityTable;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 
 import java.util.List;
@@ -24,7 +24,7 @@ public class BayesianEnumerationInference implements InferenceAlgorithm<Bayesian
         if(events.contradicts(evidence)) return 0.0;
 
         List<BayesianNode> bnNodes = bn.topologicalOrdering();
-        AssignmentTableFactor jointDistribution = bnNodes.get(0).getCPT();
+        ConditionalProbabilityTable jointDistribution = bnNodes.get(0).getCPT();
         for(int i = 1; i < bnNodes.size(); i++) {
             jointDistribution = jointDistribution.product(bnNodes.get(i).getCPT());
         }
@@ -36,7 +36,7 @@ public class BayesianEnumerationInference implements InferenceAlgorithm<Bayesian
         }
 
 
-        AssignmentTableFactor evidenceDistribution = jointDistribution;
+        ConditionalProbabilityTable evidenceDistribution = jointDistribution;
         for(Variable v : events.getVariables()) {
             evidenceDistribution = evidenceDistribution.eliminate(v);
         }

@@ -2,7 +2,7 @@ package uk.ac.cam.pd451.feature.exporter.inference;
 
 import uk.ac.cam.pd451.feature.exporter.graph.bn.BayesianNetwork;
 import uk.ac.cam.pd451.feature.exporter.graph.bn.BayesianNode;
-import uk.ac.cam.pd451.feature.exporter.inference.factor.AssignmentTableFactor;
+import uk.ac.cam.pd451.feature.exporter.inference.factor.ConditionalProbabilityTable;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 
 import java.util.HashMap;
@@ -15,7 +15,7 @@ public class BayessianGibbsSamplingInference implements InferenceAlgorithm<Bayes
     private BayesianNetwork bn;
     private Assignment evidence = new Assignment(List.of());
 
-    private final static int DEFAULT_GIBBS_ITERATIONS = 1000;
+    private final static int DEFAULT_GIBBS_ITERATIONS = 1200;
     private final static double BURN_IN_PERIOD = 0.2;
     private int iterations = DEFAULT_GIBBS_ITERATIONS;
 
@@ -221,7 +221,7 @@ public class BayessianGibbsSamplingInference implements InferenceAlgorithm<Bayes
             xProbs.put(new Assignment(List.of(e)), childrenScalingFactorFunction.get(domElem)*nodeX.getCPT().get(parentsAssignment.addEvent(e)));
         }
 
-        AssignmentTableFactor xFactor = new AssignmentTableFactor(List.of(nodeX.getVariable()), xProbs);
+        ConditionalProbabilityTable xFactor = new ConditionalProbabilityTable(List.of(nodeX.getVariable()), xProbs);
         xFactor.normalise();
 
         return nodeX.getVariable().sampleFromDistribution(xFactor);

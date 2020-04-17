@@ -4,11 +4,10 @@ import uk.ac.cam.pd451.feature.exporter.datalog.*;
 import uk.ac.cam.pd451.feature.exporter.graph.bn.BayesianNetwork;
 import uk.ac.cam.pd451.feature.exporter.graph.bn.BayesianNode;
 import uk.ac.cam.pd451.feature.exporter.inference.*;
-import uk.ac.cam.pd451.feature.exporter.inference.factor.AssignmentTableFactor;
+import uk.ac.cam.pd451.feature.exporter.inference.factor.ConditionalProbabilityTable;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.VariableClauseIdentifier;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.VariablePredicateIdentifier;
-import uk.ac.cam.pd451.feature.exporter.neo4j.provenance.Neo4jOGMProvenanceConnector;
 import uk.ac.cam.pd451.feature.exporter.pipeline.Step;
 
 import java.util.*;
@@ -68,6 +67,9 @@ public class ProvenanceCreationStep implements Step<List<Clause>, ProvenanceGrap
             cl.getBody().forEach(bodyPred -> node.addParent(predicateToNode.get(bodyPred)));
             if(cl.getBody().size() > maxAntecedents[0]){
                 maxAntecedents[0] = cl.getBody().size();
+                if(maxAntecedents[0] == 6) {
+                    System.out.println();
+                }
             }
         });
 
@@ -105,7 +107,7 @@ public class ProvenanceCreationStep implements Step<List<Clause>, ProvenanceGrap
                 else return 0.9;
             }));
 
-            AssignmentTableFactor CPT = new AssignmentTableFactor(assignmentVariables, function);
+            ConditionalProbabilityTable CPT = new ConditionalProbabilityTable(assignmentVariables, function);
             node.setCPT(CPT);
         });
 
@@ -133,7 +135,7 @@ public class ProvenanceCreationStep implements Step<List<Clause>, ProvenanceGrap
             // if node is root - predicate is an input clause
             if(node.getParentSet().size() == 0) {
                 node.setCPT(
-                        new AssignmentTableFactor(List.of(node.getVariable()), Map.of(
+                        new ConditionalProbabilityTable(List.of(node.getVariable()), Map.of(
                             new Assignment(List.of(new Event(node.getVariable(), 0))), 0.0,
                             new Assignment(List.of(new Event(node.getVariable(), 1))), 1.0
                         )
@@ -146,7 +148,9 @@ public class ProvenanceCreationStep implements Step<List<Clause>, ProvenanceGrap
 
                 if(ancestorVariables.size() > maxAntecedents[0]) {
                     maxAntecedents[0] = ancestorVariables.size();
-                    System.out.println(maxAntecedents[0]);
+                    if(maxAntecedents[0] == 6) {
+                        System.out.println();
+                    }
                 }
                 Variable predVariable = node.getVariable();
                 List<Variable> assignmentVariables = new ArrayList<>(ancestorVariables);
@@ -166,7 +170,7 @@ public class ProvenanceCreationStep implements Step<List<Clause>, ProvenanceGrap
                     else return 0.9;
                 }));
 
-                AssignmentTableFactor CPT = new AssignmentTableFactor(assignmentVariables, function);
+                ConditionalProbabilityTable CPT = new ConditionalProbabilityTable(assignmentVariables, function);
                 node.setCPT(CPT);
             }
         });

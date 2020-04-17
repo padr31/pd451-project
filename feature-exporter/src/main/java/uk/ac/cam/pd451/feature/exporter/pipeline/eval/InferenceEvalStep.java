@@ -83,6 +83,15 @@ public class InferenceEvalStep implements Step<ProvenanceGraph, RankingStatistic
         return msd;
     }
 
+    double meanAbsoluteDsitance(Map<Event, Double> distribution1, Map<Event, Double> distribution2) {
+        double msd = 0;
+        for(Map.Entry<Event, Double> e : distribution1.entrySet()) {
+            msd += Math.abs(e.getValue() - distribution2.get(e.getKey()));
+        }
+        msd = msd/distribution1.size();
+        return msd;
+    }
+
     double l1Distance(Map<Event, Double> distribution1, Map<Event, Double> distribution2) {
         double msd = 0;
         for(Map.Entry<Event, Double> e : distribution1.entrySet()) {

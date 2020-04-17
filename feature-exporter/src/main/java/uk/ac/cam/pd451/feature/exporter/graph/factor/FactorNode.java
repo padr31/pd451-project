@@ -1,6 +1,6 @@
 package uk.ac.cam.pd451.feature.exporter.graph.factor;
 
-import uk.ac.cam.pd451.feature.exporter.inference.factor.AssignmentTableFactor;
+import uk.ac.cam.pd451.feature.exporter.inference.factor.ConditionalProbabilityTable;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 
 import java.util.HashSet;
@@ -13,7 +13,7 @@ public class FactorNode{
     private Set<FactorNode> childSet;
 
     private Variable variable;
-    private AssignmentTableFactor parentalFactor;
+    private ConditionalProbabilityTable parentalFactor;
     private String id = UUID.randomUUID().toString();
 
     public FactorNode(Variable variable) {
@@ -36,7 +36,7 @@ public class FactorNode{
         return childSet;
     }
 
-    public AssignmentTableFactor getParentalFactor() {
+    public ConditionalProbabilityTable getParentalFactor() {
         return parentalFactor;
     }
 
@@ -50,7 +50,7 @@ public class FactorNode{
         node.parentSet.add(this);
     }
 
-    public void setParentalFactor(AssignmentTableFactor f) {
+    public void setParentalFactor(ConditionalProbabilityTable f) {
         this.parentalFactor = f;
     }
 

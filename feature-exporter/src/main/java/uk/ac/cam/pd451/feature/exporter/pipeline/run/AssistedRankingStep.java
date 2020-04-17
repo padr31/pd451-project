@@ -9,12 +9,41 @@ import uk.ac.cam.pd451.feature.exporter.pipeline.io.RankingStatistics;
 import uk.ac.cam.pd451.feature.exporter.pipeline.Step;
 import uk.ac.cam.pd451.feature.exporter.utils.Timer;
 
+import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class UserInteractionStep implements Step<ProvenanceGraph, RankingStatistics> {
+public class AssistedRankingStep implements Step<ProvenanceGraph, RankingStatistics> {
+
+    private Map<String, Boolean> readRankCSV() {
+        Map<String, Boolean> ranks = new HashMap<>();
+
+        String csvFile = "out_ranking/inspected_predicates_previous.csv";
+        String line;
+        String cvsSplitBy = ";";
+
+        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+
+            while ((line = br.readLine()) != null) {
+
+                // use comma as separator
+                String[] split = line.split(cvsSplitBy);
+
+                boolean isTrue = Integer.parseInt(split[3]) == 1;
+                ranks.put(split[0], isTrue);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return ranks;
+    }
+
     @Override
     public RankingStatistics process(ProvenanceGraph g) throws PipeException {
+        Map<String, Boolean> isPositive = readRankCSV();
+
         List<InspectedPredicate> inspectedPredicates = new ArrayList<>();
         List<Map<Predicate, Double>> overallRanks = new ArrayList<>();
 
@@ -56,24 +85,54 @@ public class UserInteractionStep implements Step<ProvenanceGraph, RankingStatist
 
             // pick alarm with largest probability and present for inspection
             Predicate topAlarm = alarmProbabilities.entrySet().stream().min((a, b) -> b.getValue() - a.getValue() < 0 ? -1 : 1).get().getKey();
-            System.out.println("Is this alarm a true positive? (1/0)");
-            System.out.println(topAlarm.getTerms());
 
-            if(scanner.nextInt() == 1) {
-                // true positive
-                inspectedPredicates.add(new InspectedPredicate(topAlarm, rank, alarmProbabilities.get(topAlarm), true));
-                Event e = new Event(pointsToSet.get(topAlarm), 1);
-                evidence.put(topAlarm, e);
-                trueFalse.add(true);
-                i.addEvidence(e);
-            } else {
-                // false positive
-                inspectedPredicates.add(new InspectedPredicate(topAlarm, rank, alarmProbabilities.get(topAlarm), false));
-                Event e = new Event(pointsToSet.get(topAlarm), 0);
-                evidence.put(topAlarm, e);
-                trueFalse.add(false);
-                i.addEvidence(e);
+            double noise = 0;
+
+            //is in database - was ranked previously
+            if(isPositive.containsKey(topAlarm.getTerms())) {
+                System.out.println(topAlarm.getTerms());
+                boolean truePos = isPositive.get(topAlarm.getTerms());
+                if(Math.random() < noise) {
+                    // flip value deliberately
+                    truePos = !truePos;
+                }
+                if(truePos) {
+                    // true positive
+                    inspectedPredicates.add(new InspectedPredicate(topAlarm, rank, alarmProbabilities.get(topAlarm), true));
+                    Event e = new Event(pointsToSet.get(topAlarm), 1);
+                    evidence.put(topAlarm, e);
+                    trueFalse.add(true);
+                    i.addEvidence(e);
+                } else {
+                    // false positive
+                    inspectedPredicates.add(new InspectedPredicate(topAlarm, rank, alarmProbabilities.get(topAlarm), false));
+                    Event e = new Event(pointsToSet.get(topAlarm), 0);
+                    evidence.put(topAlarm, e);
+                    trueFalse.add(false);
+                    i.addEvidence(e);
+                }
+            } //isn't ranked yet - ask user
+            else {
+                System.out.println("Is this alarm a true positive? (1/0)");
+                System.out.println(topAlarm.getTerms());
+
+                if(scanner.nextInt() == 1) {
+                    // true positive
+                    inspectedPredicates.add(new InspectedPredicate(topAlarm, rank, alarmProbabilities.get(topAlarm), true));
+                    Event e = new Event(pointsToSet.get(topAlarm), 1);
+                    evidence.put(topAlarm, e);
+                    trueFalse.add(true);
+                    i.addEvidence(e);
+                } else {
+                    // false positive
+                    inspectedPredicates.add(new InspectedPredicate(topAlarm, rank, alarmProbabilities.get(topAlarm), false));
+                    Event e = new Event(pointsToSet.get(topAlarm), 0);
+                    evidence.put(topAlarm, e);
+                    trueFalse.add(false);
+                    i.addEvidence(e);
+                }
             }
+
 
             // remove the inspected alarm
             alarmProbabilities.remove(topAlarm);

@@ -7,7 +7,7 @@ import uk.ac.cam.pd451.feature.exporter.datalog.ProvenanceGraph;
 import uk.ac.cam.pd451.feature.exporter.graph.bn.BayesianNetwork;
 import uk.ac.cam.pd451.feature.exporter.graph.bn.BayesianNode;
 import uk.ac.cam.pd451.feature.exporter.inference.*;
-import uk.ac.cam.pd451.feature.exporter.inference.factor.AssignmentTableFactor;
+import uk.ac.cam.pd451.feature.exporter.inference.factor.ConditionalProbabilityTable;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.VariableClauseIdentifier;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.VariablePredicateIdentifier;
@@ -85,19 +85,19 @@ class ProvenanceCreationStepTest {
         abcCl2Node.addParent(abNode);
 
         // CPTs
-        AssignmentTableFactor aCPT = new AssignmentTableFactor(List.of(aVariable), Map.of(
+        ConditionalProbabilityTable aCPT = new ConditionalProbabilityTable(List.of(aVariable), Map.of(
                 new Assignment(List.of(new Event(aVariable, 0))), 0.0,
                 new Assignment(List.of(new Event(aVariable, 1))), 1.0
         ));
         aNode.setCPT(aCPT);
 
-        AssignmentTableFactor bCPT = new AssignmentTableFactor(List.of(bVariable), Map.of(
+        ConditionalProbabilityTable bCPT = new ConditionalProbabilityTable(List.of(bVariable), Map.of(
                 new Assignment(List.of(new Event(bVariable, 0))), 0.0,
                 new Assignment(List.of(new Event(bVariable, 1))), 1.0
         ));
         bNode.setCPT(bCPT);
 
-        AssignmentTableFactor cCPT = new AssignmentTableFactor(List.of(cVariable), Map.of(
+        ConditionalProbabilityTable cCPT = new ConditionalProbabilityTable(List.of(cVariable), Map.of(
                 new Assignment(List.of(new Event(cVariable, 0))), 0.0,
                 new Assignment(List.of(new Event(cVariable, 1))), 1.0
         ));
@@ -124,10 +124,10 @@ class ProvenanceCreationStepTest {
                     new Assignment(List.of(new Event(aVariable, 1), new Event(bVariable, 1), new Event(cVariable, 1), new Event(abClVariable, 1))), 0.95);
         Map<Assignment, Double> m = new HashMap<>(m1);
         m.putAll(m2);
-        AssignmentTableFactor abClCPT = new AssignmentTableFactor(List.of(aVariable, bVariable, cVariable, abClVariable), m);
+        ConditionalProbabilityTable abClCPT = new ConditionalProbabilityTable(List.of(aVariable, bVariable, cVariable, abClVariable), m);
         abClNode.setCPT(abClCPT);
 
-        AssignmentTableFactor bcClCPT = new AssignmentTableFactor(List.of(bVariable, cVariable, bcClVariable), Map.of(
+        ConditionalProbabilityTable bcClCPT = new ConditionalProbabilityTable(List.of(bVariable, cVariable, bcClVariable), Map.of(
                 new Assignment(List.of(new Event(bVariable, 0), new Event(cVariable, 0), new Event(bcClVariable, 0))), 0.9,
                 new Assignment(List.of(new Event(bVariable, 0), new Event(cVariable, 1), new Event(bcClVariable, 0))), 0.9,
                 new Assignment(List.of(new Event(bVariable, 1), new Event(cVariable, 0), new Event(bcClVariable, 0))), 0.9,
@@ -139,7 +139,7 @@ class ProvenanceCreationStepTest {
         ));
         bcClNode.setCPT(bcClCPT);
 
-        AssignmentTableFactor abcClCPT = new AssignmentTableFactor(List.of(abVariable, bcVariable, abcClVariable), Map.of(
+        ConditionalProbabilityTable abcClCPT = new ConditionalProbabilityTable(List.of(abVariable, bcVariable, abcClVariable), Map.of(
                 new Assignment(List.of(new Event(abVariable, 0), new Event(bcVariable, 0), new Event(abcClVariable, 0))), 0.9,
                 new Assignment(List.of(new Event(abVariable, 0), new Event(bcVariable, 1), new Event(abcClVariable, 0))), 0.9,
                 new Assignment(List.of(new Event(abVariable, 1), new Event(bcVariable, 0), new Event(abcClVariable, 0))), 0.9,
@@ -151,7 +151,7 @@ class ProvenanceCreationStepTest {
         ));
         abcClNode.setCPT(abcClCPT);
 
-        AssignmentTableFactor abcCl2CPT = new AssignmentTableFactor(List.of(abVariable, abcCl2Variable), Map.of(
+        ConditionalProbabilityTable abcCl2CPT = new ConditionalProbabilityTable(List.of(abVariable, abcCl2Variable), Map.of(
                 new Assignment(List.of(new Event(abVariable, 0), new Event(abcCl2Variable, 0))), 0.9,
                 new Assignment(List.of(new Event(abVariable, 1), new Event(abcCl2Variable, 0))), 0.05,
                 new Assignment(List.of(new Event(abVariable, 0), new Event(abcCl2Variable, 1))), 0.1,
@@ -159,7 +159,7 @@ class ProvenanceCreationStepTest {
         ));
         abcCl2Node.setCPT(abcCl2CPT);
 
-        AssignmentTableFactor abCPT = new AssignmentTableFactor(List.of(abClVariable, abVariable), Map.of(
+        ConditionalProbabilityTable abCPT = new ConditionalProbabilityTable(List.of(abClVariable, abVariable), Map.of(
                 new Assignment(List.of(new Event(abClVariable, 0), new Event(abVariable, 0))), 0.9,
                 new Assignment(List.of(new Event(abClVariable, 1), new Event(abVariable, 0))), 0.1,
                 new Assignment(List.of(new Event(abClVariable, 0), new Event(abVariable, 1))), 0.1,
@@ -167,7 +167,7 @@ class ProvenanceCreationStepTest {
         ));
         abNode.setCPT(abCPT);
 
-        AssignmentTableFactor bcCPT = new AssignmentTableFactor(List.of(bcClVariable, bcVariable), Map.of(
+        ConditionalProbabilityTable bcCPT = new ConditionalProbabilityTable(List.of(bcClVariable, bcVariable), Map.of(
                 new Assignment(List.of(new Event(bcClVariable, 0), new Event(bcVariable, 0))), 0.9,
                 new Assignment(List.of(new Event(bcClVariable, 1), new Event(bcVariable, 0))), 0.1,
                 new Assignment(List.of(new Event(bcClVariable, 0), new Event(bcVariable, 1))), 0.1,
@@ -175,7 +175,7 @@ class ProvenanceCreationStepTest {
         ));
         bcNode.setCPT(bcCPT);
 
-        AssignmentTableFactor abcCPT = new AssignmentTableFactor(List.of(abcClVariable, abcCl2Variable, abcVariable), Map.of(
+        ConditionalProbabilityTable abcCPT = new ConditionalProbabilityTable(List.of(abcClVariable, abcCl2Variable, abcVariable), Map.of(
                 new Assignment(List.of(new Event(abcClVariable, 0), new Event(abcCl2Variable, 0), new Event(abcVariable, 0))), 0.9,
                 new Assignment(List.of(new Event(abcClVariable, 0), new Event(abcCl2Variable, 1), new Event(abcVariable, 0))), 0.1,
                 new Assignment(List.of(new Event(abcClVariable, 1), new Event(abcCl2Variable, 0), new Event(abcVariable, 0))), 0.1,

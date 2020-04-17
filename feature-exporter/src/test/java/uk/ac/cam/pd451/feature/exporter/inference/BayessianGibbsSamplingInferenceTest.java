@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import uk.ac.cam.pd451.feature.exporter.graph.bn.BayesianNetwork;
 import uk.ac.cam.pd451.feature.exporter.graph.bn.BayesianNode;
-import uk.ac.cam.pd451.feature.exporter.inference.factor.AssignmentTableFactor;
+import uk.ac.cam.pd451.feature.exporter.inference.factor.ConditionalProbabilityTable;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 
 import java.util.HashMap;
@@ -65,7 +65,7 @@ class BayessianGibbsSamplingInferenceTest {
                 new Assignment(List.of(new Event(difficulty, 0))), 0.6,
                 new Assignment(List.of(new Event(difficulty, 1))), 0.4
         );
-        AssignmentTableFactor d = new AssignmentTableFactor(List.of(difficulty), dmap);
+        ConditionalProbabilityTable d = new ConditionalProbabilityTable(List.of(difficulty), dmap);
         BayesianNode difficultyNode = new BayesianNode(difficulty);
         difficultyNode.setCPT(d);
 
@@ -73,7 +73,7 @@ class BayessianGibbsSamplingInferenceTest {
                 new Assignment(List.of(new Event(intelligence, 0))), 0.7,
                 new Assignment(List.of(new Event(intelligence, 1))), 0.3
         );
-        AssignmentTableFactor i = new AssignmentTableFactor(List.of(intelligence), imap);
+        ConditionalProbabilityTable i = new ConditionalProbabilityTable(List.of(intelligence), imap);
         BayesianNode intelligenceNode = new BayesianNode(intelligence);
         intelligenceNode.setCPT(i);
 
@@ -95,7 +95,7 @@ class BayessianGibbsSamplingInferenceTest {
         );
         Map<Assignment, Double> gmap = new HashMap<>(gmap1);
         gmap.putAll(gmap2);
-        AssignmentTableFactor g = new AssignmentTableFactor(List.of(grade, intelligence, difficulty), gmap);
+        ConditionalProbabilityTable g = new ConditionalProbabilityTable(List.of(grade, intelligence, difficulty), gmap);
         BayesianNode gradeNode = new BayesianNode(grade);
         gradeNode.setCPT(g);
 
@@ -105,7 +105,7 @@ class BayessianGibbsSamplingInferenceTest {
                 new Assignment(List.of(new Event(sat, 0), new Event(intelligence, 1))), 0.2,
                 new Assignment(List.of(new Event(sat, 1), new Event(intelligence, 1))), 0.8
         );
-        AssignmentTableFactor s = new AssignmentTableFactor(List.of(sat, intelligence), smap);
+        ConditionalProbabilityTable s = new ConditionalProbabilityTable(List.of(sat, intelligence), smap);
         BayesianNode satNode = new BayesianNode(sat);
         satNode.setCPT(s);
 
@@ -117,7 +117,7 @@ class BayessianGibbsSamplingInferenceTest {
                 new Assignment(List.of(new Event(letter, 0), new Event(grade, 3))), 0.99,
                 new Assignment(List.of(new Event(letter, 1), new Event(grade, 3))), 0.01
         );
-        AssignmentTableFactor l = new AssignmentTableFactor(List.of(letter, grade), lmap);
+        ConditionalProbabilityTable l = new ConditionalProbabilityTable(List.of(letter, grade), lmap);
         BayesianNode letterNode = new BayesianNode(letter);
         letterNode.setCPT(l);
 
@@ -138,7 +138,7 @@ class BayessianGibbsSamplingInferenceTest {
                 new Assignment(List.of(new Event(b, 0))), 0.995,
                 new Assignment(List.of(new Event(b, 1))), 0.005
         );
-        AssignmentTableFactor bcpt = new AssignmentTableFactor(List.of(b), bmap);
+        ConditionalProbabilityTable bcpt = new ConditionalProbabilityTable(List.of(b), bmap);
         BayesianNode bNode = new BayesianNode(b);
         bNode.setCPT(bcpt);
 
@@ -146,7 +146,7 @@ class BayessianGibbsSamplingInferenceTest {
                 new Assignment(List.of(new Event(f, 0))), 0.97,
                 new Assignment(List.of(new Event(f, 1))), 0.03
         );
-        AssignmentTableFactor fcpt = new AssignmentTableFactor(List.of(f), fmap);
+        ConditionalProbabilityTable fcpt = new ConditionalProbabilityTable(List.of(f), fmap);
         BayesianNode fNode = new BayesianNode(f);
         fNode.setCPT(fcpt);
 
@@ -160,7 +160,7 @@ class BayessianGibbsSamplingInferenceTest {
                 new Assignment(List.of(new Event(a, 0), new Event(b, 1), new Event(f, 1))), 0.008,
                 new Assignment(List.of(new Event(a, 1), new Event(b, 1), new Event(f, 1))), 0.992
         );
-        AssignmentTableFactor acpt = new AssignmentTableFactor(List.of(a, b, f), amap);
+        ConditionalProbabilityTable acpt = new ConditionalProbabilityTable(List.of(a, b, f), amap);
         BayesianNode aNode = new BayesianNode(a);
         aNode.setCPT(acpt);
 

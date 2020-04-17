@@ -2,7 +2,7 @@ package uk.ac.cam.pd451.feature.exporter.inference;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import uk.ac.cam.pd451.feature.exporter.inference.factor.AssignmentTableFactor;
+import uk.ac.cam.pd451.feature.exporter.inference.factor.ConditionalProbabilityTable;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 
 import java.util.*;
@@ -68,13 +68,13 @@ class FactorTest {
         probs.put(xy10, 0.2);
         probs.put(xy11, 0.4);
 
-        AssignmentTableFactor f = new AssignmentTableFactor(List.of(x, y), probs);
+        ConditionalProbabilityTable f = new ConditionalProbabilityTable(List.of(x, y), probs);
 
         Map<Assignment, Double> probsx = new HashMap<>();
         probsx.put(xy00.remove(y), 0.4);
         probsx.put(xy10.remove(y), 0.6000000000000001);
 
-        AssignmentTableFactor fx = f.eliminate(y);
+        ConditionalProbabilityTable fx = f.eliminate(y);
 
         assertEquals(probsx, fx.function);
         assertEquals(List.of(x), fx.variables);
@@ -88,7 +88,7 @@ class FactorTest {
         probsXY.put(xy10, 0.2);
         probsXY.put(xy11, 0.4);
 
-        AssignmentTableFactor fXY = new AssignmentTableFactor(List.of(x, y), probsXY);
+        ConditionalProbabilityTable fXY = new ConditionalProbabilityTable(List.of(x, y), probsXY);
 
         Map<Assignment, Double> probsYZ = new HashMap<>();
         probsYZ.put(yz00, 0.1);
@@ -96,7 +96,7 @@ class FactorTest {
         probsYZ.put(yz10, 0.4);
         probsYZ.put(yz11, 0.2);
 
-        AssignmentTableFactor fYZ = new AssignmentTableFactor(List.of(y, z), probsYZ);
+        ConditionalProbabilityTable fYZ = new ConditionalProbabilityTable(List.of(y, z), probsYZ);
 
         Assignment xyz000 = new Assignment(List.of(ex0, ey0, ez0));
         Assignment xyz001 = new Assignment(List.of(ex0, ey0, ez1));
@@ -116,7 +116,7 @@ class FactorTest {
         probsXYZ.put(xyz110, 0.16000000000000003);
         probsXYZ.put(xyz111, 0.08000000000000002);
 
-        AssignmentTableFactor fXYZ = fXY.product(fYZ);
+        ConditionalProbabilityTable fXYZ = fXY.product(fYZ);
         assertEquals(probsXYZ, fXYZ.function);
     }
 
@@ -136,7 +136,7 @@ class FactorTest {
                 new Assignment(List.of(new Event(a, 0), new Event(b, 1), new Event(f, 1))), 0.008,
                 new Assignment(List.of(new Event(a, 1), new Event(b, 1), new Event(f, 1))), 0.992
         );
-        AssignmentTableFactor acpt = new AssignmentTableFactor(List.of(a), amap);
+        ConditionalProbabilityTable acpt = new ConditionalProbabilityTable(List.of(a), amap);
     }
 
     @Test
@@ -155,7 +155,7 @@ class FactorTest {
                 new Assignment(List.of(new Event(a, 0), new Event(b, 1), new Event(f, 1))), 0.008,
                 new Assignment(List.of(new Event(a, 1), new Event(b, 1), new Event(f, 1))), 0.992
         );
-        AssignmentTableFactor acpt = new AssignmentTableFactor(List.of(a, b, f), amap);
+        ConditionalProbabilityTable acpt = new ConditionalProbabilityTable(List.of(a, b, f), amap);
 
         Map<Assignment, Double> bmap = Map.of(
                 new Assignment(List.of(new Event(a, 0), new Event(b, 0), new Event(f, 0))), 0.997,
@@ -167,7 +167,7 @@ class FactorTest {
                 new Assignment(List.of(new Event(a, 0), new Event(b, 1), new Event(f, 1))), 0.008,
                 new Assignment(List.of(new Event(a, 1), new Event(b, 1), new Event(f, 1))), 0.992
         );
-        AssignmentTableFactor bcpt = new AssignmentTableFactor(List.of(b, a, f), amap);
+        ConditionalProbabilityTable bcpt = new ConditionalProbabilityTable(List.of(b, a, f), amap);
         assertEquals(acpt, bcpt);
 
         Map<Assignment, Double> cmap = Map.of(
@@ -178,7 +178,7 @@ class FactorTest {
                 new Assignment(List.of(new Event(a, 1), new Event(b, 1), new Event(f, 0))), 0.99,
                 new Assignment(List.of(new Event(a, 0), new Event(b, 1), new Event(f, 0))), 0.01
         );
-        AssignmentTableFactor ccpt = new AssignmentTableFactor(List.of(b, a, f), cmap);
+        ConditionalProbabilityTable ccpt = new ConditionalProbabilityTable(List.of(b, a, f), cmap);
 
         assertNotEquals(acpt, ccpt);
     }
