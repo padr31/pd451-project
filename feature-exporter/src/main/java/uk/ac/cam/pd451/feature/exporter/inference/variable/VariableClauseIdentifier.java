@@ -25,4 +25,8 @@ public class VariableClauseIdentifier extends VariableIdentifier {
     public String toString() {
         return "cl: " + this.c.getHead().getName();
     }
+
+    public Clause getClause() {
+        return c;
+    }
 }

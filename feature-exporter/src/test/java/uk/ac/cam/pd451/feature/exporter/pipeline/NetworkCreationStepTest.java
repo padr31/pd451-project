@@ -11,7 +11,7 @@ import uk.ac.cam.pd451.feature.exporter.inference.factor.ConditionalProbabilityT
 import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.VariableClauseIdentifier;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.VariablePredicateIdentifier;
-import uk.ac.cam.pd451.feature.exporter.pipeline.run.ProvenanceCreationStep;
+import uk.ac.cam.pd451.feature.exporter.pipeline.run.NetworkCreationStep;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ProvenanceCreationStepTest {
+class NetworkCreationStepTest {
 
     @Test
     void process() {
@@ -39,7 +39,7 @@ class ProvenanceCreationStepTest {
 
         List<Clause> groundClauses = List.of(abCl, bcCl, abcCl, abcCl2);
 
-        Pipeline<List<Clause>, ProvenanceGraph> provenanceCreationPipeline = new Pipeline<>(new ProvenanceCreationStep());
+        Pipeline<List<Clause>, ProvenanceGraph> provenanceCreationPipeline = new Pipeline<>(new NetworkCreationStep());
         BayesianNetwork bnResult = provenanceCreationPipeline.process(groundClauses).getBayesianNetwork();
 
         Set<Integer> binaryDomain = Set.of(0, 1);

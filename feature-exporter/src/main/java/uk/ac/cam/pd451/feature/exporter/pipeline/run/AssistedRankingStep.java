@@ -7,6 +7,7 @@ import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 import uk.ac.cam.pd451.feature.exporter.pipeline.io.InspectedPredicate;
 import uk.ac.cam.pd451.feature.exporter.pipeline.io.RankingStatistics;
 import uk.ac.cam.pd451.feature.exporter.pipeline.Step;
+import uk.ac.cam.pd451.feature.exporter.utils.CSV;
 import uk.ac.cam.pd451.feature.exporter.utils.Timer;
 
 import java.io.*;
@@ -15,34 +16,11 @@ import java.util.stream.Collectors;
 
 public class AssistedRankingStep implements Step<ProvenanceGraph, RankingStatistics> {
 
-    private Map<String, Boolean> readRankCSV() {
-        Map<String, Boolean> ranks = new HashMap<>();
 
-        String csvFile = "out_ranking/inspected_predicates_previous.csv";
-        String line;
-        String cvsSplitBy = ";";
-
-        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
-
-            while ((line = br.readLine()) != null) {
-
-                // use comma as separator
-                String[] split = line.split(cvsSplitBy);
-
-                boolean isTrue = Integer.parseInt(split[3]) == 1;
-                ranks.put(split[0], isTrue);
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return ranks;
-    }
 
     @Override
     public RankingStatistics process(ProvenanceGraph g) throws PipeException {
-        Map<String, Boolean> isPositive = readRankCSV();
+        Map<String, Boolean> isPositive = CSV.readRankCSV();
 
         List<InspectedPredicate> inspectedPredicates = new ArrayList<>();
         List<Map<Predicate, Double>> overallRanks = new ArrayList<>();
@@ -57,7 +35,7 @@ public class AssistedRankingStep implements Step<ProvenanceGraph, RankingStatist
 
         System.out.println("Initialising inference algorithm");
 
-        LoopyPropagationInference i = new LoopyPropagationInference();
+        BayessianGibbsSamplingInference i = new BayessianGibbsSamplingInference();
         i.setModel(g.getBayesianNetwork());
 
         Map<Predicate, Event> evidence = new HashMap<>();

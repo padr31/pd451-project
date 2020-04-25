@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Clause {
 
@@ -22,6 +23,10 @@ public class Clause {
 
     public String getRule() {
         return this.head.getName();
+    }
+
+    public String getFullRule() {
+        return this.head.getName() + ":-" + this.getBody().stream().map(Predicate::getName).sorted().collect(Collectors.joining(","));
     }
 
     @Override

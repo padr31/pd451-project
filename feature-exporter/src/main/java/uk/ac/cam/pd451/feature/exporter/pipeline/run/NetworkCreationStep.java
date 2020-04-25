@@ -13,7 +13,7 @@ import uk.ac.cam.pd451.feature.exporter.pipeline.Step;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ProvenanceCreationStep implements Step<List<Clause>, ProvenanceGraph> {
+public class NetworkCreationStep implements Step<List<Clause>, ProvenanceGraph> {
 
     @Override
     public ProvenanceGraph process(List<Clause> groundClauses) throws PipeException {

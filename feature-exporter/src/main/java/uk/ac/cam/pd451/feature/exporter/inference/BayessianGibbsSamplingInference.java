@@ -4,6 +4,7 @@ import uk.ac.cam.pd451.feature.exporter.graph.bn.BayesianNetwork;
 import uk.ac.cam.pd451.feature.exporter.graph.bn.BayesianNode;
 import uk.ac.cam.pd451.feature.exporter.inference.factor.ConditionalProbabilityTable;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
+import uk.ac.cam.pd451.feature.exporter.inference.variable.VariableClauseIdentifier;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +16,7 @@ public class BayessianGibbsSamplingInference implements InferenceAlgorithm<Bayes
     private BayesianNetwork bn;
     private Assignment evidence = new Assignment(List.of());
 
-    private final static int DEFAULT_GIBBS_ITERATIONS = 1200;
+    private final static int DEFAULT_GIBBS_ITERATIONS = 5000;
     private final static double BURN_IN_PERIOD = 0.2;
     private int iterations = DEFAULT_GIBBS_ITERATIONS;
 
@@ -100,6 +101,68 @@ public class BayessianGibbsSamplingInference implements InferenceAlgorithm<Bayes
         }
 
         return resultMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue()/(this.iterations-this.iterations*BURN_IN_PERIOD)));
+    }
+
+    public Map<String, Double> sampleRuleProbabilities() {
+        Map<String, Double> ruleProbabilities = new HashMap<>();
+        Map<String, Double> ruleCounts = new HashMap<>();
+
+        Map<Variable, Event> state = new HashMap<>();
+        List<BayesianNode> topsort = bn.topologicalOrdering();
+
+        //initialise state - set unobserved variables to random samples from their domains
+        for(BayesianNode node : topsort) {
+            Variable v = node.getVariable();
+            if(this.evidence.contains(v)) {
+                state.put(v, new Event(v, this.evidence.getValue(v)));
+            } else {
+                Event e = new Event(v, v.randomSample().getValue());
+                state.put(v, e);
+                if(v.getId() instanceof VariableClauseIdentifier) {
+                    VariableClauseIdentifier clID = (VariableClauseIdentifier) v.getId();
+                    if(!ruleProbabilities.containsKey(clID.getClause().getFullRule())) {
+                        ruleProbabilities.put(clID.getClause().getFullRule(), 0.0);
+                    }
+                    if(!ruleCounts.containsKey(clID.getClause().getFullRule())) {
+                        ruleCounts.put(clID.getClause().getFullRule(), 0.0);
+                    }
+                }
+            }
+        }
+
+        for(int j = 0; j < this.iterations; j++) {
+            for(BayesianNode n : topsort) {
+                Variable v = n.getVariable();
+                if(!this.evidence.contains(v)) {
+                    Event e = sampleBasedOnMarkovBlanket(v, state);
+                    state.put(v, e);
+
+                    // figure out if all body variables were true
+                    final boolean[] allBodyVariablesTrue = {true};
+                    n.getParentSet().stream().map(BayesianNode::getVariable).forEach(bv -> {
+                        if(state.get(v).getValue()==0) allBodyVariablesTrue[0] =false;
+                    });
+
+                    if(v.getId() instanceof VariableClauseIdentifier) {
+                        VariableClauseIdentifier clID = (VariableClauseIdentifier) v.getId();
+                        if(ruleProbabilities.containsKey(clID.getClause().getFullRule())){
+                            ruleCounts.put(
+                                    clID.getClause().getFullRule(),
+                                    ruleCounts.get(clID.getClause().getFullRule())+1.0
+                            );
+                            if(e.getValue() == 1 && allBodyVariablesTrue[0]) {
+                                ruleProbabilities.put(
+                                        clID.getClause().getFullRule(),
+                                        ruleProbabilities.get(clID.getClause().getFullRule())+1.0
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        ruleProbabilities.replaceAll((rule, trueCount) -> trueCount/ruleCounts.get(rule));
+        return ruleProbabilities;
     }
 
     // run inference up to a certain amount of factor multiplications, return map of samples after each sampleRate-amount of factor multiplications
@@ -239,4 +302,6 @@ public class BayessianGibbsSamplingInference implements InferenceAlgorithm<Bayes
     public void setIterations(int iterations) {
         this.iterations = iterations;
     }
+
+
 }
