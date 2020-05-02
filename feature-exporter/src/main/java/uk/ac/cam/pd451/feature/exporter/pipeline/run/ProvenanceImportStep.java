@@ -11,6 +11,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * This Step imports the provenance graph outputted by Datalog
+ * from the Datalog output directory.
+ *
+ * Provenance is leaded as a list of clauses which are usually optimised afterwards.
+ */
 public class ProvenanceImportStep implements Step<EmptyIO, List<Clause>> {
 
         @Override

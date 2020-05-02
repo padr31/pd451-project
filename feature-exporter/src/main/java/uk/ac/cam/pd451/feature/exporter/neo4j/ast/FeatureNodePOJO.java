@@ -8,6 +8,10 @@ import uk.ac.cam.acr31.features.javac.proto.GraphProtos;
 import java.util.HashMap;
 import java.util.Map;
 
+
+/**
+ * Represents a Java AST node in the Neo4j graph database.
+ */
 @NodeEntity
 public class FeatureNodePOJO {
 

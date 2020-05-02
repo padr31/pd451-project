@@ -3,6 +3,11 @@ package uk.ac.cam.pd451.feature.exporter.inference.factor;
 import uk.ac.cam.pd451.feature.exporter.inference.Assignment;
 import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 
+/**
+ * An abstract representation of a Factor --- discrete function over variables.
+ * Encapsulates the three most common operations:
+ * factor products. summing out variables, and normalisation.
+ */
 public abstract class Factor {
 
     public abstract Factor product(Factor other);

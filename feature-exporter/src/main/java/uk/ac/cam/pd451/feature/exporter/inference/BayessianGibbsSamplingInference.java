@@ -11,12 +11,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Class implementing Gibbs Sampling on bayesian networks, which is a Markov Chain
+ * Monte-Carlo approach to inference.
+ *
+ * The burn in period is set experimentally. There is not general advice on
+ * what it should be for complex Bayesian Networks. The important thing is
+ * for the algorithm to avoid the variance in samples at the beginning so
+ * that it converges steadily.
+ */
 public class BayessianGibbsSamplingInference implements InferenceAlgorithm<BayesianNetwork> {
 
     private BayesianNetwork bn;
     private Assignment evidence = new Assignment(List.of());
 
-    private final static int DEFAULT_GIBBS_ITERATIONS = 5000;
+    private final static int DEFAULT_GIBBS_ITERATIONS = 2800;
     private final static double BURN_IN_PERIOD = 0.2;
     private int iterations = DEFAULT_GIBBS_ITERATIONS;
 

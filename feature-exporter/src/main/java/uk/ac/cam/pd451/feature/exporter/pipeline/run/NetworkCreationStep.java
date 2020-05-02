@@ -13,6 +13,10 @@ import uk.ac.cam.pd451.feature.exporter.pipeline.Step;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * This step is responsible for converting ground clauses into a Bayesian network.
+ * It creates links between BayesianNodes, and assigns ConditionalProbabilityTables.
+ */
 public class NetworkCreationStep implements Step<List<Clause>, ProvenanceGraph> {
 
     @Override

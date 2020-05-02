@@ -8,6 +8,12 @@ import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * The simplest exact inference method that works by summing out
+ * the variables that are not of interest.
+ *
+ * The time complexity of this inference algorithm is exponential.
+ */
 public class BayesianEnumerationInference implements InferenceAlgorithm<BayesianNetwork> {
 
     private BayesianNetwork bn;
@@ -51,34 +57,6 @@ public class BayesianEnumerationInference implements InferenceAlgorithm<Bayesian
         this.setEvidence(evidence);
         return this.infer(events);
     }
-
-    /*@Override
-    public double infer(Assignment events, Assignment evidence) {
-        if(this.bn == null) throw new RuntimeException("No model set for inference.");
-        if(evidence.contains(events)) return 1.0;
-        if(events.contradicts(evidence)) return 0.0;
-
-        List<BayesianNode> bnNodes = bn.topologicalOrdering();
-        List<Variable> variables = new ArrayList<>(events.getVariables());
-
-        Map<Assignment, Double> distribution = new HashMap<Assignment, Double>();
-        for (Assignment a : Assignment.allAssignments(variables)) {
-            distribution.put(a, enumerateAll(bnNodes, evidence.combineWith(a)));
-        }
-
-        Factor result = new Factor(variables, distribution);
-        result.normalise();
-        return result.get(events);
-    }
-
-    private double enumerateAll(List<BayesianNode> bnNodes, Assignment evidence) {
-        if(bnNodes.isEmpty()) return 1.0;
-        Variable v = bnNodes.get(0).getVariable();
-        List<BayesianNode> rest = bnNodes.subList(1, bnNodes.size());
-        if(evidence.contains(v)) {
-            return evidence.
-        }
-    }*/
 
     @Override
     public void setEvidence(Assignment evidence) {

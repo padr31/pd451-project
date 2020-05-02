@@ -4,10 +4,21 @@ import java.io.IOException;
 import org.apache.commons.cli.*;
 import uk.ac.cam.pd451.feature.exporter.pipeline.*;
 import uk.ac.cam.pd451.feature.exporter.pipeline.io.EmptyIO;
+import uk.ac.cam.pd451.feature.exporter.pipeline.learning.NetworkLearningStep;
+import uk.ac.cam.pd451.feature.exporter.pipeline.optimisations.CycleEliminationStep;
+import uk.ac.cam.pd451.feature.exporter.pipeline.optimisations.FullNarrowingStep;
+import uk.ac.cam.pd451.feature.exporter.pipeline.optimisations.ProvenancePruningStep;
+import uk.ac.cam.pd451.feature.exporter.pipeline.optimisations.SingularChainCompressionStep;
 import uk.ac.cam.pd451.feature.exporter.pipeline.run.*;
 import uk.ac.cam.pd451.feature.exporter.utils.Timer;
 
-public class ExportPipeline {
+/**
+ * This pipeline is run as the main pipeline of the program.
+ * The code is still in the development phase and a switch
+ * statement with different pipelines was included for
+ * convenience.
+ */
+public class RunPipeline {
 
     public static void main(String[] args) throws IOException, ParseException {
         Options option = new Options();
@@ -62,7 +73,7 @@ public class ExportPipeline {
                 pipeline = new Pipeline<>(
                         new ProvenanceImportStep())
                         .addStep(optimisationsPipeline)
-                        .addStep(new MLENetworkCreationStep())
+                        .addStep(new NetworkCreationStep())
                         .addStep(new AssistedRankingStep())
                         .addStep(new RankingProcessorStep());
                         //.addStep(new InferenceEvalStep());

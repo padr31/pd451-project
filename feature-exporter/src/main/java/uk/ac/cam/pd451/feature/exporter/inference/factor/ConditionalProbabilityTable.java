@@ -5,9 +5,20 @@ import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 
 import java.util.*;
 
+/**
+ * The conditional probability table encapsulates the discrete function
+ * attached to every node of a bayesian network that describes
+ * how a variable in a node depends on variables in parent nodes.
+ *
+ * Beware the size of the table grows exponentially with the number of variables.
+ *
+ * For convenience in creating and modifying these tables, the function is public and the table is mutable.
+ */
 public class ConditionalProbabilityTable extends Factor {
 
     public List<Variable> variables;
+
+
     public Map<Assignment, Double> function;
 
     public ConditionalProbabilityTable(List<Variable> variables, Map<Assignment, Double> function) {
@@ -20,6 +31,11 @@ public class ConditionalProbabilityTable extends Factor {
         return function.get(a);
     }
 
+    /**
+     * @param v
+     * @return A conditional table that contains all variables except the argument variable
+     * --- v that has been marginalised (summed out).
+     */
     public ConditionalProbabilityTable eliminate(Variable v) {
         List<Variable> eliminatedVariables = new ArrayList<>(variables);
         if (!eliminatedVariables.remove(v))
@@ -40,6 +56,11 @@ public class ConditionalProbabilityTable extends Factor {
         return coalescedFunction;
     }
 
+    /**
+     * @param other
+     * @return Factor that is the multiplication this factor with the other factor
+     * and contains the union of variables from both multiplicants.
+     */
     public ConditionalProbabilityTable product(Factor other) {
         if(!(other instanceof ConditionalProbabilityTable)) throw new RuntimeException("The product of an AssignmentTableFactor must be with a factor of identical type.");
         List<Variable> varUnion = new ArrayList<>(variables);
@@ -64,6 +85,9 @@ public class ConditionalProbabilityTable extends Factor {
         return new ConditionalProbabilityTable(varUnion, probs);
     }
 
+    /**
+     * Normalises the factor so that all values sum to 1.
+     */
     public void normalise() {
         double sum = this.function.values().stream().mapToDouble(d -> d).sum();
         if(!(sum == 1.0 || sum == 0.0)) {
@@ -73,6 +97,13 @@ public class ConditionalProbabilityTable extends Factor {
         }
     }
 
+    /**
+     * A factor equals another factor if the variables contained are the same
+     * and the two functions over the variables yield the same outputs for
+     * the same assignment inputs.
+     * @param other
+     * @return
+     */
     @Override
     public boolean equals(Object other) {
         if(!(other instanceof ConditionalProbabilityTable))

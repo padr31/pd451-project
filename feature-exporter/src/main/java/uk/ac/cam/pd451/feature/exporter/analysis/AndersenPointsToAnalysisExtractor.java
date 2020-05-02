@@ -8,6 +8,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This class contains the queries required to extract a full
+ * Andersen-style static analysis from Java AST.
+ */
 public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
 
     @Override

@@ -1,5 +1,8 @@
 package uk.ac.cam.pd451.feature.exporter.utils;
 
+/**
+ * A custom timer class that is able to time multiple segments of execution.
+ */
 public class Timer {
 
     private long time;

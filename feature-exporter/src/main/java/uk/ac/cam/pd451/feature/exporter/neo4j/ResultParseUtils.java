@@ -4,6 +4,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Class comprising static utilities for extracting static analysis features.
+ */
 public class ResultParseUtils {
 
     public static String getMinDistanceMethodName(List<String>[] methodsWithDistances) {

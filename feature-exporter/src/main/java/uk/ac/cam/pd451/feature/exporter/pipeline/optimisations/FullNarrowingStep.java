@@ -1,4 +1,4 @@
-package uk.ac.cam.pd451.feature.exporter.pipeline.run;
+package uk.ac.cam.pd451.feature.exporter.pipeline.optimisations;
 
 import uk.ac.cam.pd451.feature.exporter.datalog.Clause;
 import uk.ac.cam.pd451.feature.exporter.datalog.Predicate;
@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-public class ProvenanceNarrowingStep implements Step<List<Clause>, List<Clause>> {
+public class FullNarrowingStep implements Step<List<Clause>, List<Clause>> {
 
     //Must be higher than 2 to prevent looping indefinitely as every OR gate has at least 2 parents
     private static final int MAX_PARENTS_THRESHOLD = 4;
@@ -22,12 +22,13 @@ public class ProvenanceNarrowingStep implements Step<List<Clause>, List<Clause>>
         provenanceConnector.clearDatabase();
         provenanceConnector.loadGraph(groundClauses);*/
 
-        Set<Clause> result = new HashSet<>(groundClauses);
+        //Deal with or gates
+        Set<Clause> resultOr = new HashSet<>(groundClauses);
 
         while(true) {
             Map<Predicate, List<Clause>> parents = new HashMap<>();
 
-            for(Clause cl : result) {
+            for(Clause cl : resultOr) {
                 if(!parents.containsKey(cl.getHead())) parents.put(cl.getHead(), new ArrayList<>());
                 parents.get(cl.getHead()).add(cl);
             }
@@ -44,20 +45,45 @@ public class ProvenanceNarrowingStep implements Step<List<Clause>, List<Clause>>
                     List<Clause> left = par.subList(0, par.size()/2);
                     List<Clause> right = par.subList(par.size()/2, par.size());
                     left.forEach(cl -> {
-                        result.remove(cl);
-                        result.add(new Clause(dummyLeft, cl.getBody()));
+                        resultOr.remove(cl);
+                        resultOr.add(new Clause(dummyLeft, cl.getBody()));
                     });
                     right.forEach(cl -> {
-                        result.remove(cl);
-                        result.add(new Clause(dummyRight, cl.getBody()));
+                        resultOr.remove(cl);
+                        resultOr.add(new Clause(dummyRight, cl.getBody()));
                     });
-                    result.add(new Clause(dummyLeft, p));
-                    result.add(new Clause(dummyRight, p));
+                    resultOr.add(new Clause(dummyLeft, p));
+                    resultOr.add(new Clause(dummyRight, p));
                 }
             }
         }
 
-        System.out.println("Number of clauses after gadgeting: " + result.size());
-        return new ArrayList<>(result);
+
+        //Deal with and gates
+        Set<Clause> resultAnd = new HashSet<>(resultOr);
+        while(true) {
+            Set<Clause> bigClauses = resultAnd.stream().filter(cl -> cl.getBody().size() >= MAX_PARENTS_THRESHOLD).collect(Collectors.toSet());
+            if(bigClauses.size() == 0) break;
+
+            bigClauses.forEach(bigCl -> {
+                Predicate dummyLeft = new Predicate("dummy", UUID.randomUUID().toString());
+                Predicate dummyRight = new Predicate("dummy", UUID.randomUUID().toString());
+
+                int bodySize = bigCl.getBody().size();
+                Clause clLeft = new Clause(dummyLeft, bigCl.getBody().subList(0, bodySize/2));
+                Clause clRight = new Clause(dummyRight, bigCl.getBody().subList(bodySize/2, bodySize));
+
+                Clause clLeftRightAnd = new Clause(bigCl.getHead(), dummyLeft, dummyRight);
+                resultAnd.remove(bigCl);
+                resultAnd.add(clLeft);
+                resultAnd.add(clRight);
+                resultAnd.add(clLeftRightAnd);
+            });
+        }
+
+        assert resultAnd.stream().filter(cl -> cl.getBody().size() >= MAX_PARENTS_THRESHOLD).collect(Collectors.toSet()).isEmpty();
+
+        System.out.println("Number of clauses after gadgeting: " + resultAnd.size());
+        return new ArrayList<>(resultAnd);
     }
 }

@@ -3,6 +3,11 @@ package uk.ac.cam.pd451.feature.exporter.analysis;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+/**
+ * Represents a relation entry such as alloc("variable", "object").
+ * The name and arity are not represented in the class and are assigned
+ * by inserting the entry into a Relation.
+ */
 public class RelationEntry {
 
     private String[] elements;
@@ -15,6 +20,9 @@ public class RelationEntry {
         return elements.length;
     }
 
+    /**
+     * @return The elements of the relation entry separated by commas.
+     */
     public String getCSVString() {
         return Arrays.stream(elements).map(s -> "\"" + s + "\"").collect(Collectors.joining(","));
     }

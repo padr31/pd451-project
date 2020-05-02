@@ -1,5 +1,9 @@
 package uk.ac.cam.pd451.feature.exporter.pipeline.io;
 
+/**
+ * The IO Object used to store the source folder that is input to the main pipeline.
+ * The output directory is where ranking results are written.
+ */
 public class PipelineDirectoryIO {
     private String inputDirectory;
     private String outputDirectory;

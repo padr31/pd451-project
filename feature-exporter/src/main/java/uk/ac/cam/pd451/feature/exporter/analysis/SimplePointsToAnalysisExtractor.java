@@ -5,6 +5,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This class contains the queries required to extract a very
+ * simple points-to analysis --- the transitive closure of allocations
+ * points and variable assignments --- that only contains two rules operating
+ * on two relations --- alloc and move.
+ *
+ * The analysis is given below:
+ * rule1: points_to(a, b) :- alloc(a, b).
+ * rule2: points_to(a, c) :- alloc(b, c), move(a, c).
+ */
 public class SimplePointsToAnalysisExtractor extends AnalysisExtractor {
 
     @Override

@@ -8,7 +8,7 @@ import java.util.List;
 
 /*
  * Represents p("A", "B", "C") - predicate with terms "A", "B", "C", and arity 3.
- * Must be immutable.
+ * This class is immutable and can be used as map keys.
  */
 public class Predicate {
 

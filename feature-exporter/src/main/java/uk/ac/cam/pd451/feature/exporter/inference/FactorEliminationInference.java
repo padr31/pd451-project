@@ -10,6 +10,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * This is a faster version of the VariableEnumerationInference method.
+ * In the best case it is linear but in the worst case it is still exponential.
+ */
 public class FactorEliminationInference implements InferenceAlgorithm<FactorGraph> {
 
     private FactorGraph model;

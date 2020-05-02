@@ -10,6 +10,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+/**
+ * This step outputs .csv files containing full ranking statistics such
+ * as final ranks of alarms, their final probabilities, and ground truth.
+ * A separate .csv is also outputted after each inspection in order to
+ * capture how the ranking changes after each inspection.
+ */
 public class RankingProcessorStep implements Step<RankingStatistics, EmptyIO> {
 
     @Override

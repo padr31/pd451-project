@@ -6,6 +6,9 @@ import uk.ac.cam.acr31.features.javac.proto.GraphProtos;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Represents a Java AST edge in the Neo4j graph database.
+ */
 @RelationshipEntity(type="FEATURE_EDGE")
 public class FeatureEdgePOJO {
 

@@ -2,6 +2,11 @@ package uk.ac.cam.pd451.feature.exporter.inference;
 
 import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 
+/**
+ * Encapsulates the valuation of a single variable --- or a random event.
+ *
+ * This class is immutable and can be used as map keys.
+ */
 public class Event {
     private Variable variable;
     private int value;

@@ -2,6 +2,11 @@ package uk.ac.cam.pd451.feature.exporter.graph;
 
 import java.util.*;
 
+/**
+ * Abstract class that represents a graphical model that has a topological sort method.
+ * This is the parent class of both FactorGraph and BayesianNetwork.
+ * @param <T>
+ */
 public class AbstractGraph<T extends AbstractNode> {
     protected List<T> nodes;
 

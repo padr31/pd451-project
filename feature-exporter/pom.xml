@@ -30,7 +30,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        uk.ac.cam.pd451.feature.exporter.ExportPipeline
+                                        uk.ac.cam.pd451.feature.exporter.RunPipeline
                                     </mainClass>
                                 </manifest>
                             </archive>

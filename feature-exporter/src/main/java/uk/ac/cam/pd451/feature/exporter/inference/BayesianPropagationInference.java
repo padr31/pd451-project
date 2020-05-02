@@ -11,6 +11,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * This class implements the Peral's belief propagation algorithm for polytrees
+ * its time complexity is linear.
+ *
+ * Beware that polytrees are singly connected and do not contain any cycles. The
+ * method is therefore not suitable for inference on Bayesian Networks.
+ *
+ * Messages are scheduled sequentially following a topological node order. The
+ * first variable in the topological sort is the unique root. Two passes are carried
+ * out --- one from leaves towards root, and one from root towards leaves. This
+ * schedule guarantees correctness of exact inference.
+ *
+ * When new evidence is added, the node that is modified becomes the root and messages
+ * are sent from that node and propagated outwards.
+ */
 public class BayesianPropagationInference implements InferenceAlgorithm<BayesianNetwork> {
 
     private BayesianNetwork bn;

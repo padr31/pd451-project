@@ -2,6 +2,11 @@ package uk.ac.cam.pd451.feature.exporter.pipeline.io;
 
 import uk.ac.cam.pd451.feature.exporter.datalog.Predicate;
 
+/**
+ * Class encalsulating a predicate (tuple) that was observed by the user
+ * and associated with a rank, probability, and positivity at the end
+ * of Bayesian ranking.
+ */
 public class InspectedPredicate {
     private Predicate predicate;
     private int rank;

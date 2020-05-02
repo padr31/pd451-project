@@ -17,6 +17,10 @@ import uk.ac.cam.pd451.feature.exporter.utils.Timer;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * A class for communication that is specialised for sending and querying
+ * provenance graphs.
+ */
 public class Neo4jOGMProvenanceConnector implements Neo4jConnector<List<Clause>> {
     private static Neo4jOGMProvenanceConnector instance;
 

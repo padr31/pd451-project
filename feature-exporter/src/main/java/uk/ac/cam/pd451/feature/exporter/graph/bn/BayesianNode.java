@@ -22,6 +22,10 @@ public class BayesianNode {
     private ConditionalProbabilityTable cpt;
     private String id = UUID.randomUUID().toString();
 
+    /**
+     * Creates a BayesianNode representing a particular random variable.
+     * @param variable
+     */
     public BayesianNode(Variable variable) {
         this.variable = variable;
         this.parentSet = new HashSet<>();
@@ -33,7 +37,6 @@ public class BayesianNode {
         return this.variable;
     }
 
-
     public Set<BayesianNode> getParentSet() {
         return this.parentSet;
     }
@@ -42,6 +45,10 @@ public class BayesianNode {
         return this.childSet;
     }
 
+    /**
+     * This needs to be updated whenever a parent is added.
+     * @return The conditional probability table that gives how the node depends on parents.
+     */
     public ConditionalProbabilityTable getCPT() {
         return this.cpt;
     }
@@ -60,12 +67,21 @@ public class BayesianNode {
         this.cpt = cpt;
     }
 
+    /**
+     * For nodes to be equal their unique ids are equal.
+     * This is to avoid nodes with same content being treated equal.
+     * @param other
+     * @return
+     */
     @Override
     public boolean equals(Object other) {
         if(!(other instanceof FactorNode)) return false;
         return this.id.equals(((FactorNode) other).getId());
     }
 
+    /**
+     * @return A boolean that is true if and only if the node does not depend on parents.
+     */
     public boolean isRoot() {
         if (this.parentSet == null) return true;
         else return this.parentSet.isEmpty();

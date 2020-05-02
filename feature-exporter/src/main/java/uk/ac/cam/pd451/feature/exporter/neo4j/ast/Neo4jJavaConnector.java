@@ -11,6 +11,12 @@ import java.util.stream.Collectors;
 
 import static org.neo4j.driver.v1.Values.parameters;
 
+/**
+ * A class for communication between Java and Neo4j using the standard Bolt driver.
+ * This driver is less convenient but much faster than the Java OGM and should be used
+ * when performance is needed, for example loading a lot of graph into the database and
+ * clearing between loads.
+ */
 public class Neo4jJavaConnector implements Neo4jConnector<GraphProtos.Graph> {
     private static Neo4jJavaConnector instance;
 
@@ -18,6 +24,12 @@ public class Neo4jJavaConnector implements Neo4jConnector<GraphProtos.Graph> {
 
     //  Configuration info for connecting to the Neo4J database
     private static final String SERVER_URI = "bolt://localhost:7687";
+
+    /**
+     * These should be set for running on localhost.
+     * Using a credential retrieval system is recommended
+     * when running on non-localhost.
+     */
     private static final String SERVER_USERNAME = "neo4j";
     private static final String SERVER_PASSWORD = "password";
 
@@ -77,6 +89,10 @@ public class Neo4jJavaConnector implements Neo4jConnector<GraphProtos.Graph> {
         return value.asObject();
     }
 
+    /**
+     * This method clears the database and loads an AST graph.
+     * @param graph
+     */
     public void loadGraph(GraphProtos.Graph graph) {
         Timer t = new Timer();
         this.clearDatabase();

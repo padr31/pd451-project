@@ -4,6 +4,7 @@ import java.util.List;
 
 /**
  * Represent a a Provenance object as outputted by the Vanillalog Datalog frontend.
+ * The following is the skeleton of Provenance objects:
  * ProvenancePOJO {
  *     [GroundCalusePOJO groundClauses {
  *         [String terms],

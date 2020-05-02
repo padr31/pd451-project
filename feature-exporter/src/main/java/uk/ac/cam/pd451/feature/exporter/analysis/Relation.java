@@ -4,6 +4,12 @@ import java.io.*;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Represents a relation that has a name and entries, e.g.
+ * ALLOC("var1", "object1"),
+ * ALLOC("var2", "object2"),
+ * ...
+ */
 public class Relation {
 
     public String getName() {
@@ -30,6 +36,12 @@ public class Relation {
         this.entries.add(entry);
     }
 
+    /**
+     * Writes out the relation into a relation_name.csv format
+     * to the specified folder. This is later used for Datalog ingestion.
+     * @param dir
+     * @throws IOException
+     */
     public void writeToCSV(File dir) throws IOException {
         if(!dir.exists()) dir.mkdir();
         File csvOutputFile = new File(dir.getAbsolutePath() + File.separator + this.name + ".csv");

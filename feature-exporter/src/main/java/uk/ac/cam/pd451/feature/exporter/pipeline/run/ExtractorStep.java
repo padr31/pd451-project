@@ -19,7 +19,10 @@ import java.util.stream.Stream;
 
 
 /**
- * This class takes a directory, walks it to find all the .proto files and generates output relations in .csv files and returns the path to the containing directory.
+ * This class takes a directory,
+ * walks it to find all the .proto files,
+ * extracts analysis feature relations using Neo4j,
+ * and returns these relations.
   */
 public class ExtractorStep implements Step<String, List<Relation>> {
 

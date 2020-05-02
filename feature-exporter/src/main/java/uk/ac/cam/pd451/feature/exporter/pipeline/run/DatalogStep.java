@@ -10,7 +10,10 @@ import java.io.InputStreamReader;
 import java.util.List;
 
 /**
- * Responsible for taking a directory of .java files, compiling them with the feature extractor and outputing the target directory.
+ * Responsible for taking a directory of .csv relations,
+ * running a datalog analysis on them using exalog,
+ * and outputting the provenance graph of the analysis
+ * into the output directory.
  */
 public class DatalogStep implements Step<List<Relation>, EmptyIO> {
 

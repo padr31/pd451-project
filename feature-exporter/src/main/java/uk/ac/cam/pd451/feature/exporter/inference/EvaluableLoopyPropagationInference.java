@@ -9,6 +9,11 @@ import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * LoopyBeliefPropagation is tricky to evaluate non intrusively, therefore
+ * this class was created and it allows to run propagation up to a certain
+ * time limit of a certain number of factor multiplications.
+ */
 public class EvaluableLoopyPropagationInference implements InferenceAlgorithm<BayesianNetwork> {
 
 

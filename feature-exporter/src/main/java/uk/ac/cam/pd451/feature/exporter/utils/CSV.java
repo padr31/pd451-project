@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Utilities for reading and writing CSV files.
+ */
 public class CSV {
 
     public static Map<String, Boolean> readRankCSV() {

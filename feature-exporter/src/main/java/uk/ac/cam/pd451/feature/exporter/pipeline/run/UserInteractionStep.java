@@ -12,6 +12,12 @@ import uk.ac.cam.pd451.feature.exporter.utils.Timer;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * This step performs the Bayesian ranking algorithm, it ranks alarms according to
+ * their inferred probabilities with respect to evidence. The top alarm is presented
+ * to the user for inspection. The user feedback is set as evidence in the Bayesian
+ * network and the remaining alarms are re-ranked.
+ */
 public class UserInteractionStep implements Step<ProvenanceGraph, RankingStatistics> {
     @Override
     public RankingStatistics process(ProvenanceGraph g) throws PipeException {

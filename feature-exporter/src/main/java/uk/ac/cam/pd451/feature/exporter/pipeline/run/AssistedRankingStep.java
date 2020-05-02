@@ -9,14 +9,18 @@ import uk.ac.cam.pd451.feature.exporter.pipeline.io.RankingStatistics;
 import uk.ac.cam.pd451.feature.exporter.pipeline.Step;
 import uk.ac.cam.pd451.feature.exporter.utils.CSV;
 import uk.ac.cam.pd451.feature.exporter.utils.Timer;
-
-import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * This ranking steps runs the Bayesian ranking algorithm and automatically looks up
+ * labelled alarms if there are any. If there are no labelled alarms, it turns to the
+ * user for input.
+ *
+ * This Step is used to perform Bayesian ranking with different modifications on already
+ * labelled datasets.
+ */
 public class AssistedRankingStep implements Step<ProvenanceGraph, RankingStatistics> {
-
-
 
     @Override
     public RankingStatistics process(ProvenanceGraph g) throws PipeException {
@@ -35,7 +39,7 @@ public class AssistedRankingStep implements Step<ProvenanceGraph, RankingStatist
 
         System.out.println("Initialising inference algorithm");
 
-        BayessianGibbsSamplingInference i = new BayessianGibbsSamplingInference();
+        LoopyPropagationInference i = new LoopyPropagationInference();
         i.setModel(g.getBayesianNetwork());
 
         Map<Predicate, Event> evidence = new HashMap<>();
@@ -64,30 +68,32 @@ public class AssistedRankingStep implements Step<ProvenanceGraph, RankingStatist
             // pick alarm with largest probability and present for inspection
             Predicate topAlarm = alarmProbabilities.entrySet().stream().min((a, b) -> b.getValue() - a.getValue() < 0 ? -1 : 1).get().getKey();
 
-            double noise = 0;
+            double noise = 0.2;
 
             //is in database - was ranked previously
             if(isPositive.containsKey(topAlarm.getTerms())) {
                 System.out.println(topAlarm.getTerms());
                 boolean truePos = isPositive.get(topAlarm.getTerms());
+                boolean flipped = false;
                 if(Math.random() < noise) {
                     // flip value deliberately
                     truePos = !truePos;
+                    flipped = true;
                 }
                 if(truePos) {
                     // true positive
-                    inspectedPredicates.add(new InspectedPredicate(topAlarm, rank, alarmProbabilities.get(topAlarm), true));
+                    inspectedPredicates.add(new InspectedPredicate(topAlarm, rank, alarmProbabilities.get(topAlarm), !flipped));
                     Event e = new Event(pointsToSet.get(topAlarm), 1);
                     evidence.put(topAlarm, e);
-                    trueFalse.add(true);
                     i.addEvidence(e);
+                    trueFalse.add(!flipped);
                 } else {
                     // false positive
-                    inspectedPredicates.add(new InspectedPredicate(topAlarm, rank, alarmProbabilities.get(topAlarm), false));
+                    inspectedPredicates.add(new InspectedPredicate(topAlarm, rank, alarmProbabilities.get(topAlarm), flipped));
                     Event e = new Event(pointsToSet.get(topAlarm), 0);
                     evidence.put(topAlarm, e);
-                    trueFalse.add(false);
                     i.addEvidence(e);
+                    trueFalse.add(flipped);
                 }
             } //isn't ranked yet - ask user
             else {

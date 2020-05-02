@@ -11,6 +11,13 @@ import uk.ac.cam.pd451.feature.exporter.utils.Timer;
 
 import java.util.*;
 
+/**
+ * A class for communication between Java and Neo4j using the Object Graph Mapping
+ * framework that makes it convenient to map Java objects into the database.
+ *
+ * This framework is slow in some cases like loading a lot of grpahs, however,
+ * it is quick enough for running and retrieving queries on existing objects.
+ */
 public class Neo4jOGMConnector implements Neo4jConnector<GraphProtos.Graph> {
 
     private static Neo4jOGMConnector instance;

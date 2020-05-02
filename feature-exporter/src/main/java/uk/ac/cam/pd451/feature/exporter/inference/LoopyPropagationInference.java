@@ -9,9 +9,17 @@ import uk.ac.cam.pd451.feature.exporter.inference.variable.Variable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * An implementation of the randomised schedule for belief propagation
+ * that allows inference on graphs containing loops,
+ * for example Bayesian Networks.
+ */
 public class LoopyPropagationInference implements InferenceAlgorithm<BayesianNetwork> {
 
-    private final static long DEFAULT_LOOPY_ITERATIONS = 200000;
+    /**
+     * The number of messages sent. This value should change based on the network size.
+     */
+    private final static long DEFAULT_LOOPY_ITERATIONS = 100000;
     private long iterations = DEFAULT_LOOPY_ITERATIONS;
 
     private BayesianNetwork bn;

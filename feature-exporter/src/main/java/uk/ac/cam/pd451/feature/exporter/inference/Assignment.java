@@ -6,6 +6,13 @@ import uk.ac.cam.pd451.feature.exporter.inference.variable.VariableIdentifier;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Encapsulates a valuation of a set of variables.
+ * The valuation is given as a set of Event objects.
+ *
+ * An assignment is immutable.
+ * An assignment can and is used as map keys in ConditionalProbabilityTable.
+ */
 public class Assignment {
     List<Event> events;
 
@@ -20,6 +27,13 @@ public class Assignment {
         });
     }
 
+    /**
+     *
+     * @param varList
+     * @return Returns all possible assignments of the variables in the argument
+     * to binary values 0 and 1. The number of all assignments is exponential
+     * in the number of variables.
+     */
     public static List<Assignment> allAssignments(List<Variable> varList) {
         List<Variable> varListCopy = new ArrayList<>(varList);
         return recAllAssignments(varListCopy);
@@ -75,6 +89,10 @@ public class Assignment {
         return true;
     }
 
+    /**
+     * @param evidence
+     * @return Returns true if two assignments value one variable in two different ways, false otherwise.
+     */
     public boolean contradicts(Assignment evidence) {
         Map<VariableIdentifier, Event> m = new HashMap<>();
         this.events.forEach(e -> m.put(e.getVariable().getId(), e));
@@ -116,7 +134,10 @@ public class Assignment {
     }
 
     /**
-     * If the evidence contains overlap with others then deal with it
+     * Creates an assignment that combines the valuation of variables in this and the evidence argument.
+     * Beware that there is no check for overlapping variables and therefore the result of this function
+     * may be a contradicting valuation that values the same variable in two different ways. This is not
+     * a bug but a feature of this function.
      * @param evidence
      * @return
      */

@@ -8,6 +8,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * An AnalysisExtractor connects to Neo4j, takes a source folder
+ * and returns a list of relations that are the features extracted
+ * by an analysis. Different analyses can extend this class and
+ * override the extractAnalysis method.
+ */
 public abstract class AnalysisExtractor {
 
     protected List<Relation> relations = new ArrayList<>();

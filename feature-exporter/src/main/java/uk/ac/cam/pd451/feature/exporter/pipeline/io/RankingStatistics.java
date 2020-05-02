@@ -5,8 +5,16 @@ import uk.ac.cam.pd451.feature.exporter.datalog.Predicate;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This class encapsulates the information collected during
+ * ranking a single program.
+ */
 public class RankingStatistics {
 
+    /**
+     * Contains the list of InspectedPredicates which have associated ranks,
+     * probabilities (at inspection time), and positivity that was set by the user.
+     */
     private List<InspectedPredicate> inspectedPredicates;
 
     private List<Map<Predicate, Double>> overallRanks;

@@ -1,4 +1,4 @@
-package uk.ac.cam.pd451.feature.exporter.pipeline.run;
+package uk.ac.cam.pd451.feature.exporter.pipeline.optimisations;
 
 import uk.ac.cam.pd451.feature.exporter.datalog.Clause;
 import uk.ac.cam.pd451.feature.exporter.datalog.Predicate;

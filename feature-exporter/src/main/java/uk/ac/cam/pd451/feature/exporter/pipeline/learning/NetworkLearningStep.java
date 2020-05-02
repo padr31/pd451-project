@@ -1,4 +1,4 @@
-package uk.ac.cam.pd451.feature.exporter.pipeline.run;
+package uk.ac.cam.pd451.feature.exporter.pipeline.learning;
 
 import uk.ac.cam.pd451.feature.exporter.datalog.*;
 import uk.ac.cam.pd451.feature.exporter.graph.bn.BayesianNetwork;

@@ -14,6 +14,10 @@ import uk.ac.cam.pd451.feature.exporter.utils.Timer;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * A step for evaluating Loopy Belief Propagation versus Gibbs Sampling
+ * using the evaluable versions of the algorithms.
+ */
 public class InferenceEvalStep implements Step<ProvenanceGraph, RankingStatistics> {
     @Override
     public RankingStatistics process(ProvenanceGraph g) throws PipeException {
@@ -66,6 +70,7 @@ public class InferenceEvalStep implements Step<ProvenanceGraph, RankingStatistic
 
     }
 
+    // implementations of different means of distances between probability distributions
     double klDistance(Map<Event, Double> distribution1, Map<Event, Double> distribution2) {
         double kl = 0;
         for(Map.Entry<Event, Double> e : distribution1.entrySet()) {
