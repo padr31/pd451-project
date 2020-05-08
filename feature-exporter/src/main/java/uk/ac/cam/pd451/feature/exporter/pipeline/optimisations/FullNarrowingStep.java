@@ -18,9 +18,9 @@ public class FullNarrowingStep implements Step<List<Clause>, List<Clause>> {
     public List<Clause> process(List<Clause> groundClauses) throws PipeException {
         System.out.println("Number of clauses before gadgeting: " + groundClauses.size());
 
-        /*Neo4jOGMProvenanceConnector provenanceConnector = Neo4jOGMProvenanceConnector.getInstance();
+        Neo4jOGMProvenanceConnector provenanceConnector = Neo4jOGMProvenanceConnector.getInstance();
         provenanceConnector.clearDatabase();
-        provenanceConnector.loadGraph(groundClauses);*/
+        provenanceConnector.loadGraph(groundClauses);
 
         //Deal with or gates
         Set<Clause> resultOr = new HashSet<>(groundClauses);
