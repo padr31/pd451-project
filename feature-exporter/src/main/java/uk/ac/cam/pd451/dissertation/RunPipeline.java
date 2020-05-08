@@ -13,10 +13,10 @@ import uk.ac.cam.pd451.dissertation.pipeline.optimisations.SingularChainCompress
 import uk.ac.cam.pd451.dissertation.utils.Timer;
 
 /**
- * This pipeline is run as the main pipeline of the program.
- * The code is still in the development phase and a switch
- * statement with different pipelines was included for
- * convenience.
+ * This class provides a convenient way to run different pre-built pipelines.
+ * This is intended for development purposes.
+ * To productionise any of the provided pipelines, it is recommended to separate
+ * them into their own class and customise its I/O accordingly.
  */
 public class RunPipeline {
 
