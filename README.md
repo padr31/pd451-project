@@ -61,3 +61,6 @@ mvn clean compile package
 3. Run the project `java -jar target/feature-exporter-1.0-SNAPSHOT-jar-with-dependencies.jar`
 4. You should see the GUI displayed above
 5. Exit the window to exit program
+
+## License 
+[GNU GPLv3](https://www.gnu.org/licenses/gpl-3.0.en.html)
