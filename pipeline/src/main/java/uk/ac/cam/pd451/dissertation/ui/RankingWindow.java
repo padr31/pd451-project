@@ -225,8 +225,8 @@ public class RankingWindow implements Step<ProvenanceGraph, RankingStatistics> {
     private void $$$setupUI$$$() {
         panelMain = new JPanel();
         panelMain.setLayout(new GridLayoutManager(9, 1, new Insets(0, 0, 0, 0), -1, -1));
-        panelMain.setMinimumSize(new Dimension(500, 400));
-        panelMain.setPreferredSize(new Dimension(500, 400));
+        panelMain.setMinimumSize(new Dimension(500, 500));
+        panelMain.setPreferredSize(new Dimension(500, 500));
         panelMain.setRequestFocusEnabled(true);
         textSource = new JTextField();
         textSource.setText("");
@@ -303,4 +303,3 @@ public class RankingWindow implements Step<ProvenanceGraph, RankingStatistics> {
         }
     }
 }
-//Users/padr/repos/pd451-project/pipeline/src/main/java/uk/ac/cam/pd451/dissertation/examples
