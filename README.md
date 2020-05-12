@@ -60,7 +60,8 @@ mvn clean compile package
 2. Build the project `mvn clean compile package`
 3. Run the project `java -jar target/feature-exporter-1.0-SNAPSHOT-jar-with-dependencies.jar`
 4. You should see the GUI displayed above
-5. Exit the window to exit program
+5. After ranking, there are intermediate analysis outputs and ranking statistics in the folders `pipeline/out`, `pipeline/out_provenance`, `pipeline/out_ranking`, `pipeline/analysis`. You need to delete these to run a new ranking.
+6. Exit the window to exit program
 
 ## License 
 [GNU GPLv3](https://www.gnu.org/licenses/gpl-3.0.en.html)
