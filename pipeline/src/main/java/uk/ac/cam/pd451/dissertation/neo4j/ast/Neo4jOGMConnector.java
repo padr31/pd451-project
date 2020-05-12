@@ -66,32 +66,32 @@ public class Neo4jOGMConnector implements Neo4jConnector<GraphProtos.Graph> {
     }
 
     public void loadGraph(GraphProtos.Graph graph) {
-        Timer t = new Timer();
+        //Timer t = new Timer();
         Session session = sessionFactory.openSession();
         session.purgeDatabase();
-        t.printLastTimeSegment("TIMER 2 - opening session and purging database");
+        //t.printLastTimeSegment("TIMER 2 - opening session and purging database");
 
         Transaction txn = session.beginTransaction();
-        t.printLastTimeSegment("TIMER 2 - beginning transaction");
+        //t.printLastTimeSegment("TIMER 2 - beginning transaction");
 
         Map<Long, FeatureNodePOJO> featureNodePOJOs = new HashMap<>();
         for(GraphProtos.FeatureNode featureNode : graph.getNodeList()) {
             featureNodePOJOs.put(featureNode.getId(), new FeatureNodePOJO(featureNode));
         }
-        t.printLastTimeSegment("TIMER 2 - creating FeatureNodePOJOs");
+        //t.printLastTimeSegment("TIMER 2 - creating FeatureNodePOJOs");
 
         List<FeatureEdgePOJO> featureEdgePOJOs = new ArrayList<>();
         for(GraphProtos.FeatureEdge featureEdge : graph.getEdgeList()) {
             featureEdgePOJOs.add(new FeatureEdgePOJO(featureEdge, featureNodePOJOs));
         }
-        t.printLastTimeSegment("TIMER 2 - creating FeatureEdgePOJOs");
+        //t.printLastTimeSegment("TIMER 2 - creating FeatureEdgePOJOs");
 
         for(FeatureNodePOJO featureNodePOJO : featureNodePOJOs.values()) session.save(featureNodePOJO);
-        t.printLastTimeSegment("TIMER 2 - saving nodes");
+        //t.printLastTimeSegment("TIMER 2 - saving nodes");
         for(FeatureEdgePOJO featureEdgePOJO : featureEdgePOJOs) session.save(featureEdgePOJO);
-        t.printLastTimeSegment("TIMER 2 - saving edges");
+        //t.printLastTimeSegment("TIMER 2 - saving edges");
 
         txn.commit();
-        t.printLastTimeSegment("TIMER 2 - commiting transaction");
+        //t.printLastTimeSegment("TIMER 2 - commiting transaction");
     }
 }

@@ -195,6 +195,7 @@ public class RankingWindow implements Step<ProvenanceGraph, RankingStatistics> {
     public static void main(String[] args) {
         RankingWindow ranker = new RankingWindow();
         JFrame rankingWindow = new JFrame("RankingWindow");
+        rankingWindow.setSize(500, 1000);
         rankingWindow.setContentPane(ranker.panelMain);
         rankingWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         rankingWindow.addWindowListener(new WindowAdapter() {
@@ -224,6 +225,9 @@ public class RankingWindow implements Step<ProvenanceGraph, RankingStatistics> {
     private void $$$setupUI$$$() {
         panelMain = new JPanel();
         panelMain.setLayout(new GridLayoutManager(9, 1, new Insets(0, 0, 0, 0), -1, -1));
+        panelMain.setMinimumSize(new Dimension(500, 400));
+        panelMain.setPreferredSize(new Dimension(500, 400));
+        panelMain.setRequestFocusEnabled(true);
         textSource = new JTextField();
         textSource.setText("");
         textSource.setToolTipText("Java source folder location");

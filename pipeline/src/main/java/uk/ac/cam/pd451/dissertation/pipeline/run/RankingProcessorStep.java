@@ -44,6 +44,8 @@ public class RankingProcessorStep implements Step<RankingStatistics, EmptyIO> {
             index[0]++;
         });
 
+        System.out.println("Detailed ranking statistics were output to: " + new File(rankingStatisticsOutputFolder).getAbsolutePath());
+
         return null;
     }
 }
