@@ -1,16 +1,16 @@
-alloc(X,Y,Z) :- read_csv3("/Users/padr/repos/pd451-project/feature-exporter/out/ALLOC.csv",X,Y,Z).
-move(X,Y) :- read_csv2("/Users/padr/repos/pd451-project/feature-exporter/out/MOVE.csv",X,Y).
-load(X,Y,Z) :- read_csv3("/Users/padr/repos/pd451-project/feature-exporter/out/LOAD.csv",X,Y,Z).
-store(X,Y,Z) :- read_csv3("/Users/padr/repos/pd451-project/feature-exporter/out/STORE.csv",X,Y,Z).
-vCall(X,Y,Z,W) :- read_csv4("/Users/padr/repos/pd451-project/feature-exporter/out/VCALL.csv",X,Y,Z,W).
-formalArg(X,Y,Z) :- read_csv3("/Users/padr/repos/pd451-project/feature-exporter/out/FORMALARG.csv",X,Y,Z).
-actualArg(X,Y,Z) :- read_csv3("/Users/padr/repos/pd451-project/feature-exporter/out/ACTUALARG.csv",X,Y,Z).
-formalReturn(X,Y) :- read_csv2("/Users/padr/repos/pd451-project/feature-exporter/out/FORMALRETURN.csv",X,Y).
-actualReturn(X,Y) :- read_csv2("/Users/padr/repos/pd451-project/feature-exporter/out/ACTUALRETURN.csv",X,Y).
-thisVar(X,Y) :- read_csv2("/Users/padr/repos/pd451-project/feature-exporter/out/THISVAR.csv",X,Y).
-heapType(X,Y) :- read_csv2("/Users/padr/repos/pd451-project/feature-exporter/out/HEAPTYPE.csv",X,Y).
-lookup(X,Y,Z) :- read_csv3("/Users/padr/repos/pd451-project/feature-exporter/out/LOOKUP.csv",X,Y,Z).
-reachable(X) :- read_csv1("/Users/padr/repos/pd451-project/feature-exporter/out/REACHABLE.csv",X).
+alloc(X,Y,Z) :- read_csv3("extractedRelationsOutput/ALLOC.csv",X,Y,Z).
+move(X,Y) :- read_csv2("extractedRelationsOutput/MOVE.csv",X,Y).
+load(X,Y,Z) :- read_csv3("extractedRelationsOutput/LOAD.csv",X,Y,Z).
+store(X,Y,Z) :- read_csv3("extractedRelationsOutput/STORE.csv",X,Y,Z).
+vCall(X,Y,Z,W) :- read_csv4("extractedRelationsOutput/VCALL.csv",X,Y,Z,W).
+formalArg(X,Y,Z) :- read_csv3("extractedRelationsOutput/FORMALARG.csv",X,Y,Z).
+actualArg(X,Y,Z) :- read_csv3("extractedRelationsOutput/ACTUALARG.csv",X,Y,Z).
+formalReturn(X,Y) :- read_csv2("extractedRelationsOutput/FORMALRETURN.csv",X,Y).
+actualReturn(X,Y) :- read_csv2("extractedRelationsOutput/ACTUALRETURN.csv",X,Y).
+thisVar(X,Y) :- read_csv2("extractedRelationsOutput/THISVAR.csv",X,Y).
+heapType(X,Y) :- read_csv2("extractedRelationsOutput/HEAPTYPE.csv",X,Y).
+lookup(X,Y,Z) :- read_csv3("extractedRelationsOutput/LOOKUP.csv",X,Y,Z).
+reachable(X) :- read_csv1("extractedRelationsOutput/REACHABLE.csv",X).
 
 pointsTo(Var, Heap) :- varPointsTo(Var, Heap).
 nullPointer(Var) :- pointsTo(Var, Heap), heapType(Heap, "null").

@@ -1,5 +1,5 @@
-move(X,Y) :- csv2("/Users/padr/repos/pd451-project/feature-exporter/out/MOVE.csv",X,Y).
-alloc(X,Y) :- csv2("/Users/padr/repos/pd451-project/feature-exporter/out/ALLOC2.csv",X,Y).
+move(X,Y) :- csv2("extractedRelationsOutput/MOVE.csv",X,Y).
+alloc(X,Y) :- csv2("extractedRelationsOutput/ALLOC2.csv",X,Y).
 
 varPointsTo(VAR, OBJ) :- alloc(VAR, OBJ).
 varPointsTo(TO, OBJ) :- move(TO, FROM),varPointsTo(FROM, OBJ).
