@@ -14,7 +14,7 @@ public class CSV {
     public static Map<String, Boolean> readRankCSV() {
         Map<String, Boolean> ranks = new HashMap<>();
 
-        String csvFile = "out_ranking/inspected_predicates_previous.csv";
+        String csvFile = Props.get("rankingStatisticsOutputFolder") + "/inspected_predicates_previous.csv";
         String line;
         String csvSplitBy = ";";
 
@@ -39,7 +39,7 @@ public class CSV {
     public static Map<String, Double> readRuleProbabilitiesCSV() {
         Map<String, Double> ruleProbs = new HashMap<>();
 
-        String csvFile = "out_learning/rule_probs.csv";
+        String csvFile = Props.get("ruleProbabilityLearningPath") + "/rule_probs.csv";
         String line;
         String csvSplitBy = ";";
 

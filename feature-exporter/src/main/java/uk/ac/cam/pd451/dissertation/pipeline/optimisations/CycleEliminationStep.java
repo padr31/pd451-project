@@ -2,6 +2,7 @@ package uk.ac.cam.pd451.dissertation.pipeline.optimisations;
 
 import uk.ac.cam.pd451.dissertation.datalog.Clause;
 import uk.ac.cam.pd451.dissertation.datalog.Predicate;
+import uk.ac.cam.pd451.dissertation.neo4j.provenance.Neo4jOGMProvenanceConnector;
 import uk.ac.cam.pd451.dissertation.pipeline.Step;
 
 import java.util.*;

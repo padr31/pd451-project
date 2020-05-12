@@ -4,6 +4,7 @@ import org.neo4j.driver.internal.value.ListValue;
 import org.neo4j.driver.v1.*;
 import uk.ac.cam.acr31.features.javac.proto.GraphProtos;
 import uk.ac.cam.pd451.dissertation.neo4j.Neo4jConnector;
+import uk.ac.cam.pd451.dissertation.utils.Props;
 import uk.ac.cam.pd451.dissertation.utils.Timer;
 
 import java.util.*;
@@ -23,15 +24,15 @@ public class Neo4jJavaConnector implements Neo4jConnector<GraphProtos.Graph> {
     private final org.neo4j.driver.v1.Driver driver;
 
     //  Configuration info for connecting to the Neo4J database
-    private static final String SERVER_URI = "bolt://localhost:7687";
+    private static final String SERVER_URI = Props.get("neo4jServerURI");
 
     /**
      * These should be set for running on localhost.
      * Using a credential retrieval system is recommended
      * when running on non-localhost.
      */
-    private static final String SERVER_USERNAME = "neo4j";
-    private static final String SERVER_PASSWORD = "password";
+    private static final String SERVER_USERNAME = Props.get("neo4jServerUsername");
+    private static final String SERVER_PASSWORD = Props.get("neo4jServerPassword");
 
     /**
      * Singleton class Neo4jConnector maintains a connection to the Neo4j server instance running locally.
@@ -56,16 +57,6 @@ public class Neo4jJavaConnector implements Neo4jConnector<GraphProtos.Graph> {
     public void clearDatabase() {
         query("MATCH ()-[r]-() DELETE r");
         query("MATCH (n) DELETE n");
-        /*long deleted = -1;
-        while(deleted != 0) {
-            Iterator<Map<String, Object>> i = query("MATCH (n)\n" +
-                    "OPTIONAL MATCH (n)-[r]-()\n" +
-                    "WITH n,r LIMIT 50000\n" +
-                    "DELETE r\n" +
-                    "DELETE n\n" +
-                    "RETURN count(n) as deletedNodesCount");
-            deleted = (long) i.next().get("deletedNodesCount");
-        }*/
     }
 
     public Iterator<Map<String, Object>> query(String query) {

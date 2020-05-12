@@ -6,7 +6,7 @@ import uk.ac.cam.pd451.dissertation.analysis.AndersenPointsToAnalysisExtractor;
 import uk.ac.cam.pd451.dissertation.analysis.Relation;
 import uk.ac.cam.pd451.dissertation.neo4j.ast.Neo4jJavaConnector;
 import uk.ac.cam.pd451.dissertation.pipeline.Step;
-import uk.ac.cam.pd451.dissertation.utils.Timer;
+import uk.ac.cam.pd451.dissertation.utils.Props;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,7 +30,7 @@ public class ExtractorStep implements Step<String, List<Relation>> {
     public List<Relation> process(String input) throws PipeException {
         List<Relation> result = new ArrayList<>();
 
-        Timer t = new Timer();
+        //Timer t = new Timer();
 
         List<Path> protoFilePaths;
         try (Stream<Path> walk = Files.walk(Paths.get(input))) {
@@ -39,7 +39,7 @@ public class ExtractorStep implements Step<String, List<Relation>> {
             throw new PipeException(e);
         }
         protoFilePaths.forEach(System.out::println);
-        t.printLastTimeSegment("loading file paths");
+        //t.printLastTimeSegment("loading file paths");
 
         ProgressBar pb = new ProgressBar("Feature Extraction", protoFilePaths.size(), ProgressBarStyle.ASCII); // name, initial max
         pb.start();
@@ -50,20 +50,22 @@ public class ExtractorStep implements Step<String, List<Relation>> {
                 System.out.println("Loading graph into Neo4J: " + filePath.toString());
                 System.out.println("Graph size: (nodes)" + graph.getNodeCount());
                 System.out.println("Graph size: (edges)" + graph.getEdgeCount());
-                t.printLastTimeSegment("proto parse");
+                //t.printLastTimeSegment("proto parse");
 
                 Neo4jJavaConnector.getInstance().loadGraph(graph);
-                t.printLastTimeSegment("neo4j graph load");
+                //t.printLastTimeSegment("neo4j graph load");
 
                 AndersenPointsToAnalysisExtractor extractor = new AndersenPointsToAnalysisExtractor();
-                t.printLastTimeSegment("new analysis object creation");
+                //t.printLastTimeSegment("new analysis object creation");
 
                 extractor.extractAnalysis();
-                t.printLastTimeSegment("analysis extraction");
+                //t.printLastTimeSegment("analysis extraction");
 
                 extractor.appendRelations(result);
-                extractor.writeToCSV(new File("./out"));
-                t.printLastTimeSegment("writing to csv");
+
+                String extractedRelationsOutput = Props.get("extractedRelationsOutput");
+                extractor.writeToCSV(new File(extractedRelationsOutput));
+                //t.printLastTimeSegment("writing to csv");
 
             } catch (IOException e) {
                 throw new PipeException(e);

@@ -2,6 +2,7 @@ package uk.ac.cam.pd451.dissertation.pipeline.run;
 
 import uk.ac.cam.pd451.dissertation.datalog.Predicate;
 import uk.ac.cam.pd451.dissertation.datalog.ProvenanceGraph;
+import uk.ac.cam.pd451.dissertation.inference.BayessianGibbsSamplingInference;
 import uk.ac.cam.pd451.dissertation.inference.Event;
 import uk.ac.cam.pd451.dissertation.inference.LoopyPropagationInference;
 import uk.ac.cam.pd451.dissertation.pipeline.Step;
@@ -35,7 +36,7 @@ public class UserInteractionStep implements Step<ProvenanceGraph, RankingStatist
 
         System.out.println("Initialising inference algorithm");
 
-        LoopyPropagationInference i = new LoopyPropagationInference();
+        BayessianGibbsSamplingInference i = new BayessianGibbsSamplingInference();
         i.setModel(g.getBayesianNetwork());
 
         Map<Predicate, Event> evidence = new HashMap<>();

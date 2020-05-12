@@ -3,6 +3,7 @@ package uk.ac.cam.pd451.dissertation.pipeline.run;
 import uk.ac.cam.pd451.dissertation.pipeline.Step;
 import uk.ac.cam.pd451.dissertation.pipeline.io.RankingStatistics;
 import uk.ac.cam.pd451.dissertation.pipeline.io.EmptyIO;
+import uk.ac.cam.pd451.dissertation.utils.Props;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -19,7 +20,8 @@ public class RankingProcessorStep implements Step<RankingStatistics, EmptyIO> {
 
     @Override
     public EmptyIO process(RankingStatistics input) throws PipeException {
-        File dir = new File("out_ranking");
+        String rankingStatisticsOutputFolder = Props.get("rankingStatisticsOutputFolder");
+        File dir = new File(rankingStatisticsOutputFolder);
         if(!dir.exists()) dir.mkdir();
 
         File inspectedPredicatesCSV = new File(dir.getAbsolutePath() + File.separator + "inspected_predicates.csv");

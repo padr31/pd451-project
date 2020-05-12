@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.ac.cam.pd451.dissertation.datalog.*;
 import uk.ac.cam.pd451.dissertation.pipeline.Step;
 import uk.ac.cam.pd451.dissertation.pipeline.io.EmptyIO;
+import uk.ac.cam.pd451.dissertation.utils.Props;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,10 +26,10 @@ public class ProvenanceImportStep implements Step<EmptyIO, List<Clause>> {
             ObjectMapper objectMapper = new ObjectMapper();
 
             try {
-                File file = new File("out_provenance/provenance.json");
-                //file.createNewFile();
+                String provenanceOutputFolder = Props.get("provenanceOutputFolder");
+                File file = new File(provenanceOutputFolder + "/provenance.json");
                 List<GroundClausePOJO> provenance = objectMapper.readValue(file, new TypeReference<List<GroundClausePOJO>>(){});
-                System.out.println(objectMapper.writeValueAsString(provenance));
+                //System.out.println(objectMapper.writeValueAsString(provenance));
 
                 return clausify(provenance);
             } catch (IOException e) {

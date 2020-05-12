@@ -105,7 +105,6 @@ public class LoopyPropagationInference implements InferenceAlgorithm<BayesianNet
             for(BayesianNode nodeZi : nodeX.getParentSet()) {
                 piX = piX.product(piXMessages.get(nodeZi.getVariable()));
             }
-            //TODO put multinomial elimination inside the Factor class
             for(BayesianNode nodeZi : nodeX.getParentSet()) {
                 piX = piX.eliminate(nodeZi.getVariable());
             }

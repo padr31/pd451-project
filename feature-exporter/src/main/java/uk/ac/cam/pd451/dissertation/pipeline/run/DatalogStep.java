@@ -3,6 +3,8 @@ package uk.ac.cam.pd451.dissertation.pipeline.run;
 import uk.ac.cam.pd451.dissertation.analysis.Relation;
 import uk.ac.cam.pd451.dissertation.pipeline.Step;
 import uk.ac.cam.pd451.dissertation.pipeline.io.EmptyIO;
+import uk.ac.cam.pd451.dissertation.utils.Props;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -21,8 +23,15 @@ public class DatalogStep implements Step<List<Relation>, EmptyIO> {
     public EmptyIO process(List<Relation> input) throws PipeException {
         Runtime rt = Runtime.getRuntime();
         try {
-            Process proc = rt.exec(new String[]{"sh","-c","stack exec -- vanillalog run -f ~/repos/pd451-project/analysis/andersen-analysis.datalog --keep-all-predicates --json --provenance > /Users/padr/repos/pd451-project/feature-exporter/out_provenance/provenance.json"},
-                    null, new File("/Users/padr/repos/pd451-project/vanillalog"));
+            String vanillalogPath = Props.get("vanillalogPath");
+            String analysisPath = Props.get("analysisPath");
+            String provenanceOutputFolder = Props.get("provenanceOutputFolder");
+
+            File provenanceFolder = new File(provenanceOutputFolder);
+            if(!provenanceFolder.exists()) provenanceFolder.mkdir();
+
+            Process proc = rt.exec(new String[]{"sh","-c","stack exec -- vanillalog run -f " + analysisPath + " --keep-all-predicates --json --provenance > " + provenanceFolder.getAbsolutePath() + "/provenance.json"},
+                    null, new File(vanillalogPath));
 
             BufferedReader stdInput = new BufferedReader(new
                     InputStreamReader(proc.getInputStream()));

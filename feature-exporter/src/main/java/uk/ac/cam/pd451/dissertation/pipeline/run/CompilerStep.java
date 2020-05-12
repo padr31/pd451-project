@@ -1,6 +1,7 @@
 package uk.ac.cam.pd451.dissertation.pipeline.run;
 
 import uk.ac.cam.pd451.dissertation.pipeline.Step;
+import uk.ac.cam.pd451.dissertation.utils.Props;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,7 +16,8 @@ public class CompilerStep implements Step<CompilerStep.CompilerPipeInput, String
     public String process(CompilerStep.CompilerPipeInput input) throws PipeException {
         Runtime rt = Runtime.getRuntime();
         try {
-            Process proc = rt.exec(new String[]{"sh","-c","javac -cp /Users/padr/repos/features-javac/extractor/target/features-javac-extractor-1.0.0-SNAPSHOT-jar-with-dependencies.jar -Xplugin:FeaturePlugin $(find " + input.inputDirectory.toString() + " -name '*.java') -XDfeaturesOutputDirectory=" + input.outputDirectory.toString()},
+            String featureExtractorJarPath = Props.get("featureExtractorJarPath");
+            Process proc = rt.exec(new String[]{"sh","-c","javac -cp " + featureExtractorJarPath + " -Xplugin:FeaturePlugin $(find " + input.inputDirectory.toString() + " -name '*.java') -XDfeaturesOutputDirectory=" + input.inputDirectory.toString()},
                     null, null);
 
             BufferedReader stdInput = new BufferedReader(new
@@ -31,7 +33,7 @@ public class CompilerStep implements Step<CompilerStep.CompilerPipeInput, String
                 System.out.println(s);
             }
 
-// Read any errors from the attempted command
+            // Read any errors from the attempted command
             System.out.println("Here is the standard error of the command (if any):\n");
             while ((s = stdError.readLine()) != null) {
                 System.out.println(s);

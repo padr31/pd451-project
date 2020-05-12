@@ -8,6 +8,7 @@ import org.neo4j.ogm.transaction.Transaction;
 import uk.ac.cam.pd451.dissertation.datalog.Clause;
 import uk.ac.cam.pd451.dissertation.datalog.Predicate;
 import uk.ac.cam.pd451.dissertation.neo4j.Neo4jConnector;
+import uk.ac.cam.pd451.dissertation.utils.Props;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,9 +26,9 @@ public class Neo4jOGMProvenanceConnector implements Neo4jConnector<List<Clause>>
     private final SessionFactory sessionFactory;
 
     //  Configuration info for connecting to the Neo4J database
-    private static final String SERVER_URI = "bolt://localhost:7687";
-    private static final String SERVER_USERNAME = "neo4j";
-    private static final String SERVER_PASSWORD = "password";
+    private static final String SERVER_URI = Props.get("neo4jServerURI");
+    private static final String SERVER_USERNAME = Props.get("neo4jServerUsername");
+    private static final String SERVER_PASSWORD = Props.get("neo4jServerPassword");
 
     /**
      * Singleton class Neo4jConnector maintains a connection to the Neo4j server instance running locally.

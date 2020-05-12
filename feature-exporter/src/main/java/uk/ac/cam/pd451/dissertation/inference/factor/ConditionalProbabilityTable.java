@@ -22,7 +22,6 @@ public class ConditionalProbabilityTable extends Factor {
     public Map<Assignment, Double> function;
 
     public ConditionalProbabilityTable(List<Variable> variables, Map<Assignment, Double> function) {
-        // TODO make sure that variables reflects the actual variables contained in assignments, variables is redundant
         this.variables = variables;
         this.function = function;
     }

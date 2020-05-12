@@ -2,6 +2,8 @@ package uk.ac.cam.pd451.dissertation;
 
 import java.io.IOException;
 import org.apache.commons.cli.*;
+import uk.ac.cam.pd451.dissertation.datalog.Clause;
+import uk.ac.cam.pd451.dissertation.datalog.Predicate;
 import uk.ac.cam.pd451.dissertation.pipeline.Pipeline;
 import uk.ac.cam.pd451.dissertation.pipeline.learning.NetworkLearningStep;
 import uk.ac.cam.pd451.dissertation.pipeline.optimisations.FullNarrowingStep;
@@ -27,14 +29,14 @@ public class RunPipeline {
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(option, args);
 
-        String pipe = "extract";
+        String pipe = "import";
 
         Pipeline pipeline;
         Pipeline optimisationsPipeline = new Pipeline(
                 new CycleEliminationStep())
-                .addStep(new ProvenancePruningStep());
-                //.addStep(new SingularChainCompressionStep())
-                //.addStep(new FullNarrowingStep());
+                .addStep(new ProvenancePruningStep())
+                .addStep(new SingularChainCompressionStep())
+                .addStep(new FullNarrowingStep());
 
         Timer t = new Timer();
         switch (pipe) {
@@ -42,7 +44,7 @@ public class RunPipeline {
                 pipeline = new Pipeline<>(
                         new CompilerStep()
                 );
-                pipeline.process(new CompilerStep.CompilerPipeInput(cmd.getOptionValue("input-file"),cmd.getOptionValue("input-file") + "/target"));
+                pipeline.process(new CompilerStep.CompilerPipeInput(cmd.getOptionValue("input-file"),cmd.getOptionValue("output-file") + "/target"));
                 break;
             case "extract":
                 pipeline = new Pipeline<>(

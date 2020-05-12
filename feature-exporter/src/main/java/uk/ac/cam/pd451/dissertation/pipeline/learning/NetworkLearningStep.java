@@ -14,6 +14,7 @@ import uk.ac.cam.pd451.dissertation.graph.bn.BayesianNetwork;
 import uk.ac.cam.pd451.dissertation.graph.bn.BayesianNode;
 import uk.ac.cam.pd451.dissertation.inference.factor.ConditionalProbabilityTable;
 import uk.ac.cam.pd451.dissertation.inference.variable.Variable;
+import uk.ac.cam.pd451.dissertation.utils.Props;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -72,7 +73,8 @@ public class NetworkLearningStep implements Step<List<Clause>, ProvenanceGraph> 
         }
 
         //write out
-        File dir = new File("out_learning");
+        String ruleProbabilityLearningPath = Props.get("ruleProbabilityLearningPath");
+        File dir = new File(ruleProbabilityLearningPath);
         if(!dir.exists()) dir.mkdir();
 
         File inspectedPredicatesCSV = new File(dir.getAbsolutePath() + File.separator + "rule_probs.csv");

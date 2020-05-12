@@ -7,6 +7,7 @@ import org.neo4j.ogm.session.SessionFactory;
 import org.neo4j.ogm.transaction.Transaction;
 import uk.ac.cam.acr31.features.javac.proto.GraphProtos;
 import uk.ac.cam.pd451.dissertation.neo4j.Neo4jConnector;
+import uk.ac.cam.pd451.dissertation.utils.Props;
 import uk.ac.cam.pd451.dissertation.utils.Timer;
 
 import java.util.*;
@@ -28,9 +29,9 @@ public class Neo4jOGMConnector implements Neo4jConnector<GraphProtos.Graph> {
     private final SessionFactory sessionFactory;
 
     //  Configuration info for connecting to the Neo4J database
-    private static final String SERVER_URI = "bolt://localhost:7687";
-    private static final String SERVER_USERNAME = "neo4j";
-    private static final String SERVER_PASSWORD = "password";
+    private static final String SERVER_URI = Props.get("neo4jServerURI");
+    private static final String SERVER_USERNAME = Props.get("neo4jServerUsername");
+    private static final String SERVER_PASSWORD = Props.get("neo4jServerPassword");
 
     /**
      * Singleton class Neo4jConnector maintains a connection to the Neo4j server instance running locally.
@@ -38,7 +39,7 @@ public class Neo4jOGMConnector implements Neo4jConnector<GraphProtos.Graph> {
      */
     private Neo4jOGMConnector() {
         Configuration configuration = new Configuration.Builder().uri(SERVER_URI).credentials(SERVER_USERNAME, SERVER_PASSWORD).build();
-        sessionFactory = new SessionFactory(configuration, "uk.ac.cam.pd451.feature.exporter.neo4j.ast");
+        sessionFactory = new SessionFactory(configuration, "uk.ac.cam.pd451.dissertation.neo4j.ast");
     }
 
     public static Neo4jOGMConnector getInstance() {

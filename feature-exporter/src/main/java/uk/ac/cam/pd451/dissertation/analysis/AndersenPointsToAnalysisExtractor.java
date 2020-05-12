@@ -17,7 +17,7 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
     @Override
     public List<Relation> extractAnalysis() {
         List<Relation> extractedRelations = new ArrayList<>();
-        Timer t = new Timer();
+        //Timer t = new Timer();
 
         extractedRelations.add(((RelationExtractor) () -> {
             Relation alloc = new Relation("ALLOC", 3);
@@ -76,29 +76,7 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
 
             return alloc;
         }).extractRelation());
-        t.printLastTimeSegment("TIMER 3 - ALLOC");
-
-        /*
-        extractedRelations.add(((RelationExtractor) () -> {
-            Relation init = new Relation("INIT", 1);
-
-            Iterator<Map<String, Object>> result = neo4JConnector.query(
-                    "match (variable) --> (type)\n" +
-                            "match (variable) --> (name2) --> (var) <-- (decl_var)\n" +
-                            "match (variable) --> (semi)\n" +
-                            "match (typename) --> (var) --> (semi)\n" +
-                            "where variable.contents=\"VARIABLE\" and type.contents=\"TYPE\" and name2.contents=\"NAME\" and var.type=\"IDENTIFIER_TOKEN\" and decl_var.type=\"SYMBOL_VAR\" and semi.contents=\"SEMI\"\n" +
-                            "return variable.startLineNumber, min(decl_var.contents) as var");
-
-            result.forEachRemaining(resultEntry -> {
-                init.addEntry(new RelationEntry((String) resultEntry.get("var"))
-                );
-            });
-
-            return init;
-        }).extractRelation());
-        t.printLastTimeSegment("TIMER 3 - INIT");
-         */
+        //t.printLastTimeSegment("TIMER 3 - ALLOC");
 
         extractedRelations.add(((RelationExtractor) () -> {
             Relation move = new Relation("MOVE", 2);
@@ -112,7 +90,7 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
             });
             return move;
         }).extractRelation());
-        t.printLastTimeSegment("TIMER 3 - MOVE");
+        //t.printLastTimeSegment("TIMER 3 - MOVE");
 
         extractedRelations.add(((RelationExtractor) () -> {
             Relation heaptype = new Relation("HEAPTYPE", 2);
@@ -147,7 +125,7 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
 
             return heaptype;
         }).extractRelation());
-        t.printLastTimeSegment("TIMER 3 - HEAPTYPE");
+        //t.printLastTimeSegment("TIMER 3 - HEAPTYPE");
 
         extractedRelations.add(((RelationExtractor) () -> {
             Relation load = new Relation("LOAD", 3);
@@ -164,7 +142,7 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
 
             return load;
         }).extractRelation());
-        t.printLastTimeSegment("TIMER 3 - LOAD");
+        //t.printLastTimeSegment("TIMER 3 - LOAD");
 
         extractedRelations.add(((RelationExtractor) () -> {
             Relation store = new Relation("STORE", 3);
@@ -178,7 +156,7 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
             });
             return store;
         }).extractRelation());
-        t.printLastTimeSegment("TIMER 3 - STORE");
+        //t.printLastTimeSegment("TIMER 3 - STORE");
 
         extractedRelations.add(((RelationExtractor) () -> {
             Relation formalArg = new Relation("FORMALARG", 3);
@@ -197,7 +175,7 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
             });
             return formalArg;
         }).extractRelation());
-        t.printLastTimeSegment("TIMER 3 - FORMALARG");
+        //t.printLastTimeSegment("TIMER 3 - FORMALARG");
 
         extractedRelations.add(((RelationExtractor) () -> {
             Relation actualArg = new Relation("ACTUALARG", 3);
@@ -217,7 +195,7 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
             });
             return actualArg;
         }).extractRelation());
-        t.printLastTimeSegment("TIMER 3 - ACTUALARG");
+        //t.printLastTimeSegment("TIMER 3 - ACTUALARG");
 
         extractedRelations.add(((RelationExtractor) () -> {
             Relation formalReturn = new Relation("FORMALRETURN", 2);
@@ -244,14 +222,10 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
             });
             return formalReturn;
         }).extractRelation());
-        t.printLastTimeSegment("TIMER 3 - FORMALRETURN");
+        //t.printLastTimeSegment("TIMER 3 - FORMALRETURN");
 
         extractedRelations.add(((RelationExtractor) () -> {
             Relation actualReturn = new Relation("ACTUALRETURN", 2);
-            /*Iterator<Map<String, Object>> result = neo4JConnector.query("match (assign) --> (var) --> (identifier) --> (name1) --> (var_name) <-- (decl_var)\n" +
-                    "match (assign) --> (exp) --> (invoc)\n" +
-                    "where assign.contents=\"ASSIGNMENT\" and var.contents=\"VARIABLE\" and identifier.contents=\"IDENTIFIER\" and name1.contents=\"NAME\" and decl_var.type=\"SYMBOL_VAR\"  and exp.contents=\"EXPRESSION\" and invoc.contents=\"METHOD_INVOCATION\"\n" +
-                    "return assign.startLineNumber, decl_var.contents");*/
             Iterator<Map<String, Object>> result = neo4JConnector.query("match (var) <-- (assign) --> (exp) --> (invoc)\n" +
                     "match (var_name) <-- (decl_var)\n" +
                     "where assign.contents=\"ASSIGNMENT\" and var.contents=\"VARIABLE\" and decl_var.type=\"SYMBOL_VAR\" and exp.contents=\"EXPRESSION\" and invoc.contents=\"METHOD_INVOCATION\" and var.startLineNumber = var_name.startLineNumber\n" +
@@ -262,7 +236,7 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
             });
             return actualReturn;
         }).extractRelation());
-        t.printLastTimeSegment("TIMER 3 - ACTUALRETURN");
+        //t.printLastTimeSegment("TIMER 3 - ACTUALRETURN");
 
         extractedRelations.add(((RelationExtractor) () -> {
             Relation thisVar = new Relation("THISVAR", 2);
@@ -274,7 +248,7 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
             });
             return thisVar;
         }).extractRelation());
-        t.printLastTimeSegment("TIMER 3 - THISVAR");
+        //t.printLastTimeSegment("TIMER 3 - THISVAR");
 
         extractedRelations.add(((RelationExtractor) () -> {
             Relation lookup = new Relation("LOOKUP", 3);
@@ -288,7 +262,7 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
             });
             return lookup;
         }).extractRelation());
-        t.printLastTimeSegment("TIMER 3 - LOOKUP");
+        //t.printLastTimeSegment("TIMER 3 - LOOKUP");
 
         extractedRelations.add(((RelationExtractor) () -> {
             Relation vcall = new Relation("VCALL", 4);
@@ -311,7 +285,7 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
             });
             return vcall;
         }).extractRelation());
-        t.printLastTimeSegment("TIMER 3 - VCALL");
+        //t.printLastTimeSegment("TIMER 3 - VCALL");
 
         extractedRelations.add(((RelationExtractor) () -> {
             Relation reachable = new Relation("REACHABLE", 1);
@@ -324,7 +298,7 @@ public class AndersenPointsToAnalysisExtractor extends AnalysisExtractor {
             });
             return reachable;
         }).extractRelation());
-        t.printLastTimeSegment("TIMER 3 - REACHABLE");
+        //t.printLastTimeSegment("TIMER 3 - REACHABLE");
 
         this.relations = extractedRelations;
         return extractedRelations;
